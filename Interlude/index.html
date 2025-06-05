@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omikuji</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap" rel="stylesheet">
+  <script src="videoMapping.js"></script>
+  <script src="mindfulnessPrompts.js"></script>
+  <script src="script.js"></script>
+  
+</head>
+
+
+<body>
+
+<canvas id="sakura-canvas"></canvas>
+
+  <div class="center-container">
+  <h1 id="text">Schüttele den Blossom-Tree</h1>
+
+  <div id="question-container" class="hidden">
+    <h2 id="question-text">Wie fühlst du dich gerade?</h2>
+    <div id="button-group" class="button-group">
+      <button>überfordert</button>
+      <button>nachdenklich</button>
+      <button>neugierig</button>
+      <button>leer</button>
+      <button>leicht</button>
+      <button>ruhig</button>
+    </div>
+  </div>
+
+  <!-- Anzeige gespeicherter Auswahl unten links -->
+  <div id="user-choice" class="user-choice hidden"></div>
+</div>
+
+</body>
+</html>
