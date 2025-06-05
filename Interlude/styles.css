@@ -1,0 +1,329 @@
+#sakura-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -3; /* Canvas ganz hinten */
+}
+
+#blossom-tree {
+  position: fixed;
+  bottom: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 110vh;
+  z-index: -2; /* <- weiter nach hinten als Canvas */
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+  pointer-events: none;
+  animation: sway 5s ease-in-out infinite;
+}
+
+/* Wackelanimation im Wind */
+@keyframes sway {
+  0% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(1deg); }
+  100% { transform: translateX(-50%) rotate(-2deg); }
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  height: 100vh;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 1.5s ease;
+}
+
+
+
+
+#text {
+  position: fixed;
+  top: 8%; /* Abstand vom oberen Rand */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 4rem;
+  white-space: nowrap;
+  z-index: -3;
+}
+
+
+
+h1 {
+  font-size: 5rem;
+  color: #AD2637;
+  font-weight: bold;
+  text-align: center;
+  font-family: "DynaPuff", system-ui;
+  text-shadow:
+    2px 2px 0 #AD2637,
+    4px 4px 10px rgba(0, 0, 0, 0.4); /* 3D-Effekt */
+  letter-spacing: 0.1em;
+  background: radial-gradient(circle at 30% 30%, #ff9aa2, #ff6b81);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: floaty 3s ease-in-out infinite;
+}
+
+@keyframes floaty {
+  0%   { transform: translateX(-50%) translateY(0); }
+  50%  { transform: translateX(-50%) translateY(-10px); }
+  100% { transform: translateX(-50%) translateY(0); }
+}
+
+.hidden {
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+#question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+  color: white;
+  text-align: center;
+}
+
+#question-container.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.button-group {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.button-group button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: none;
+  background-color: #666;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-group button:hover {
+  background-color: #555;
+}
+
+.user-choice {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: rgba(0,0,0,0.6);
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: opacity 0.5s ease;
+}
+
+.user-choice.hidden {
+  opacity: 0;
+}
+
+.user-choice.show {
+  opacity: 1;
+}
+
+.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+.final-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  color: white;
+  opacity: 0; /* Start mit 0 */
+  transition: opacity 1s ease;
+  z-index: 10;
+}
+
+.final-message.fade-out {
+  opacity: 0;
+}
+
+.fullscreen-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.fullscreen-video.show {
+  opacity: 1;
+}
+
+
+.mindfulness-prompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5em;
+  color: white;
+  opacity: 0;
+  transition: opacity 1s ease;
+  z-index: 20;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.mindfulness-prompt.fade-in {
+  opacity: 1;
+}
+
+.mindfulness-prompt.fade-out {
+  opacity: 0;
+}
+
+.centered-gif {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 30vw; /* 40% der Bildschirmbreite */
+  max-height: 30vh; /* 40% der Bildschirmhöhe */
+  z-index: 1000;
+}
+
+
+.user-input {
+  display: block;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-size: 1.2rem;
+  width: 60%;
+  border: 2px solid #aaa;
+  border-radius: 10px;
+  box-shadow: 0 0 10px #ccc;
+}
+
+.prompt-list {
+  margin: 2rem auto;
+  padding: 1rem;
+  width: 70%;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 0 5px #bbb;
+}
+
+.prompt-list p {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.input-container.fade-in {
+  opacity: 1;
+}
+
+.input-question {
+  font-size: 1.4em;
+  color: #ffffff;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.user-input {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+
+.reminder-text {
+  opacity: 0;
+  font-size: 1.4em;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 40px;
+  transition: opacity 1.5s ease;
+  font-family: 'Georgia', serif;
+  padding: 0 20px;
+}
+
+.reminder-text.fade-in {
+  opacity: 1;
+}
+
+.reminder-text.fade-out {
+  opacity: 0;
+}
+
+
+
+
+.prompt-list h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  color: #000; /* oder deine gewünschte Farbe */
+  text-align: center;
+}
+
+
+.finish-button {
+  display: block;
+  margin: 40px auto 0 auto;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.finish-button:hover {
+  background-color: #666;
+}
+
+
+
