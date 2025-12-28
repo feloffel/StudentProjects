@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>studyabroadfriends - Friends first, flight later.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+     <link rel="stylesheet" href="styles.css">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.1/mapbox-gl.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-line1">
+                <span class="study">study</span><span class="abroad">abroad</span><span class="friends">friends</span>
+            </div>
+            <div class="tagline">Friends first, flight later.</div>
+        </div>
+        <div class="header-buttons" id="headerButtons">
+            <button class="header-btn primary" onclick="scrollToForm(event)">Check-In</button>
+            <a href="https://instagram.com/studyabroadfriends" target="_blank" class="header-btn secondary">Instagram</a>
+        </div>
+    </header>
+
+    <div id="map"></div>
+
+    <!-- Aero the Assistant -->
+    <div class="aero-container" id="aeroContainer">
+        <div class="aero-speech-bubble" id="aeroSpeechBubble">
+            <div class="speech-content" id="speechContent">Hi! I'm Aero, your study abroad assistant! 👋</div>
+            <button class="speech-close" onclick="hideAeroTip()">×</button>
+        </div>
+        <img src="images/Aero.png" alt="Aero" class="aero-image" id="aeroImage">
+    </div>
+
+    <div class="hero-section" id="heroSection">
+        <h1 class="hero-title">
+            <span class="study">Find Fellow Students,</span><br>
+            <span class="friends">Before Your Semester Abroad Begins.</span>
+        </h1>
+        <p class="hero-subtitle">
+            Connect with students worldwide. Share your excitement, plan together, and make friends before you go abroad.
+        </p>
+        <div class="cta-buttons">
+            <button class="btn-primary" onclick="scrollToForm(event)">Check-In</button>
+            <a href="https://instagram.com/studyabroadfriends" target="_blank" class="btn-secondary">Open Instagram</a>
+        </div>
+        <div class="code-entry-section">
+            <p class="code-label">Have an access code?</p>
+            <div class="code-input-group">
+                <input type="text" id="accessCodeInput" class="code-input" placeholder="Enter Code" maxlength="8" style="text-transform: uppercase;">
+                <button class="btn-code" onclick="enterAccessCode()">Access Map</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="pass-overlay" id="passOverlay" onclick="closeSidebar()"></div>
+
+    <div class="boarding-pass-wrapper" id="sidebarWrapper">
+        <div class="pass-controls">
+            <button class="pass-close-top" onclick="closeSidebar()">×</button>
+            <button class="btn-download-top" onclick="downloadBoardingPass()">📥 Download</button>
+        </div>
+        <div class="boarding-pass-container" id="sidebar">
+            <div class="boarding-pass" id="sidebarContent"></div>
+        </div>
+    </div>
+
+    <div class="form-overlay" id="formOverlay" onclick="closeForm()"></div>
+
+    <div class="form-container" id="formContainer">
+        <div class="form-header">
+            <button class="form-close" onclick="closeForm()">×</button>
+            <h2>Create Your Factsheet</h2>
+            <p>Share your study abroad journey with others!</p>
+        </div>
+        <div class="form-body">
+            <form id="factsheetForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label">Your Profile Picture</label>
+                    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                        <div id="uploadPlaceholder">
+                            <div class="upload-icon">📸</div>
+                            <div class="upload-text">Click to upload your photo</div>
+                        </div>
+                        <img id="imagePreview" class="preview-image" style="display: none;">
+                    </div>
+                    <input type="file" id="imageInput" class="hidden-input" accept="image/*" onchange="handleImageUpload(event)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" class="form-input" name="name" required placeholder="e.g., Maria">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Origin City</label>
+                        <input type="text" class="form-input" name="originCity" required placeholder="e.g., Berlin">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Origin Country</label>
+                        <input type="text" class="form-input" name="originCountry" required placeholder="e.g., Germany">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Study Abroad Destination</label>
+                    <div class="location-selector">
+                        <input 
+                            type="text" 
+                            class="location-search" 
+                            id="locationSearch" 
+                            placeholder="Search for your destination city (e.g., Rome, Italy)"
+                            autocomplete="off"
+                        >
+                        <div class="search-results" id="searchResults"></div>
+                        <div id="selectedLocation" class="selected-location" style="display: none;"></div>
+                    </div>
+                    <input type="hidden" name="destCity" id="destCity">
+                    <input type="hidden" name="destCountry" id="destCountry">
+                    <input type="hidden" name="destLat" id="destLat">
+                    <input type="hidden" name="destLng" id="destLng">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">University</label>
+                    <input type="text" class="form-input" name="university" required placeholder="e.g., Sapienza University of Rome">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Major</label>
+                        <input type="text" class="form-input" name="major" required placeholder="e.g., Architecture">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Semester</label>
+                        <input type="text" class="form-input" name="semester" required placeholder="e.g., SS 25">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Languages</label>
+                    <input type="text" class="form-input" name="languages" required placeholder="e.g., English, Italian, German">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Instagram Username</label>
+                    <input type="text" class="form-input" name="instagram" required placeholder="e.g., maria_rome">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Looking For</label>
+                    <input type="text" class="form-input" name="lookingFor" required placeholder="e.g., Roommate & Travel Buddies">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">About You</label>
+                    <textarea class="form-textarea" name="about" required placeholder="Tell us a bit about yourself and what you're excited about..."></textarea>
+                </div>
+
+                <button type="submit" class="form-submit">🎉 Add Me to the Map!</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stat-item">
+            <div class="stat-number" id="student-count">127</div>
+            <div class="stat-label">Students</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="country-count">34</div>
+            <div class="stat-label">Countries</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="connection-count">289</div>
+            <div class="stat-label">Connections</div>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
