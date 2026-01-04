@@ -2,8 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>studyabroadfriends - Friends first, flight later.</title>
+    <title>studyabroadfriends – Radar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 
      <link rel="stylesheet" href="styles.css">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.1/mapbox-gl.css" rel="stylesheet">
@@ -15,12 +16,51 @@
 <body>
     <header class="header">
         <div class="logo-container">
-            <div class="logo-line1">
-                <span class="study">study</span><span class="abroad">abroad</span><span class="friends">friends</span>
-            </div>
-            <div class="tagline">Friends first, flight later.</div>
+            <img src="images/Hauptlogo.png" alt="studyabroad friends" class="logo-image">
         </div>
         <div class="header-buttons" id="headerButtons">
+            <!-- Search Bar -->
+            <div class="header-search-container" id="searchPanel">
+                <input 
+                    type="text" 
+                    class="header-search-input" 
+                    id="mapSearchInput" 
+                    placeholder="Search for a city or place..."
+                    autocomplete="off"
+                >
+                <button class="header-search-btn" onclick="performMapSearch()">🔍</button>
+                <div class="search-results-map" id="mapSearchResults"></div>
+            </div>
+            
+            <!-- Filter Button -->
+            <div class="header-filter-container" id="filterPanel">
+                <button class="header-filter-toggle" id="filterToggle" onclick="toggleFilterPanel()">Filter</button>
+                <div class="filter-content" id="filterContent">
+                    <div class="filter-header">
+                        <h3>Filter Radar</h3>
+                        <button class="filter-close" onclick="toggleFilterPanel()">×</button>
+                    </div>
+                    <div class="filter-options">
+                        <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">
+                            <span class="filter-icon">🌍</span>
+                            <span>All Students</span>
+                        </button>
+                        <button class="filter-btn" data-filter="abroad" onclick="applyFilter('abroad')">
+                            <span class="filter-icon">✈️</span>
+                            <span>Currently Abroad</span>
+                        </button>
+                        <button class="filter-btn" data-filter="upcoming" onclick="applyFilter('upcoming')">
+                            <span class="filter-icon">📅</span>
+                            <span>About to Go</span>
+                        </button>
+                        <button class="filter-btn" data-filter="attendant" onclick="applyFilter('attendant')">
+                            <span class="filter-icon">👨‍✈️</span>
+                            <span>Flight Attendants</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <button class="header-btn primary" onclick="scrollToForm(event)">Check-In</button>
             <a href="https://instagram.com/studyabroadfriends" target="_blank" class="header-btn secondary">Instagram</a>
         </div>
@@ -132,14 +172,19 @@
                     <input type="text" class="form-input" name="university" required placeholder="e.g., Sapienza University of Rome">
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">Major</label>
+                    <input type="text" class="form-input" name="major" required placeholder="e.g., Architecture">
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Major</label>
-                        <input type="text" class="form-input" name="major" required placeholder="e.g., Architecture">
+                        <label class="form-label">Study Abroad Start Date</label>
+                        <input type="date" class="form-input" name="startDate" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Semester</label>
-                        <input type="text" class="form-input" name="semester" required placeholder="e.g., SS 25">
+                        <label class="form-label">Study Abroad End Date</label>
+                        <input type="date" class="form-input" name="endDate" required>
                     </div>
                 </div>
 

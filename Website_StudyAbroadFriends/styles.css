@@ -70,8 +70,6 @@
 
         .aero-speech-bubble {
             position: absolute;
-            bottom: 100px;
-            right: 0;
             background: white;
             padding: 15px 20px;
             border-radius: 20px;
@@ -82,7 +80,17 @@
             transform: translateY(10px) scale(0.9);
             transition: all 0.3s ease;
             pointer-events: all;
+            right: 0;
+        }
+
+        .aero-speech-bubble.above {
+            bottom: 100px;
             margin-bottom: 10px;
+        }
+
+        .aero-speech-bubble.below {
+            top: 100px;
+            margin-top: 10px;
         }
 
         .aero-speech-bubble.show {
@@ -90,7 +98,7 @@
             transform: translateY(0) scale(1);
         }
 
-        .aero-speech-bubble::after {
+        .aero-speech-bubble.above::after {
             content: '';
             position: absolute;
             bottom: -10px;
@@ -100,6 +108,18 @@
             border-left: 12px solid transparent;
             border-right: 12px solid transparent;
             border-top: 12px solid white;
+        }
+
+        .aero-speech-bubble.below::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 30px;
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 12px solid white;
         }
 
         .speech-content {
@@ -209,6 +229,7 @@
         .header-buttons {
             display: flex;
             gap: 15px;
+            align-items: center;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s ease;
@@ -217,6 +238,75 @@
         .header-buttons.visible {
             opacity: 1;
             pointer-events: all;
+        }
+
+        .header-search-container {
+            position: relative;
+            display: none;
+        }
+
+        .header-search-input {
+            padding: 10px 45px 10px 16px;
+            border: 2px solid #609c9b;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            width: 250px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .header-search-input:focus {
+            outline: none;
+            border-color: #DB7E70;
+            box-shadow: 0 2px 8px rgba(96, 156, 155, 0.2);
+            width: 280px;
+        }
+
+        .header-search-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #609c9b 0%, #5a8e8d 100%);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .header-search-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .header-filter-container {
+            position: relative;
+            display: none;
+        }
+
+        .header-filter-toggle {
+            background: linear-gradient(135deg, #609c9b 0%, #5a8e8d 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(96, 156, 155, 0.3);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .header-filter-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(96, 156, 155, 0.4);
         }
 
         .header-btn {
@@ -255,8 +345,13 @@
 
         .logo-container {
             display: flex;
-            flex-direction: column;
-            gap: 2px;
+            align-items: center;
+        }
+
+        .logo-image {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
         }
 
         .logo-line1 {
@@ -470,6 +565,170 @@
             margin-top: 5px;
         }
 
+
+        .search-results-map {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: rgba(253, 252, 232, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(219, 126, 112, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .search-results-map.show {
+            display: block;
+        }
+
+        .search-result-map-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            transition: background 0.2s;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .search-result-map-item:hover {
+            background: rgba(96, 156, 155, 0.1);
+        }
+
+        .search-result-map-item:last-child {
+            border-bottom: none;
+        }
+
+        .filter-panel {
+            position: fixed;
+            top: 110px;
+            right: 40px;
+            z-index: 200;
+            display: none;
+        }
+
+        .filter-toggle {
+            background: linear-gradient(135deg, #609c9b 0%, #5a8e8d 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(96, 156, 155, 0.4);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .filter-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(96, 156, 155, 0.6);
+        }
+
+        .filter-content {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: rgba(253, 252, 232, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            min-width: 250px;
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(219, 126, 112, 0.2);
+            z-index: 1000;
+        }
+
+        .filter-content.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(219, 126, 112, 0.2);
+        }
+
+        .filter-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .filter-close {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .filter-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            text-align: left;
+        }
+
+        .filter-btn:hover {
+            border-color: #609c9b;
+            background: #f0f8f7;
+            transform: translateX(5px);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #609c9b 0%, #5a8e8d 100%);
+            color: white;
+            border-color: #609c9b;
+        }
+
+        .filter-icon {
+            font-size: 20px;
+        }
+
         .pass-overlay {
             position: fixed;
             top: 0;
@@ -643,14 +902,41 @@
             text-align: center;
         }
 
+        .barcode-container {
+            position: relative;
+            width: 100%;
+            margin: 10px auto 20px auto;
+        }
+
         .barcode-canvas {
             width: 100%;
             max-width: 100%;
             height: 50px;
-            margin: 10px auto 20px auto;
             display: block;
+            margin: 0 auto;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+        }
+
+        .tag-section {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed #609c9b;
+            border-radius: 6px;
+            padding: 6px 12px;
+            max-width: 160px;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+        }
+
+        .tag-text {
+            font-size: 9px;
+            font-weight: 600;
+            color: #609c9b;
+            line-height: 1.2;
+            text-align: center;
         }
 
         .btn-connect {
@@ -946,12 +1232,8 @@
                 padding: 0 20px;
             }
             
-            .logo-line1 {
-                font-size: 24px;
-            }
-            
-            .tagline {
-                font-size: 12px;
+            .logo-image {
+                height: 45px;
             }
 
             .aero-container {
@@ -973,5 +1255,34 @@
 
             .speech-content {
                 font-size: 12px;
+            }
+
+            .header-buttons {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .header-search-container {
+                order: -1;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .header-search-input {
+                width: 100%;
+            }
+
+            .header-search-input:focus {
+                width: 100%;
+            }
+
+            .filter-content {
+                min-width: 220px;
+                padding: 15px;
+            }
+
+            .filter-btn {
+                padding: 10px 12px;
+                font-size: 13px;
             }
         }
