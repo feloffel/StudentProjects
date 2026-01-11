@@ -1,6 +1,5 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViOThhZG93NSJ9.GC6nZB6eVgkZkxqAqsHipQ';
 
-        // Aero the Assistant
         const aeroTips = {
             welcome: "Hi! I'm Aero, your study abroad assistant! 👋 Click on me anytime for tips!",
             hero: "Welcome! Create your factsheet to connect with students worldwide. Click 'Check-In' to get started! ✈️",
@@ -17,46 +16,37 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
         let tipTimeout = null;
         let positionMonitorInterval = null;
 
-        // Update speech bubble position based on Aero's current position
         function updateSpeechBubblePosition() {
             const speechBubble = document.getElementById('aeroSpeechBubble');
             const aeroContainer = document.getElementById('aeroContainer');
             
-            // Only update if speech bubble is currently showing
             if (!speechBubble.classList.contains('show')) {
                 return;
             }
             
-            // Check Aero's position relative to viewport
             const aeroRect = aeroContainer.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
             const aeroCenterY = aeroRect.top + (aeroRect.height / 2);
             
-            // If Aero is in the upper half of the viewport, position bubble below
             if (aeroCenterY < viewportHeight / 2) {
                 speechBubble.classList.add('below');
                 speechBubble.classList.remove('above');
             } else {
-                // Aero is in lower half, position bubble above (default)
                 speechBubble.classList.add('above');
                 speechBubble.classList.remove('below');
             }
         }
 
-        // Start monitoring Aero's position in real-time
         function startPositionMonitoring() {
-            // Clear any existing interval
             if (positionMonitorInterval) {
                 clearInterval(positionMonitorInterval);
             }
             
-            // Monitor position every 50ms for smooth updates
             positionMonitorInterval = setInterval(() => {
                 updateSpeechBubblePosition();
             }, 50);
         }
 
-        // Stop monitoring Aero's position
         function stopPositionMonitoring() {
             if (positionMonitorInterval) {
                 clearInterval(positionMonitorInterval);
@@ -71,10 +61,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             if (aeroTips[tipKey]) {
                 speechContent.textContent = aeroTips[tipKey];
                 
-                // Update position based on Aero's current location
                 updateSpeechBubblePosition();
                 
-                // Start monitoring position in real-time
                 startPositionMonitoring();
                 
                 speechBubble.classList.add('show');
@@ -94,7 +82,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             speechBubble.classList.remove('show');
             currentTip = null;
             
-            // Stop monitoring position when tip is hidden
             stopPositionMonitoring();
             
             if (tipTimeout) {
@@ -106,11 +93,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
         function moveAeroToPosition(x, y) {
             const aeroContainer = document.getElementById('aeroContainer');
             
-            // Move Aero to new position
             aeroContainer.style.right = `${x}px`;
             aeroContainer.style.bottom = `${y}px`;
             
-            // Position will be updated in real-time by the monitoring interval if speech bubble is showing
         }
 
         function flyAeroToElement(elementId, offsetX = 0, offsetY = 0) {
@@ -129,7 +114,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             if (!element) return;
             
             const rect = element.getBoundingClientRect();
-            // Position to the left of the element: calculate from left edge, add offset, then convert to right-based positioning
             const x = window.innerWidth - rect.left + offsetX;
             const y = window.innerHeight - rect.bottom - offsetY;
             
@@ -141,16 +125,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             if (!element) return;
             
             const rect = element.getBoundingClientRect();
-            // Position to the left and at the bottom of the element
-            // x: to the left of the element's left edge (positive offsetX moves further left)
             const x = window.innerWidth - rect.left + offsetX;
-            // y: at the bottom of the element (positive offsetY moves down from bottom)
             const y = window.innerHeight - rect.bottom + offsetY;
             
             moveAeroToPosition(x, y);
         }
 
-        // Make Aero clickable to show tips (set up on window load)
         function setupAeroClick() {
             const aeroImage = document.getElementById('aeroImage');
             if (aeroImage) {
@@ -158,7 +138,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                     if (currentTip) {
                         hideAeroTip();
                     } else {
-                        // Show context-appropriate tip
                         const heroSection = document.getElementById('heroSection');
                         const formContainer = document.getElementById('formContainer');
                         const map = document.getElementById('map');
@@ -177,9 +156,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             }
         }
 
-        // Generate a unique access code
         function generateAccessCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing characters
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
             let code = '';
             for (let i = 0; i < 8; i++) {
                 code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -187,7 +165,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             return code;
         }
 
-        // Map search functionality
         let mapSearchTimeout;
         document.getElementById('mapSearchInput')?.addEventListener('input', function(e) {
             clearTimeout(mapSearchTimeout);
@@ -210,15 +187,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             }
         });
 
-        // Show Aero tip when user focuses on search input
         document.getElementById('mapSearchInput')?.addEventListener('focus', function() {
             setTimeout(() => {
                 const searchInput = document.getElementById('mapSearchInput');
                 const rect = searchInput.getBoundingClientRect();
-                // Position to the left of the search input
-                const x = window.innerWidth - rect.left + rect.width + 150; // 150px to the left of the input
-                // Position below the header
-                const y = window.innerHeight - rect.bottom - 20; // 20px below the input
+                const x = window.innerWidth - rect.left + rect.width + 150; 
+                const y = window.innerHeight - rect.bottom - 20;
                 moveAeroToPosition(x, y);
                 showAeroTip('search', 6000);
             }, 300);
@@ -271,7 +245,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             }
         }
 
-        // Close search results when clicking outside
         document.addEventListener('click', function(e) {
             const searchContainer = document.getElementById('searchPanel');
             const resultsDiv = document.getElementById('mapSearchResults');
@@ -281,11 +254,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             }
         });
 
-        // Check if user has an access code on page load
         function checkAccessCode() {
             const accessCode = localStorage.getItem('studyAbroadAccessCode');
             if (accessCode) {
-                // User has a code, enable map and hide hero
                 document.getElementById('map').classList.add('interactive');
                 document.getElementById('heroSection').classList.add('hidden');
                 document.getElementById('headerButtons').classList.add('visible');
@@ -294,7 +265,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 document.getElementById('searchPanel').style.display = 'block';
                 document.getElementById('filterPanel').style.display = 'block';
                 
-                // Welcome back tip
                 setTimeout(() => {
                     moveAeroToPosition(50, 100);
                     showAeroTip('map', 6000);
@@ -305,13 +275,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             return false;
         }
 
-        // Function to enter access code manually
         function enterAccessCode() {
             const input = document.getElementById('accessCodeInput');
             const code = input.value.trim().toUpperCase();
             
             if (code.length === 8) {
-                // Store the code and grant access
                 localStorage.setItem('studyAbroadAccessCode', code);
                 document.getElementById('map').classList.add('interactive');
                 document.getElementById('heroSection').classList.add('hidden');
@@ -322,7 +290,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 document.getElementById('filterPanel').style.display = 'block';
                 input.value = '';
                 
-                // Aero tip after code entry
                 setTimeout(() => {
                     moveAeroToPosition(50, 100);
                     showAeroTip('map', 6000);
@@ -350,11 +317,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             });
         });
 
-        // Store markers for filtering
         const studentMarkers = [];
         let currentFilter = 'all';
 
-        // Format date range for display
         function formatDateRange(startDate, endDate, semester) {
             if (startDate && endDate) {
                 const start = new Date(startDate);
@@ -367,19 +332,16 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             return 'N/A';
         }
 
-        // Calculate student status based on dates
         function calculateStudentStatus(student) {
             const now = new Date();
-            now.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+            now.setHours(0, 0, 0, 0); 
             
-            // Use startDate and endDate if available, otherwise fall back to semester parsing
             let startDate, endDate;
             
             if (student.startDate && student.endDate) {
                 startDate = new Date(student.startDate);
                 endDate = new Date(student.endDate);
             } else if (student.semester) {
-                // Fallback to semester parsing for old data
                 const semesterMatch = student.semester.match(/(WS|SS)\s*(\d{2})(?:\/(\d{2}))?/);
                 if (!semesterMatch) return 'upcoming';
                 
@@ -394,25 +356,23 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                     endDate = new Date(year, 8, 30);
                 }
             } else {
-                return 'upcoming'; // Default if no date info
+                return 'upcoming'; 
             }
             
             startDate.setHours(0, 0, 0, 0);
             endDate.setHours(0, 0, 0, 0);
             
-            // Calculate one semester (6 months) after end date (for flight attendants)
             const oneSemesterAfter = new Date(endDate);
             oneSemesterAfter.setMonth(oneSemesterAfter.getMonth() + 6);
             
-            // Determine status
             if (now < startDate) {
-                return 'upcoming'; // About to go abroad
+                return 'upcoming'; 
             } else if (now >= startDate && now <= endDate) {
-                return 'abroad'; // Currently abroad
+                return 'abroad'; 
             } else if (now > endDate && now <= oneSemesterAfter) {
-                return 'attendant'; // Flight attendant (returned, visible for one semester)
+                return 'attendant'; 
             } else {
-                return 'attendant'; // Still show as attendant even if past one semester (for "all" filter)
+                return 'attendant';
             }
         }
 
@@ -422,16 +382,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             const isOpen = filterContent.classList.toggle('open');
             
             if (isOpen) {
-                // Aero tip for filter menu - position to the left of the filter button in header
                 setTimeout(() => {
                     const filterToggle = document.getElementById('filterToggle');
                     const rect = filterToggle.getBoundingClientRect();
-                    // Position to the left of the filter button
-                    // For right-based positioning: window.innerWidth - rect.left gives distance from right to left edge
-                    // Add offset to move further left (away from right edge)
-                    const x = window.innerWidth - rect.left + rect.width + 150; // 150px to the left of the button
-                    // Position below the header
-                    const y = window.innerHeight - rect.bottom - 20; // 20px below the button
+                    const x = window.innerWidth - rect.left + rect.width + 150; 
+                    const y = window.innerHeight - rect.bottom - 20;
                     moveAeroToPosition(x, y);
                     showAeroTip('filter', 6000);
                 }, 300);
@@ -441,13 +396,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
         function applyFilter(filterType) {
             currentFilter = filterType;
             
-            // Update active button
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.querySelector(`[data-filter="${filterType}"]`).classList.add('active');
             
-            // Filter markers
             studentMarkers.forEach(markerData => {
                 const { marker, student } = markerData;
                 const status = calculateStudentStatus(student);
@@ -455,7 +408,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 let shouldShow = false;
                 
                 if (filterType === 'all') {
-                    // Show all students regardless of status
                     shouldShow = true;
                 } else if (filterType === 'abroad') {
                     shouldShow = status === 'abroad';
@@ -465,7 +417,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                     shouldShow = status === 'attendant';
                 }
                 
-                // Show/hide marker
                 const markerElement = marker.getElement();
                 if (shouldShow) {
                     markerElement.style.display = 'block';
@@ -474,7 +425,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 }
             });
             
-            // Update stats
             updateStats();
         }
 
@@ -1419,7 +1369,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             
         ];
 
-        // Create markers and store them for filtering
         function createStudentMarker(student) {
             const el = document.createElement('div');
             el.className = 'student-marker';
@@ -1433,16 +1382,13 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 .setLngLat([student.lng, student.lat])
                 .addTo(map);
             
-            // Store marker with student data
             studentMarkers.push({ marker, student });
         }
 
-        // Create markers for all students
         students.forEach(student => {
             createStudentMarker(student);
         });
         
-        // Apply initial filter after all markers are created
         applyFilter('all');
 
         function openSidebar(student) {
@@ -1450,7 +1396,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             const overlay = document.getElementById('passOverlay');
             const content = document.getElementById('sidebarContent');
             
-            // Aero tip for boarding pass
             setTimeout(() => {
                 flyAeroToElement('sidebarWrapper', -20, 20);
                 showAeroTip('boardingPass', 6000);
@@ -1527,7 +1472,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 </div>
             `;
 
-            // Draw barcode on canvas after HTML is inserted
             setTimeout(() => {
                 drawBarcode();
             }, 100);
@@ -1542,9 +1486,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
 
             const barcodeContainer = canvas.parentElement;
             const passBottom = barcodeContainer.parentElement;
-            // Get the actual width, accounting for padding (25px on each side)
             const containerWidth = passBottom.offsetWidth;
-            const canvasWidth = containerWidth - 50; // Account for 25px padding on each side
+            const canvasWidth = containerWidth - 50; 
             const height = 50;
 
             // Barcode pattern with varying stripe widths (in pixels)
@@ -1556,18 +1499,15 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 2, 1, 3, 1, 2, 1, 4, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 1, 4, 1
             ];
 
-            // Calculate total barcode width
             const gap = 1;
             let barcodeWidth = 0;
             for (let i = 0; i < pattern.length; i++) {
                 barcodeWidth += pattern[i] + gap;
             }
-            barcodeWidth -= gap; // Remove last gap
+            barcodeWidth -= gap; 
 
-            // Center the barcode within the canvas
             const startX = (canvasWidth - barcodeWidth) / 2;
 
-            // Set canvas size (use device pixel ratio for crisp rendering)
             const dpr = window.devicePixelRatio || 1;
             canvas.width = canvasWidth * dpr;
             canvas.height = height * dpr;
@@ -1593,7 +1533,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             if (!boardingPass) return;
 
             try {
-                // Hide elements that shouldn't be in the download
                 const profileImage = boardingPass.querySelector('.pass-profile-image-inline');
                 const connectButton = boardingPass.querySelector('.btn-connect');
                 const tagSection = boardingPass.querySelector('.tag-section');
@@ -1606,20 +1545,17 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 if (connectButton) connectButton.style.display = 'none';
                 if (tagSection) tagSection.style.display = 'block';
 
-                // Use html2canvas to capture the boarding pass
                 const canvas = await html2canvas(boardingPass, {
                     backgroundColor: null,
-                    scale: 2, // Higher quality
+                    scale: 2, 
                     useCORS: true,
                     logging: false
                 });
 
-                // Restore original display states
                 if (profileImage) profileImage.style.display = originalImageDisplay || '';
                 if (connectButton) connectButton.style.display = originalButtonDisplay || '';
                 if (tagSection) tagSection.style.display = originalTagDisplay || 'none';
 
-                // Convert canvas to blob and download
                 canvas.toBlob(function(blob) {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
@@ -1643,12 +1579,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
 
         function scrollToForm(e) {
             e.preventDefault();
-            // Hide hero section when opening form
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('formContainer').classList.add('open');
             document.getElementById('formOverlay').classList.add('visible');
-            
-            // Aero tip for form
+
+
             setTimeout(() => {
                 flyAeroToElement('formContainer', -20, 20);
                 showAeroTip('form', 6000);
@@ -1659,7 +1594,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             document.getElementById('formContainer').classList.remove('open');
             document.getElementById('formOverlay').classList.remove('visible');
             
-            // Show hero section again if map is not yet interactive (user hasn't created factsheet)
             const map = document.getElementById('map');
             if (!map.classList.contains('interactive')) {
                 document.getElementById('heroSection').classList.remove('hidden');
@@ -1763,7 +1697,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             const startDate = formData.get('startDate');
             const endDate = formData.get('endDate');
             
-            // Validate dates
             if (new Date(startDate) >= new Date(endDate)) {
                 alert('End date must be after start date!');
                 return;
@@ -1788,10 +1721,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
 
             students.push(newStudent);
             
-            // Create marker using the same function
             createStudentMarker(newStudent);
             
-            // Apply current filter to new marker
             applyFilter(currentFilter);
             
             e.target.reset();
@@ -1804,11 +1735,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             
             closeForm();
             
-            // Generate and store access code
             const accessCode = generateAccessCode();
             localStorage.setItem('studyAbroadAccessCode', accessCode);
             
-            // Enable map interaction and hide hero section
             document.getElementById('map').classList.add('interactive');
             document.getElementById('heroSection').classList.add('hidden');
             document.getElementById('headerButtons').classList.add('visible');
@@ -1824,7 +1753,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
             setTimeout(() => {
                 alert(`🎉 Your factsheet has been added to the map!\n\nYour access code: ${accessCode}\n\nSave this code to access the map directly next time!`);
                 
-                // Aero tip after factsheet creation
                 setTimeout(() => {
                     moveAeroToPosition(50, 100);
                     showAeroTip('firstMarker', 7000);
@@ -1835,14 +1763,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
         }
 
         function updateStats() {
-            // Count students based on current filter - use students array directly for accuracy
             let visibleStudents = [];
             
             if (currentFilter === 'all') {
-                // Show all students regardless of status
                 visibleStudents = students;
             } else {
-                // Filter based on status
                 visibleStudents = students.filter(student => {
                     const status = calculateStudentStatus(student);
                     if (currentFilter === 'abroad') {
@@ -1870,13 +1795,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
 
 
         window.addEventListener('load', () => {
-            // Set up Aero click handler
             setupAeroClick();
             
-            // Check for access code on page load
             const hasCode = checkAccessCode();
             
-            // Set up Enter key for code input
             const codeInput = document.getElementById('accessCodeInput');
             if (codeInput) {
                 codeInput.addEventListener('keypress', (e) => {
@@ -1886,7 +1808,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 });
             }
             
-            // Show welcome tip if no access code
             if (!hasCode) {
                 setTimeout(() => {
                     moveAeroToPosition(50, 100);
@@ -1894,15 +1815,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWRhNDE2NjgiLCJhIjoiY21peWVzYzY5MDVmOTNlc2ViO
                 }, 1500);
             }
             
-            // Update stats with actual counts after a short delay to ensure markers are created
             setTimeout(() => {
                 updateStats();
-                // Animate the numbers after getting actual counts
                 const studentCount = parseInt(document.getElementById('student-count').textContent) || 0;
                 const countryCount = parseInt(document.getElementById('country-count').textContent) || 0;
                 const connectionCount = parseInt(document.getElementById('connection-count').textContent) || 0;
                 
-                // Reset to 0 and animate
                 document.getElementById('student-count').textContent = '0';
                 document.getElementById('country-count').textContent = '0';
                 document.getElementById('connection-count').textContent = '0';
