@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Tetris-Studie · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c1226;--bg2:#0a0f20;--panel:#141d3a;--panel2:#192349;--ink:#eef2fb;--muted:#8b96bd;
+  --line:rgba(255,255,255,.10);--accent:#3b82f6;--accent2:#22d3ee;--ok:#34d399;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:
+   radial-gradient(1200px 800px at 85% -10%,rgba(59,130,246,.12),transparent 60%),
+   linear-gradient(180deg,var(--bg),var(--bg2));
+   color:var(--ink);font-family:'Outfit',system-ui,sans-serif;padding:28px}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:22px}
+h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
+.spacer{flex:1}
+.src{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:7px 11px;border-radius:9px;border:1px solid var(--line)}
+.src.on{color:var(--ok);background:rgba(52,211,153,.08)}
+.src.off{color:#f5c451;background:rgba(245,196,81,.07)}
+select,button{font:inherit;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid var(--line);
+  border-radius:10px;padding:9px 13px;cursor:pointer;transition:.15s}
+select:hover,button:hover{background:rgba(255,255,255,.09)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+  border-radius:16px;padding:18px;box-shadow:0 24px 60px -30px rgba(0,0,0,.8)}
+.panel h2{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);margin:0 0 12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.chartbox{height:300px}
+.chartnote{font-size:.78rem;color:var(--muted);margin-top:10px;min-height:1em}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.count{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}
+td.pid{font-weight:600;color:var(--accent2)}
+td.note{white-space:normal;color:var(--muted);max-width:220px}
+.na{color:rgba(255,255,255,.22)}
+.tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;padding:2px 8px;border-radius:6px}
+.tag.baseline{background:rgba(139,150,189,.18);color:#c3cbe6}
+.tag.intervention{background:rgba(34,211,238,.16);color:var(--accent2)}
+.tag.washout{background:rgba(245,196,81,.16);color:#f5c451}
+.tablewrap{overflow:auto;max-height:60vh;border-radius:12px}
+.empty{color:var(--muted);text-align:center;padding:48px 12px}
+@media(max-width:880px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Tetris-Studie · Live-Dashboard</h1>
+    <span id="src" class="src">…</span>
+    <div class="spacer"></div>
+    <button id="refresh">↻ Aktualisieren</button>
+    <button id="csv">⬇ CSV exportieren</button>
+  </header>
+
+  <div class="grid">
+    <div class="panel"><h2>Reaktionszeit über die Studie</h2>
+      <div class="chartbox"><canvas id="chartRT"></canvas></div>
+      <p class="chartnote" id="chartnote"></p>
+      <p class="chartnote">Kernbefund-Check: Fallen Rotation &amp; Einpassen, während die Kontrolle flach bleibt → spezifischer räumlicher Transfer.</p>
+    </div>
+    <div class="panel"><h2>Räumliches Gedächtnis (Corsi-Span)</h2>
+      <div class="chartbox"><canvas id="chartSpan"></canvas></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <select id="pfilter"></select>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tablewrap"><div id="table"></div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>
