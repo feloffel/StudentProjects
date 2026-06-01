@@ -4,87 +4,166 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Tetris-Studie · Dashboard</title>
+<title>Studien-Dashboard · Wahrnehmungs-Studie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0c1226;--bg2:#0a0f20;--panel:#141d3a;--panel2:#192349;--ink:#eef2fb;--muted:#8b96bd;
-  --line:rgba(255,255,255,.10);--accent:#3b82f6;--accent2:#22d3ee;--ok:#34d399;
+  --bg:#0c1226; --bg2:#0a0f20; --panel:#141d3a; --panel2:#192349;
+  --ink:#eef2fb; --muted:#8b96bd; --line:rgba(255,255,255,.10);
+  --accent:#3b82f6; --accent2:#22d3ee; --ok:#34d399; --no:#f87171; --warn:#f5c451;
+  --r:16px; --shadow:0 24px 60px -28px rgba(0,0,0,.8);
 }
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:
-   radial-gradient(1200px 800px at 85% -10%,rgba(59,130,246,.12),transparent 60%),
-   linear-gradient(180deg,var(--bg),var(--bg2));
-   color:var(--ink);font-family:'Outfit',system-ui,sans-serif;padding:28px}
-.wrap{max-width:1180px;margin:0 auto}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:22px}
-h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
-.spacer{flex:1}
-.src{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:7px 11px;border-radius:9px;border:1px solid var(--line)}
+html,body{margin:0;min-height:100%}
+body{
+  background:
+    radial-gradient(1200px 800px at 80% -10%, rgba(59,130,246,.12), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, rgba(34,211,238,.08), transparent 55%),
+    linear-gradient(180deg,var(--bg),var(--bg2)) fixed;
+  color:var(--ink); font-family:'Outfit',system-ui,sans-serif; line-height:1.5;
+  padding:28px 20px 60px; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto}
+header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+h1{font-size:1.55rem;margin:0;letter-spacing:-.02em}
+.tag-mono{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:.82rem;margin:0 0 4px}
+.sub{color:var(--muted);margin:.25rem 0 0;font-size:.92rem;max-width:60ch}
+.src{font-family:'JetBrains Mono',monospace;font-size:.78rem;padding:8px 12px;border-radius:10px;border:1px solid var(--line);white-space:nowrap}
 .src.on{color:var(--ok);background:rgba(52,211,153,.08)}
-.src.off{color:#f5c451;background:rgba(245,196,81,.07)}
-select,button{font:inherit;background:rgba(255,255,255,.05);color:var(--ink);border:1px solid var(--line);
-  border-radius:10px;padding:9px 13px;cursor:pointer;transition:.15s}
-select:hover,button:hover{background:rgba(255,255,255,.09)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
-.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
-  border-radius:16px;padding:18px;box-shadow:0 24px 60px -30px rgba(0,0,0,.8)}
-.panel h2{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted);margin:0 0 12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
-.chartbox{height:300px}
-.chartnote{font-size:.78rem;color:var(--muted);margin-top:10px;min-height:1em}
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
-.count{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--muted)}
-table{width:100%;border-collapse:collapse;font-size:.82rem}
-th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}
-td.pid{font-weight:600;color:var(--accent2)}
-td.note{white-space:normal;color:var(--muted);max-width:220px}
-.na{color:rgba(255,255,255,.22)}
-.tag{font-family:'JetBrains Mono',monospace;font-size:.68rem;padding:2px 8px;border-radius:6px}
-.tag.baseline{background:rgba(139,150,189,.18);color:#c3cbe6}
-.tag.intervention{background:rgba(34,211,238,.16);color:var(--accent2)}
-.tag.washout{background:rgba(245,196,81,.16);color:#f5c451}
-.tablewrap{overflow:auto;max-height:60vh;border-radius:12px}
-.empty{color:var(--muted);text-align:center;padding:48px 12px}
-@media(max-width:880px){.grid{grid-template-columns:1fr}}
+.src.off{color:var(--warn);background:rgba(245,196,81,.07)}
+
+.tabs{display:flex;gap:8px;margin:22px 0 18px;border-bottom:1px solid var(--line)}
+.tabbtn{appearance:none;cursor:pointer;font:inherit;font-weight:600;color:var(--muted);background:none;border:0;border-bottom:2px solid transparent;padding:11px 16px;margin-bottom:-1px;transition:.16s}
+.tabbtn:hover{color:var(--ink)}
+.tabbtn.active{color:var(--ink);border-bottom-color:var(--accent)}
+
+.panel{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.bar h2{font-size:1.08rem;margin:0}
+.bar .meta{color:var(--muted);font-size:.86rem}
+.row-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;font:inherit;font-weight:600;border-radius:11px;padding:11px 16px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);transition:.16s}
+.btn:hover{background:rgba(255,255,255,.09);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:linear-gradient(180deg,var(--accent),#2563eb);border-color:transparent;box-shadow:0 12px 30px -16px var(--accent)}
+.btn.small{padding:8px 12px;font-size:.86rem}
+.savestate{font-size:.85rem;color:var(--muted)}
+.savestate.ok{color:var(--ok)}
+
+select{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:10px 12px;font:inherit;font-size:.95rem;outline:none;min-width:220px}
+select:focus{border-color:var(--accent)}
+
+/* ---- Config: test pool cards ---- */
+#pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.tcard{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;transition:.16s;opacity:.62}
+.tcard.on{opacity:1;border-color:rgba(59,130,246,.55);background:rgba(59,130,246,.07)}
+.trow{display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:2px}
+.tchk{width:18px;height:18px;margin-top:3px;accent-color:var(--accent);flex:none;cursor:pointer}
+.tname{font-weight:600;font-size:1.02rem}
+.tdesc{color:#d6def4;font-size:.9rem;margin:6px 0 0;padding-left:28px}
+.tmeasure{color:var(--muted);font-size:.83rem;margin:8px 0 12px;padding-left:28px}
+.tdiff{display:flex;align-items:center;flex-wrap:wrap;gap:7px;font-size:.82rem;color:var(--muted);padding-left:28px}
+.diffbtn{appearance:none;cursor:pointer;font:inherit;font-size:.82rem;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:5px 11px;transition:.14s}
+.diffbtn:hover{color:var(--ink)}
+.diffbtn.sel{color:#fff;background:linear-gradient(180deg,var(--accent),#2563eb);border-color:transparent}
+
+/* ---- Results ---- */
+#results{display:flex;flex-direction:column;gap:16px}
+.scard{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.smeta{color:var(--muted);font-size:.82rem;font-family:'JetBrains Mono',monospace}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.02em;padding:3px 9px;border-radius:999px;text-transform:capitalize;border:1px solid var(--line)}
+.tag.baseline{color:#cbd5ff;background:rgba(148,163,255,.14)}
+.tag.intervention{color:#bff3ff;background:rgba(34,211,238,.14)}
+.tag.washout{color:#ffe2b8;background:rgba(245,196,81,.14)}
+.chip{display:inline-block;font-size:.74rem;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:3px 10px;margin-left:8px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.rblock{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+.rname{font-weight:600;font-size:.95rem;margin-bottom:8px}
+.rdiff{display:inline-block;font-size:.7rem;font-weight:500;color:var(--muted);background:rgba(255,255,255,.06);border-radius:6px;padding:1px 7px;margin-left:6px;text-transform:capitalize}
+.rrow{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:4px 0;font-size:.9rem;border-top:1px dashed rgba(255,255,255,.07)}
+.rrow:first-of-type{border-top:0}
+.rlabel{color:var(--muted)}
+.rval{font-weight:600;font-family:'JetBrains Mono',monospace}
+.rrow.muted .rlabel,.rrow.muted{color:var(--muted)}
+.snote{margin-top:14px;padding:11px 13px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;font-size:.9rem;color:#d6def4}
+/* Detailbereich pro Test */
+.rblock:has(.ddetail[style*="block"]){grid-column:1/-1}
+.dtoggle{margin-top:10px;appearance:none;cursor:pointer;font:inherit;font-size:.82rem;font-weight:600;color:var(--accent2);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.25);border-radius:9px;padding:6px 11px;transition:.14s}
+.dtoggle:hover{background:rgba(34,211,238,.16)}
+.ddetail{margin-top:10px}
+.dmetrics{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.dmetric{font-size:.8rem;color:#d6def4;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:4px 9px}
+.dmetric b{color:var(--muted);font-weight:600}
+.dtbl{width:100%;border-collapse:collapse;font-size:.82rem;font-family:'JetBrains Mono',monospace}
+.dtbl th{text-align:left;color:var(--muted);font-weight:600;padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--panel2)}
+.dtbl td{padding:5px 9px;border-bottom:1px solid rgba(255,255,255,.06);white-space:nowrap}
+.dtbl td.ok{color:var(--ok)}
+.dtbl td.no{color:var(--no)}
+.dtbl tr:hover td{background:rgba(255,255,255,.03)}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:34px 14px;font-size:.95rem}
+.note{color:var(--muted);font-size:.82rem;margin:16px 2px 0;line-height:1.6}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>Tetris-Studie · Live-Dashboard</h1>
-    <span id="src" class="src">…</span>
-    <div class="spacer"></div>
-    <button id="refresh">↻ Aktualisieren</button>
-    <button id="csv">⬇ CSV exportieren</button>
+  <header class="top">
+    <div>
+      <p class="tag-mono">STUDIEN-DASHBOARD</p>
+      <h1>Wahrnehmungs-Studie · Steuerung</h1>
+      <p class="sub">Tests f&uuml;r die Teilnehmer-App ausw&auml;hlen und Schwierigkeit einstellen &ndash; und die Ergebnisse einzelner Teilnehmer:innen in Klartext ansehen.</p>
+    </div>
+    <div id="src" class="src off">&#9675; wird geladen &hellip;</div>
   </header>
 
-  <div class="grid">
-    <div class="panel"><h2>Reaktionszeit über die Studie</h2>
-      <div class="chartbox"><canvas id="chartRT"></canvas></div>
-      <p class="chartnote" id="chartnote"></p>
-      <p class="chartnote">Kernbefund-Check: Fallen Rotation &amp; Einpassen, während die Kontrolle flach bleibt → spezifischer räumlicher Transfer.</p>
-    </div>
-    <div class="panel"><h2>Räumliches Gedächtnis (Corsi-Span)</h2>
-      <div class="chartbox"><canvas id="chartSpan"></canvas></div>
-    </div>
-  </div>
+  <nav class="tabs">
+    <button id="nav-config" class="tabbtn active">Tests &amp; Schwierigkeit</button>
+    <button id="nav-results" class="tabbtn">Ergebnisse ansehen</button>
+  </nav>
 
-  <div class="panel">
-    <div class="toolbar">
-      <select id="pfilter"></select>
-      <span class="count" id="count"></span>
+  <!-- ===== Tab: Konfiguration ===== -->
+  <section id="tab-config" class="panel">
+    <div class="bar">
+      <div>
+        <h2>Test-Pool</h2>
+        <div class="meta">Angehakte Tests bekommt die Teilnehmer-App t&auml;glich angezeigt &middot; <span id="poolcount">0 ausgew&auml;hlt</span></div>
+      </div>
+      <div class="row-actions">
+        <span id="savestate" class="savestate"></span>
+        <button id="savecfg" class="btn primary">Auswahl speichern</button>
+      </div>
     </div>
-    <div class="tablewrap"><div id="table"></div></div>
-  </div>
+    <div id="pool"></div>
+    <p class="note">Die gespeicherte Auswahl wird an die Teilnehmer-App &uuml;bergeben (&uuml;ber Firebase, sonst lokal als Fallback). Die App liest sie beim n&auml;chsten Start. Reihenfolge der Tests in der App = Reihenfolge im Pool.</p>
+  </section>
+
+  <!-- ===== Tab: Ergebnisse ===== -->
+  <section id="tab-results" class="panel" style="display:none">
+    <div class="bar">
+      <div>
+        <h2>Ergebnisse</h2>
+        <div class="meta"><span id="pcount">0 Teilnehmer:innen</span></div>
+      </div>
+      <div class="row-actions">
+        <select id="pfilter"><option value="">&ndash; Teilnehmer:in w&auml;hlen &ndash;</option></select>
+        <button id="refresh" class="btn small">Aktualisieren</button>
+        <button id="csv" class="btn small">CSV (Zusammenfassung)</button>
+        <button id="csvraw" class="btn small">CSV (alle Rohdaten)</button>
+      </div>
+    </div>
+    <div id="results"><div class="empty">Oben eine:n Teilnehmer:in ausw&auml;hlen, um die Ergebnisse zu sehen.</div></div>
+    <p class="note">Die Werte sind bewusst in Alltagssprache formuliert (z.&nbsp;B. &bdquo;Typische Antwortzeit&ldquo; statt &bdquo;Median-RT&ldquo;). Jede Karte = eine Tagessitzung; farbige Marke = Studienphase. Mit <b>&bdquo;Alle Daten anzeigen&ldquo;</b> klappt ihr pro Test die vollst&auml;ndige Liste aller Einzeldurchg&auml;nge auf (jede Antwort, richtig/falsch, Zeit). Den Export gibt es zweimal: <b>Zusammenfassung</b> (eine Zeile pro Sitzung) und <b>alle Rohdaten</b> (eine Zeile pro Durchgang).</p>
+  </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="tests.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>
