@@ -149,7 +149,7 @@ var FIELD_LABELS = {
   len:'Länge', seq:'Gezeigte Folge', resp:'Deine Eingabe', target:'Zielzeit (Sek)',
   producedMs:'Gestoppt bei', devMs:'Abweichung', rule:'Regel', switched:'Regelwechsel?',
   fits:'Passt rein?', items:'Anzahl Symbole', a:'Aufgabe', given:'Deine Antwort', sol:'Lösung',
-  q:'Aufgabe', value:'Wert', round:'Runde', hit:'Treffer?', kind:'Art',
+  q:'Aufgabe', value:'Wert', round:'Runde', hit:'Treffer?', kind:'Art', figure:'Figur', angle:'Drehwinkel', source:'Quelle',
   correctCount:'Richtige gesamt', accuracy:'Trefferquote', avgMs:'Durchschnittszeit', medMs:'Typische Zeit',
   bestLength:'Längste Folge', totalTrials:'Durchgänge gesamt', hits:'Treffer', misses:'Verpasst',
   falseAlarms:'Fehlalarme', rounds:'Runden', switchMs:'Zeit nach Wechsel', stayMs:'Zeit ohne Wechsel',
@@ -163,6 +163,7 @@ function cellVal(k, v){
   if(k==='correct' || k==='hit') return v ? '✓ richtig' : '✗ falsch';
   if(k==='mirror' || k==='switched' || k==='fits') return v ? 'ja' : 'nein';
   if(k==='accuracy'){ var pc=Math.round(Number(v)*100); return isNaN(pc)?String(v):pc+' %'; }
+  if(k==='angle'){ return v+'°'; }
   if(k==='rt' || k==='producedMs' || k==='devMs' || k==='avgMs' || k==='medMs' || k==='switchMs' || k==='stayMs' || k==='switchCost'){
     var ms=Number(v); if(isNaN(ms)) return String(v);
     return (k==='devMs'||k==='switchCost' ? (ms>=0?'+':'') : '') + (ms/1000).toFixed(2).replace('.',',')+' s';

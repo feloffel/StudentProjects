@@ -203,6 +203,92 @@ function gridGapSVG(gapCells){
 }
 
 /* =====================================================================
+   MENTALE ROTATION – BILD-BASIERT (Bilder aus dem Ordner MentalRotationImages)
+   Dateiname {Figur}_{Winkel}.jpg = gedreht (Antwort "gleich"),
+   {Figur}_{Winkel}_R.jpg = gespiegelt (Antwort "Spiegelbild").
+   ===================================================================== */
+var __rotManifest;  // undefined=noch nicht gebaut, Objekt=fertig
+// Standard-Schema, falls keine manifest.js vorhanden ist: Dateinamen werden selbst gebildet.
+function rotConventionManifest(){
+  var folder='MentalRotationImages', FIGS=48, ANGLES=[0,50,100,150], images=[];
+  for(var f=1; f<=FIGS; f++){
+    for(var ai=0; ai<ANGLES.length; ai++){
+      images.push({ file:f+'_'+ANGLES[ai]+'.jpg',   figure:f, angle:ANGLES[ai], mirror:false });
+      images.push({ file:f+'_'+ANGLES[ai]+'_R.jpg', figure:f, angle:ANGLES[ai], mirror:true  });
+    }
+  }
+  return { folder:folder, images:images };
+}
+// Liest die Bildliste OHNE fetch (läuft daher auch per Doppelklick / file://):
+// 1) globale Variable aus MentalRotationImages/manifest.js (per <script> geladen),
+// 2) sonst nach Namensschema selbst erzeugt.
+// Jede Bilddatei ist EIN kompletter Durchgang (Ursprungs- und veränderte Figur sind im selben Bild).
+// Antwort: ohne _R = "Dieselbe Figur" (same), mit _R = "Spiegelbild" (mir).
+function loadRotationImages(){
+  if(__rotManifest!==undefined) return __rotManifest;
+  var data = (typeof window!=='undefined' && window.MENTAL_ROTATION_MANIFEST) ? window.MENTAL_ROTATION_MANIFEST
+           : (typeof MENTAL_ROTATION_MANIFEST!=='undefined' ? MENTAL_ROTATION_MANIFEST : null);
+  if(!data || !data.images || !data.images.length) data = rotConventionManifest();
+  var fld=data.folder||'MentalRotationImages';
+  var items=data.images.map(function(im){
+    return { figure:im.figure, angle:im.angle, mirror:!!im.mirror,
+             img: fld+'/'+im.file, correct: im.mirror ? 'mir' : 'same' };
+  });
+  __rotManifest={ folder:fld, items:items };
+  return __rotManifest;
+}
+// Durchgänge nach erlaubten Winkeln (Schwierigkeit) filtern, gemischt
+function rotPool(man, angles){
+  var ok={}; (angles||[]).forEach(function(a){ ok[a]=1; });
+  var pool=man.items.filter(function(it){ return !angles || !angles.length || ok[it.angle]; });
+  return T.shuffle(pool.slice());
+}
+// Bild vorab laden; false, wenn es nicht existiert -> Code wählt dann ein anderes
+function preloadImg(src){
+  return new Promise(function(resolve){
+    var done=false; function fin(v){ if(!done){ done=true; resolve(v); } }
+    try{
+      var im=new Image();
+      im.onload=function(){ fin(true); };
+      im.onerror=function(){ fin(false); };
+      im.src=src;
+      setTimeout(function(){ fin(false); }, 4000);   // Sicherheits-Timeout, falls nichts feuert
+    }catch(e){ fin(false); }
+  });
+}
+// Fallback: code-generierte 3D-Würfelfiguren, falls keine Bilder/kein Manifest da sind
+async function rotationFallbackRun(P, ui){
+  var results=[], cubes=P.cubes||11;
+  for(var i=0;i<P.trials;i++){
+    var base, isMirror=(i % 2 === 0), guard=0;
+    do { base = makePolycube(cubes); guard++; }
+    while(isMirror && guard<40 && intersects(allRotKeys(base), allRotKeys(mirrorCells(base))));
+    var refCells=applyRots(base, randomRotSeq());
+    var cmpCells=applyRots(isMirror?mirrorCells(base):base, randomRotSeq());
+    ui.count((i+1)+' / '+P.trials);
+    await ui.fixation();
+    ui.host.innerHTML =
+      '<div class="stage rot3d"><div class="pair3d">'+
+        '<div class="shp3d">'+cubesSVG(refCells,{})+'</div><div class="vs">?</div>'+
+        '<div class="shp3d">'+cubesSVG(cmpCells,{})+'</div></div>'+
+        '<div class="answers two">'+
+          '<button class="btn ans" data-a="same"><kbd>F</kbd> Dieselbe Figur</button>'+
+          '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
+        '</div></div>';
+    var t0=performance.now();
+    var ans=await ui.choice([['same','f'],['mir','j']]);
+    var rt=performance.now()-t0;
+    var correct=(ans==='mir')===isMirror;
+    results.push({ i:i+1, mirror:isMirror, answer:ans, correct:correct, rt:T.round(rt) });
+    await ui.flash(correct);
+  }
+  var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
+  return { n:results.length, source:'generiert', correctCount:results.filter(function(r){return r.correct;}).length,
+           accuracy:T.round(results.filter(function(r){return r.correct;}).length/results.length,3),
+           avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
+}
+
+/* =====================================================================
    DER TEST-POOL
    ===================================================================== */
 var TEST_POOL = [
@@ -211,50 +297,51 @@ var TEST_POOL = [
 {
   id:'rotation3d',
   name:'Figuren im Kopf drehen',
-  short:'Zwei 3D-Würfelfiguren vergleichen: dieselbe Figur (nur gedreht) oder das Spiegelbild?',
+  short:'Ein Bild mit zwei Figuren: ist die zweite dieselbe (nur gedreht) oder das Spiegelbild?',
   measures:'Wie schnell und sicher räumlich gedreht wird.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:12, cubes:9 },
-    mittel:{ trials:18, cubes:11 },
-    schwer:{ trials:24, cubes:14 }
+    leicht:{ trials:12, angles:[0,50],     cubes:9  },
+    mittel:{ trials:18, angles:[50,100],   cubes:11 },
+    schwer:{ trials:24, angles:[100,150],  cubes:14 }
   },
   run: async function(P, ui){
-    var results=[];
-    for(var i=0;i<P.trials;i++){
-      var base, isMirror=(i % 2 === 0), guard=0;
-      do { base = makePolycube(P.cubes); guard++; }
-      while(isMirror && guard<40 && intersects(allRotKeys(base), allRotKeys(mirrorCells(base))));
-      var refSeq = randomRotSeq();
-      var cmpSeq = randomRotSeq();
-      var refCells = applyRots(base, refSeq);
-      var cmpBase  = isMirror ? mirrorCells(base) : base;
-      var cmpCells = applyRots(cmpBase, cmpSeq);
-      ui.count((i+1)+' / '+P.trials);
-      await ui.fixation();
-      ui.host.innerHTML =
-        '<div class="stage rot3d">'+
-          '<div class="pair3d">'+
-            '<div class="shp3d">'+cubesSVG(refCells,{})+'</div>'+
-            '<div class="vs">?</div>'+
-            '<div class="shp3d">'+cubesSVG(cmpCells,{})+'</div>'+
-          '</div>'+
-          '<div class="answers two">'+
-            '<button class="btn ans" data-a="same"><kbd>F</kbd> Dieselbe Figur</button>'+
-            '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
-          '</div>'+
-        '</div>';
-      var t0=performance.now();
-      var ans=await ui.choice([['same','f'],['mir','j']]);
-      var rt=performance.now()-t0;
-      var correct = (ans==='mir')===isMirror;
-      results.push({ i:i+1, mirror:isMirror, answer:ans, correct:correct, rt:T.round(rt) });
-      await ui.flash(correct);
+    var man = loadRotationImages();
+    if(man && man.items && man.items.length){
+      var pool = rotPool(man, P.angles || [50,100,150]);
+      if(pool.length){
+        var results=[], used=0, idx=0, guard=pool.length*4;
+        while(used<P.trials && idx<guard){
+          var t=pool[idx % pool.length]; idx++;
+          var ok=await preloadImg(t.img);                  // fehlt das Bild -> nächstes
+          if(!ok){ if(used===0 && idx>=pool.length) break; continue; }
+          ui.count((used+1)+' / '+P.trials);
+          await ui.fixation();
+          ui.host.innerHTML =
+            '<div class="stage rot3d">'+
+              '<div class="shp3d single"><img class="rotimg" src="'+t.img+'" alt="Aufgabenbild"></div>'+
+              '<div class="answers two">'+
+                '<button class="btn ans" data-a="same"><kbd>F</kbd> Dieselbe Figur</button>'+
+                '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
+              '</div></div>';
+          var t0=performance.now();
+          var ans=await ui.choice([['same','f'],['mir','j']]);
+          var rt=performance.now()-t0;
+          var correct=(ans===t.correct);
+          results.push({ i:used+1, figure:t.figure, angle:t.angle, mirror:t.mirror, answer:ans, correct:correct, rt:T.round(rt) });
+          await ui.flash(correct);
+          used++;
+        }
+        if(results.length){
+          var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
+          return { n:results.length, source:'bilder', correctCount:results.filter(function(r){return r.correct;}).length,
+                   accuracy:T.round(results.filter(function(r){return r.correct;}).length/results.length,3),
+                   avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
+        }
+      }
     }
-    var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
-    return { n:results.length, correctCount:results.filter(function(r){return r.correct;}).length,
-             accuracy:T.round(results.filter(function(r){return r.correct;}).length/results.length,3),
-             avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
+    // keine Bilder gefunden -> generierte Würfelfiguren als Rückfallebene
+    return await rotationFallbackRun(P, ui);
   },
   format:function(r){ return [
     {label:'Richtig erkannt', value:fmtPct(r.accuracy)},
