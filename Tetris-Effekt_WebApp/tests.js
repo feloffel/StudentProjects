@@ -544,14 +544,14 @@ var TEST_POOL = [
   measures:'Räumliches Vorstellungsvermögen (mehrschrittiges Denken).',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:8, folds:1 },
-    mittel:{ trials:10, folds:2 },
-    schwer:{ trials:12, folds:2, twoHoles:true }
+    leicht:{ trials:8,  folds:1, holes:1 },
+    mittel:{ trials:10, folds:2, holes:1 },
+    schwer:{ trials:12, folds:3, holes:1 }
   },
   run: async function(P, ui){
     var results=[];
     for(var i=0;i<P.trials;i++){
-      var tr=makeFoldTrial(P.folds, !!P.twoHoles);
+      var tr=makeFoldTrial(P.folds, P.holes||1);
       ui.count((i+1)+' / '+P.trials);
       await ui.fixation();
       ui.host.innerHTML =
@@ -937,69 +937,107 @@ function produceInterval(ui, targetSec){
 }
 
 /* ----- Papier falten: Aufgabe erzeugen ----- */
-function makeFoldTrial(nFolds, twoHoles){
-  // 4x4 Raster. Falze: 'v' (rechts auf links) oder 'h' (unten auf oben).
-  var axes=[]; var avail=['v','h'];
-  for(var f=0; f<nFolds; f++){ axes.push(avail.splice(T.rint(0,avail.length-1),1)[0]); }
-  // gelochte Position(en) im gefalteten Bereich (immer linke obere Hälfte je Achse)
-  function foldedRange(){
-    var xmax=3, ymax=3;
-    if(axes.indexOf('v')>=0) xmax=1;
-    if(axes.indexOf('h')>=0) ymax=1;
-    return {xmax:xmax, ymax:ymax};
+function makeFoldTrial(nFolds, nHoles){
+  // Echtes Faltmodell auf 4x4-Raster. Jeder Falz halbiert das aktuelle Papier
+  // entlang einer zufälligen Achse UND Richtung. Löcher liegen irgendwo im
+  // gefalteten Bereich; beim Aufklappen werden sie über die echten Falzlinien gespiegelt.
+  var N=4;
+  var region={x0:0,x1:N-1,y0:0,y1:N-1};
+  var folds=[], regionsSeq=[];
+  for(var f=0; f<nFolds; f++){
+    regionsSeq.push({x0:region.x0,x1:region.x1,y0:region.y0,y1:region.y1});
+    var canV=(region.x1-region.x0+1)>=2, canH=(region.y1-region.y0+1)>=2;
+    var axis = (canV&&canH) ? T.pick(['v','h']) : (canV?'v':'h');
+    if(axis==='v'){
+      var mid=(region.x0+region.x1)/2, rl=Math.random()<0.5;
+      folds.push({axis:'v', crease:mid, dir: rl?'RL':'LR'});
+      if(rl) region.x1=Math.floor(mid); else region.x0=Math.ceil(mid);
+    }else{
+      var midy=(region.y0+region.y1)/2, bt=Math.random()<0.5;
+      folds.push({axis:'h', crease:midy, dir: bt?'BT':'TB'});
+      if(bt) region.y1=Math.floor(midy); else region.y0=Math.ceil(midy);
+    }
   }
-  var rng=foldedRange();
-  function randHole(){ return [T.rint(0,rng.xmax), T.rint(0,rng.ymax)]; }
+  regionsSeq.push({x0:region.x0,x1:region.x1,y0:region.y0,y1:region.y1}); // gefalteter Endzustand
+  var fin=region;
+  function randHole(){ return [T.rint(fin.x0,fin.x1), T.rint(fin.y0,fin.y1)]; }
   var holes=[randHole()];
-  if(twoHoles){ var h2; var guard=0; do{ h2=randHole(); guard++; }while(guard<20 && h2[0]===holes[0][0] && h2[1]===holes[0][1]); holes.push(h2); }
-  // entfalten: jede Achse erzeugt Spiegelung
-  function unfold(set){
-    var out=set.slice();
-    if(axes.indexOf('v')>=0){ out=out.concat(out.map(function(c){ return [3-c[0], c[1]]; })); }
-    if(axes.indexOf('h')>=0){ out=out.concat(out.map(function(c){ return [c[0], 3-c[1]]; })); }
-    // dedupe
-    var seen={}, res=[]; out.forEach(function(c){ var k=c[0]+','+c[1]; if(!seen[k]){ seen[k]=1; res.push(c); } });
-    return res;
+  var cap=(fin.x1-fin.x0+1)*(fin.y1-fin.y0+1); nHoles=Math.min(nHoles||1, cap);
+  var g=0; while(holes.length<nHoles && g++<30){ var h=randHole(); if(!holes.some(function(c){return c[0]===h[0]&&c[1]===h[1];})) holes.push(h); }
+
+  function reflect(set, fd){ return set.map(function(c){ return fd.axis==='v' ? [2*fd.crease-c[0], c[1]] : [c[0], 2*fd.crease-c[1]]; }); }
+  function dedupe(set){ var s={},o=[]; set.forEach(function(c){var k=c[0]+','+c[1]; if(!s[k]){s[k]=1;o.push(c);}}); return o; }
+  function unfold(set, skipIdx){
+    var cur=set.map(function(c){return c.slice();});
+    for(var i=folds.length-1;i>=0;i--){ if(i===skipIdx) continue; cur=dedupe(cur.concat(reflect(cur,folds[i]))); }
+    return cur;
   }
-  var correct=unfold(holes);
-  // Falt-Schritte als kleine SVGs (Anschauung)
-  var stepSVGs=[];
-  stepSVGs.push(foldStepSVG(null, null, 64));        // ganzes Blatt
-  axes.forEach(function(ax,i){ stepSVGs.push(foldStepSVG(ax, null, 64)); });
-  stepSVGs.push(foldStepSVG(null, holes, 64, rng));  // gelocht im gefalteten Bereich
-  // Optionen: korrekt + 3 plausible Distraktoren
   function keyOf(set){ return set.map(function(c){return c[0]+','+c[1];}).sort().join(';'); }
-  var ckey=keyOf(correct);
-  var opts=[correct]; var oset={}; oset[ckey]=1; var guard=0;
-  while(opts.length<4 && guard++<60){
-    var cand;
-    var roll=Math.random();
-    if(roll<0.4){ cand=holes.slice(); } // nur die gefalteten Löcher (zu wenige)
-    else if(roll<0.7){ cand=unfold(holes).map(function(c){ return [c[1],c[0]]; }); } // gedreht
-    else { cand=unfold([randHole()]); } // andere Ausgangslöcher
-    var k=keyOf(cand);
-    if(!oset[k]){ oset[k]=1; opts.push(cand); }
-  }
-  while(opts.length<4){ var extra=unfold([randHole()]); opts.push(extra); }
+
+  var correct=unfold(holes,-1), ckey=keyOf(correct);
+  // plausible Distraktoren
+  var cands=[];
+  if(folds.length>1) cands.push(unfold(holes, T.rint(0,folds.length-1)));        // einen Falz "vergessen"
+  cands.push(dedupe(correct.map(function(c){return [N-1-c[0],c[1]];})));          // ganz waagerecht gespiegelt
+  cands.push(dedupe(correct.map(function(c){return [c[0],N-1-c[1]];})));          // ganz senkrecht gespiegelt
+  cands.push(holes.map(function(c){return c.slice();}));                          // nur die gestanzten Punkte
+  var opts=[correct], oset={}; oset[ckey]=1;
+  for(var ci=0; ci<cands.length && opts.length<4; ci++){ var k=keyOf(cands[ci]); if(cands[ci].length && !oset[k]){ oset[k]=1; opts.push(cands[ci]); } }
+  var guard=0; while(opts.length<4 && guard++<60){ var rnd=unfold([randHole()],-1); var k2=keyOf(rnd); if(!oset[k2]){ oset[k2]=1; opts.push(rnd); } }
   opts=T.shuffle(opts.slice(0,4));
-  return { axes:axes, holes:holes, options:opts, correctIndex:opts.findIndex(function(o){ return keyOf(o)===ckey; }), stepSVGs:stepSVGs };
+
+  // Visualisierung: pro Falz ein Bild (Papier wird sichtbar kleiner), zum Schluss gefaltet + gelocht
+  var stepSVGs=[];
+  for(var s=0;s<folds.length;s++) stepSVGs.push(paperFrameSVG(regionsSeq[s], folds[s], null, 90));
+  stepSVGs.push(paperFrameSVG(regionsSeq[folds.length], null, holes, 90));
+  return { folds:folds, holes:holes, options:opts, correctIndex:opts.findIndex(function(o){return keyOf(o)===ckey;}), stepSVGs:stepSVGs };
 }
-function foldGridSVG(holes, size){
-  size=size||72; var n=4, pad=4, cell=(size-pad*2)/n, r='';
-  r+='<rect x="1" y="1" width="'+(size-2)+'" height="'+(size-2)+'" rx="6" fill="#1b2440" stroke="#3a4263"/>';
-  var set={}; holes.forEach(function(c){ set[c[0]+','+c[1]]=1; });
-  for(var y=0;y<n;y++) for(var x=0;x<n;x++){
-    var cx=pad+x*cell+cell/2, cy=pad+y*cell+cell/2;
-    if(set[x+','+y]) r+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(cell*0.26)+'" fill="#22d3ee"/>';
+function _arrow(x0,y0,x1,y1,col){
+  var ang=Math.atan2(y1-y0,x1-x0), ah=6;
+  var hx1=x1-ah*Math.cos(ang-0.5), hy1=y1-ah*Math.sin(ang-0.5);
+  var hx2=x1-ah*Math.cos(ang+0.5), hy2=y1-ah*Math.sin(ang+0.5);
+  return '<line x1="'+x0.toFixed(1)+'" y1="'+y0.toFixed(1)+'" x2="'+x1.toFixed(1)+'" y2="'+y1.toFixed(1)+'" stroke="'+col+'" stroke-width="2"/>'+
+         '<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' L'+hx1.toFixed(1)+' '+hy1.toFixed(1)+' L'+hx2.toFixed(1)+' '+hy2.toFixed(1)+' Z" fill="'+col+'"/>';
+}
+// Ein Falt-Schritt: zeigt das AKTUELLE Papier (echte Größe/Position) + Flap, Falzlinie, Pfeil
+function paperFrameSVG(region, fold, holes, size){
+  size=size||90; var N=4, pad=9, cell=(size-2*pad)/N, r='';
+  var paper='#e4eaf7', edge='#8d97bd', cc='#22d3ee', holeFill='#0c1226';
+  function px(g){ return pad+g*cell; }
+  var rx=px(region.x0), ry=px(region.y0), rw=(region.x1-region.x0+1)*cell, rh=(region.y1-region.y0+1)*cell;
+  // ganz schwacher Umriss des Originalblatts (Orientierung, wie groß es mal war)
+  r+='<rect x="'+pad+'" y="'+pad+'" width="'+(N*cell)+'" height="'+(N*cell)+'" rx="4" fill="none" stroke="rgba(255,255,255,.10)" stroke-dasharray="2 3"/>';
+  // aktuelles Papier
+  r+='<rect x="'+rx.toFixed(1)+'" y="'+ry.toFixed(1)+'" width="'+rw.toFixed(1)+'" height="'+rh.toFixed(1)+'" rx="4" fill="'+paper+'" stroke="'+edge+'"/>';
+  if(fold){
+    if(fold.axis==='v'){
+      var cx=px(fold.crease+0.5);
+      var flapX=(fold.dir==='RL')?cx:rx, flapW=(fold.dir==='RL')?(rx+rw-cx):(cx-rx);
+      r+='<rect x="'+flapX.toFixed(1)+'" y="'+ry.toFixed(1)+'" width="'+flapW.toFixed(1)+'" height="'+rh.toFixed(1)+'" fill="rgba(34,211,238,.18)" stroke="'+cc+'" stroke-dasharray="3 2"/>';
+      r+='<line x1="'+cx.toFixed(1)+'" y1="'+ry.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+(ry+rh).toFixed(1)+'" stroke="'+cc+'" stroke-dasharray="4 3" stroke-width="2"/>';
+      var fcx=flapX+flapW/2, tcx=(fold.dir==='RL')?(cx-rw*0.12):(cx+rw*0.12);
+      r+=_arrow(fcx, ry+rh/2, tcx, ry+rh/2, cc);
+    }else{
+      var cy=px(fold.crease+0.5);
+      var flapY=(fold.dir==='BT')?cy:ry, flapH=(fold.dir==='BT')?(ry+rh-cy):(cy-ry);
+      r+='<rect x="'+rx.toFixed(1)+'" y="'+flapY.toFixed(1)+'" width="'+rw.toFixed(1)+'" height="'+flapH.toFixed(1)+'" fill="rgba(34,211,238,.18)" stroke="'+cc+'" stroke-dasharray="3 2"/>';
+      r+='<line x1="'+rx.toFixed(1)+'" y1="'+cy.toFixed(1)+'" x2="'+(rx+rw).toFixed(1)+'" y2="'+cy.toFixed(1)+'" stroke="'+cc+'" stroke-dasharray="4 3" stroke-width="2"/>';
+      var fcy=flapY+flapH/2, tcy=(fold.dir==='BT')?(cy-rh*0.12):(cy+rh*0.12);
+      r+=_arrow(rx+rw/2, fcy, rx+rw/2, tcy, cc);
+    }
   }
+  if(holes){ holes.forEach(function(c){ var hx=px(c[0]+0.5), hy=px(c[1]+0.5); r+='<circle cx="'+hx.toFixed(1)+'" cy="'+hy.toFixed(1)+'" r="'+(cell*0.2).toFixed(1)+'" fill="'+holeFill+'" stroke="'+edge+'" stroke-width="1"/>'; }); }
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+r+'</svg>';
 }
-function foldStepSVG(foldAxis, holes, size, rng){
-  size=size||64; var r='';
-  r+='<rect x="2" y="2" width="'+(size-4)+'" height="'+(size-4)+'" rx="6" fill="#222c4d" stroke="#3a4263"/>';
-  if(foldAxis==='v') r+='<line x1="'+(size/2)+'" y1="2" x2="'+(size/2)+'" y2="'+(size-2)+'" stroke="#22d3ee" stroke-dasharray="4 3" stroke-width="2"/><path d="M'+(size-8)+' '+(size/2)+' l-8 -5 v10 z" fill="#22d3ee"/>';
-  if(foldAxis==='h') r+='<line x1="2" y1="'+(size/2)+'" x2="'+(size-2)+'" y2="'+(size/2)+'" stroke="#22d3ee" stroke-dasharray="4 3" stroke-width="2"/><path d="M'+(size/2)+' '+(size-8)+' l-5 -8 h10 z" fill="#22d3ee"/>';
-  if(holes){ var n=4, pad=4, cell=(size-pad*2)/n; holes.forEach(function(c){ var cx=pad+c[0]*cell+cell/2, cy=pad+c[1]*cell+cell/2; r+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(cell*0.24)+'" fill="#22d3ee"/>'; }); }
+// Antwortoption: aufgeklapptes Blatt (4x4) mit gestanzten Löchern
+function foldGridSVG(holes, size){
+  size=size||76; var N=4, pad=6, cell=(size-2*pad)/N, r='';
+  r+='<rect x="'+pad+'" y="'+pad+'" width="'+(N*cell)+'" height="'+(N*cell)+'" rx="4" fill="#e4eaf7" stroke="#8d97bd"/>';
+  for(var i=1;i<N;i++){ var p=pad+i*cell;
+    r+='<line x1="'+p+'" y1="'+pad+'" x2="'+p+'" y2="'+(pad+N*cell)+'" stroke="rgba(20,29,58,.10)"/>'+
+       '<line x1="'+pad+'" y1="'+p+'" x2="'+(pad+N*cell)+'" y2="'+p+'" stroke="rgba(20,29,58,.10)"/>'; }
+  var set={}; holes.forEach(function(c){ set[c[0]+','+c[1]]=1; });
+  for(var y=0;y<N;y++) for(var x=0;x<N;x++){ if(set[x+','+y]){ var cx=pad+(x+0.5)*cell, cy=pad+(y+0.5)*cell; r+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(cell*0.22)+'" fill="#0c1226" stroke="#8d97bd"/>'; } }
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+r+'</svg>';
 }
 
