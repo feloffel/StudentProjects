@@ -125,7 +125,8 @@ function screenIntro(){
 function keyHint(id){
   switch(id){
     case 'rotation3d': return 'Tasten: <b>F</b> = dieselbe Figur · <b>J</b> = Spiegelbild';
-    case 'gapfit': case 'paperfold': case 'lineclose': case 'control_math': return 'Tasten: <b>1–4</b> für die Auswahl';
+    case 'gapfit': case 'lineclose': case 'control_math': return 'Tasten: <b>1–4</b> für die Auswahl';
+    case 'paperfold': return 'Tasten: <b>1–5</b> (A–E) für die Auswahl';
     case 'corsi': return 'Mit Maus/Finger antippen';
     case 'timeprod': return '';
     case 'deary_rt': return 'Tasten: <b>D F J K</b> für die vier Felder';
@@ -140,22 +141,50 @@ function keyHint(id){
 var UI = {
   host:null,
   sleep:sleep,
+  TIMEOUT:'__timeout__',
   count:function(text){ var c=$('#cnt'); if(c) c.textContent=text; },
   fixation:async function(){ UI.host.innerHTML='<div class="stage"><div class="fix">+</div></div>'; await sleep(500+Math.random()*350); },
   flash:async function(ok){ var s=UI.host.querySelector('.stage'); if(s) s.classList.add(ok?'ok':'no'); await sleep(220); },
-  choice:function(map){
+  // Sichtbarer Countdown in der Leiste #timerbar. Gibt eine Abbruch-Funktion zurück.
+  countdownStart:function(ms, onEnd){
+    var bar=document.getElementById('timerbar');
+    if(!bar || !ms || ms<=0) return function(){};
+    bar.innerHTML='<div class="cd-track"><div class="cd-fill"></div></div><div class="cd-num"></div>';
+    bar.classList.add('on');
+    var fill=bar.querySelector('.cd-fill'), num=bar.querySelector('.cd-num');
+    var start=Date.now(), raf=null, to=null, stopped=false;
+    fill.style.transition='none'; fill.style.width='100%';
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      if(stopped) return; fill.style.transition='width '+ms+'ms linear'; fill.style.width='0%';
+    }); });
+    function upd(){
+      if(stopped) return;
+      var left=Math.max(0, ms-(Date.now()-start));
+      num.textContent=(left/1000).toFixed(1)+'s';
+      if(left<=ms*0.30) bar.classList.add('warn'); else bar.classList.remove('warn');
+      if(left>0) raf=requestAnimationFrame(upd);
+    }
+    upd();
+    function clear(){ if(to){clearTimeout(to);to=null;} if(raf){cancelAnimationFrame(raf);raf=null;} bar.classList.remove('on'); bar.classList.remove('warn'); bar.innerHTML=''; }
+    to=setTimeout(function(){ if(stopped) return; stopped=true; clear(); if(onEnd) onEnd(); }, ms);
+    return function(){ if(stopped) return; stopped=true; clear(); };
+  },
+  // choice(map) wie bisher; mit optionalem timeLimitMs startet ein Countdown.
+  // Läuft die Zeit ab, wird mit UI.TIMEOUT aufgelöst (-> Aufgabe gilt als falsch).
+  choice:function(map, timeLimitMs){
     return new Promise(function(resolve){
-      var done=false;
-      function finish(v){ if(done) return; done=true; document.removeEventListener('keydown',onKey); resolve(v); }
+      var done=false, cancelCd=function(){};
+      function finish(v){ if(done) return; done=true; document.removeEventListener('keydown',onKey); cancelCd(); resolve(v); }
       UI.host.querySelectorAll('.ans').forEach(function(b){ b.onclick=function(){ finish(b.dataset.a); }; });
-      function onKey(e){ var k=e.key.toLowerCase(); for(var i=0;i<map.length;i++){ if(map[i][1]===k){ finish(map[i][0]); return; } } }
+      function onKey(e){ var k=(e.key||'').toLowerCase(); for(var i=0;i<map.length;i++){ if(map[i][1]===k){ finish(map[i][0]); return; } } }
       document.addEventListener('keydown',onKey);
+      if(timeLimitMs && timeLimitMs>0){ cancelCd=UI.countdownStart(timeLimitMs, function(){ finish(UI.TIMEOUT); }); }
     });
   }
 };
 async function runCurrent(){
   var p=PLAN[STEP], def=p.def;
-  setScreen('<div class="card test"><div class="testhead"><span>'+escapeHtml(def.name)+'</span><span id="cnt"></span></div><div id="host"></div></div>');
+  setScreen('<div class="card test"><div class="testhead"><span>'+escapeHtml(def.name)+'</span><span id="cnt"></span></div><div id="timerbar" class="timerbar"></div><div id="host"></div></div>');
   UI.host=$('#host');
   var result;
   try { result = await def.run(p.params, UI); }

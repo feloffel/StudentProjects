@@ -276,16 +276,26 @@ async function rotationFallbackRun(P, ui){
           '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
         '</div></div>';
     var t0=performance.now();
-    var ans=await ui.choice([['same','f'],['mir','j']]);
+    var ans=await ui.choice([['same','f'],['mir','j']], P.tl||0);
     var rt=performance.now()-t0;
-    var correct=(ans==='mir')===isMirror;
-    results.push({ i:i+1, mirror:isMirror, answer:ans, correct:correct, rt:T.round(rt) });
+    var timedOut=(ans===ui.TIMEOUT);
+    var correct=!timedOut && ((ans==='mir')===isMirror);
+    results.push({ i:i+1, mirror:isMirror, answer:(timedOut?'timeout':ans), correct:correct, rt:T.round(rt) });
     await ui.flash(correct);
   }
   var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
   return { n:results.length, source:'generiert', correctCount:results.filter(function(r){return r.correct;}).length,
            accuracy:T.round(results.filter(function(r){return r.correct;}).length/results.length,3),
            avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
+}
+
+// Erzeugt n GARANTIERT unterschiedliche Wartezeiten (ms), gut gestreut über [lo,hi]
+// und gemischt -> kein vorhersehbarer Rhythmus, keine Wiederholung.
+function distinctIntervals(n, lo, hi){
+  var step=(hi-lo)/n, arr=[];
+  for(var i=0;i<n;i++){ arr.push(Math.round(lo + i*step + Math.random()*step*0.96)); }
+  // jeder Wert liegt in einem eigenen, nicht überlappenden Zeitfenster -> alle verschieden
+  return T.shuffle(arr);
 }
 
 /* =====================================================================
@@ -301,9 +311,9 @@ var TEST_POOL = [
   measures:'Wie schnell und sicher räumlich gedreht wird.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:12, angles:[0,50],     cubes:9  },
-    mittel:{ trials:18, angles:[50,100],   cubes:11 },
-    schwer:{ trials:24, angles:[100,150],  cubes:14 }
+    leicht:{ trials:12, angles:[0,50],     cubes:9,  tl:12000 },
+    mittel:{ trials:18, angles:[50,100],   cubes:11, tl:10000 },
+    schwer:{ trials:24, angles:[100,150],  cubes:14, tl:8000  }
   },
   run: async function(P, ui){
     var man = loadRotationImages();
@@ -325,10 +335,11 @@ var TEST_POOL = [
                 '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
               '</div></div>';
           var t0=performance.now();
-          var ans=await ui.choice([['same','f'],['mir','j']]);
+          var ans=await ui.choice([['same','f'],['mir','j']], P.tl||0);
           var rt=performance.now()-t0;
-          var correct=(ans===t.correct);
-          results.push({ i:used+1, figure:t.figure, angle:t.angle, mirror:t.mirror, answer:ans, correct:correct, rt:T.round(rt) });
+          var timedOut=(ans===ui.TIMEOUT);
+          var correct=!timedOut && (ans===t.correct);
+          results.push({ i:used+1, figure:t.figure, angle:t.angle, mirror:t.mirror, answer:(timedOut?'timeout':ans), correct:correct, rt:T.round(rt) });
           await ui.flash(correct);
           used++;
         }
@@ -358,9 +369,9 @@ var TEST_POOL = [
   measures:'Wie schnell man erkennt, welche Form in eine Lücke passt.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:10, mirrorFrom:99 },
-    mittel:{ trials:15, mirrorFrom:8 },
-    schwer:{ trials:20, mirrorFrom:1 }
+    leicht:{ trials:10, mirrorFrom:99, tl:10000 },
+    mittel:{ trials:15, mirrorFrom:8,  tl:8000  },
+    schwer:{ trials:20, mirrorFrom:1,  tl:6000  }
   },
   run: async function(P, ui){
     var keys=Object.keys(PIECES), targets=keys.slice();
@@ -395,10 +406,11 @@ var TEST_POOL = [
           '</div>'+
         '</div>';
       var t0=performance.now();
-      var ans=await ui.choice(options.map(function(_,k){ return [String(k), String(k+1)]; }));
+      var ans=await ui.choice(options.map(function(_,k){ return [String(k), String(k+1)]; }), P.tl||0);
       var rt=performance.now()-t0;
-      var ok=Number(ans)===correctIndex;
-      results.push({ i:i+1, correct:ok, rt:T.round(rt) });
+      var timedOut=(ans===ui.TIMEOUT);
+      var ok=!timedOut && (Number(ans)===correctIndex);
+      results.push({ i:i+1, correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -500,9 +512,9 @@ var TEST_POOL = [
   measures:'Allgemeines Tempo & Konzentration – als Vergleichswert.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:15, max:50 },
-    mittel:{ trials:20, max:90 },
-    schwer:{ trials:25, max:140 }
+    leicht:{ trials:15, max:50,  tl:9000 },
+    mittel:{ trials:20, max:90,  tl:7000 },
+    schwer:{ trials:25, max:140, tl:6000 }
   },
   run: async function(P, ui){
     var results=[];
@@ -519,9 +531,9 @@ var TEST_POOL = [
       ui.host.innerHTML='<div class="stage calc"><div class="eq">'+a+' '+(op==='-'?'−':'+')+' '+b+' =</div>'+
         '<div class="answers four num">'+options.map(function(o,k){ return '<button class="btn ans" data-a="'+k+'"><kbd>'+(k+1)+'</kbd>'+o+'</button>'; }).join('')+'</div></div>';
       var t0=performance.now();
-      var ans=await ui.choice(options.map(function(_,k){ return [String(k),String(k+1)]; }));
-      var rt=performance.now()-t0; var ok=Number(ans)===ci;
-      results.push({ i:i+1, correct:ok, rt:T.round(rt) });
+      var ans=await ui.choice(options.map(function(_,k){ return [String(k),String(k+1)]; }), P.tl||0);
+      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT); var ok=!timedOut && (Number(ans)===ci);
+      results.push({ i:i+1, correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -543,12 +555,17 @@ var TEST_POOL = [
   short:'Ein Blatt wird gefaltet und gelocht. Wo sind die Löcher, wenn man es wieder aufklappt?',
   measures:'Räumliches Vorstellungsvermögen (mehrschrittiges Denken).',
   defaultDifficulty:'mittel',
+  // Pro Durchgang werden "trials" Aufgaben FRISCH aus dem Generator gezogen
+  // (zufällige Faltungen + zufällig gestanztes Loch). Standard = 10 Aufgaben.
+  // Jede Aufgabe hat 5 Antwortmöglichkeiten A–E wie im VZ-2; die richtige
+  // Lösung wird geometrisch berechnet (kein fester Antwortschlüssel nötig).
   difficulties:{
-    leicht:{ trials:8,  folds:1, holes:1 },
-    mittel:{ trials:10, folds:2, holes:1 },
-    schwer:{ trials:12, folds:3, holes:1 }
+    leicht:{ trials:10, folds:1, holes:1, tl:18000 },
+    mittel:{ trials:10, folds:2, holes:1, tl:20000 },
+    schwer:{ trials:10, folds:3, holes:1, tl:25000 }
   },
   run: async function(P, ui){
+    var LETTERS=['A','B','C','D','E'];
     var results=[];
     for(var i=0;i<P.trials;i++){
       var tr=makeFoldTrial(P.folds, P.holes||1);
@@ -558,14 +575,16 @@ var TEST_POOL = [
         '<div class="stage fold">'+
           '<div class="foldsteps">'+tr.stepSVGs.join('<span class="arrow">→</span>')+'</div>'+
           '<div class="foldq">Wo sind die Löcher nach dem Aufklappen?</div>'+
-          '<div class="answers four">'+
-            tr.options.map(function(op,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+(k+1)+'</kbd>'+foldGridSVG(op,72)+'</button>'; }).join('')+
+          '<div class="answers five">'+
+            tr.optionSVGs.map(function(svg,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+LETTERS[k]+'</kbd>'+svg+'</button>'; }).join('')+
           '</div>'+
         '</div>';
       var t0=performance.now();
-      var ans=await ui.choice(tr.options.map(function(_,k){ return [String(k),String(k+1)]; }));
-      var rt=performance.now()-t0; var ok=Number(ans)===tr.correctIndex;
-      results.push({ i:i+1, correct:ok, rt:T.round(rt) });
+      var ans=await ui.choice(tr.options.map(function(_,k){ return [String(k),String(k+1)]; }), P.tl||0);
+      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT);
+      var chosen=Number(ans); var ok=!timedOut && (chosen===tr.correctIndex);
+      results.push({ i:i+1, correct:ok, rt:T.round(rt),
+                     chosen:(timedOut?'—':LETTERS[chosen]), correctAnswer:LETTERS[tr.correctIndex], folds:tr.nFolds });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -588,29 +607,31 @@ var TEST_POOL = [
   measures:'Reine Reaktionsgeschwindigkeit.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:15 },
-    mittel:{ trials:24 },
-    schwer:{ trials:32 }
+    leicht:{ trials:15, tl:3500 },
+    mittel:{ trials:24, tl:3000 },
+    schwer:{ trials:32, tl:2500 }
   },
   run: async function(P, ui){
     var results=[]; var keys=['d','f','j','k'];
+    var waits=distinctIntervals(P.trials, 800, 2200);   // alle unterschiedlich, gemischt
     for(var i=0;i<P.trials;i++){
       ui.count((i+1)+' / '+P.trials);
       ui.host.innerHTML='<div class="stage rt"><div class="rtrow">'+
         [0,1,2,3].map(function(k){ return '<div class="rtbox" data-k="'+k+'"><kbd>'+keys[k].toUpperCase()+'</kbd></div>'; }).join('')+
         '</div><div class="status">Warten…</div></div>';
-      await ui.sleep(T.rint(800,1800));
+      await ui.sleep(waits[i]);
       var target=T.rint(0,3);
       var box=ui.host.querySelector('.rtbox[data-k="'+target+'"]'); box.classList.add('lit');
       ui.host.querySelector('.status').textContent='Jetzt!';
       var t0=performance.now();
       var ans=await ui.choice([[String(target),keys[target]]].concat(
         [0,1,2,3].filter(function(k){return k!==target;}).map(function(k){ return ['wrong'+k, keys[k]]; })
-      ));
+      ), P.tl||0);
       var rt=performance.now()-t0;
-      var ok = ans===String(target);
+      var timedOut=(ans===ui.TIMEOUT);
+      var ok = !timedOut && (ans===String(target));
       box.classList.remove('lit');
-      results.push({ i:i+1, correct:ok, rt:T.round(rt) });
+      results.push({ i:i+1, wait:waits[i], correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -633,9 +654,9 @@ var TEST_POOL = [
   measures:'Wie flexibel man zwischen Aufgaben umschaltet.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:18 },
-    mittel:{ trials:28 },
-    schwer:{ trials:40 }
+    leicht:{ trials:18, tl:4000 },
+    mittel:{ trials:28, tl:3500 },
+    schwer:{ trials:40, tl:3000 }
   },
   run: async function(P, ui){
     var results=[]; var prevRule=null;
@@ -657,9 +678,9 @@ var TEST_POOL = [
         '</div></div>';
       var correctSide = rule==='groesse' ? (n<5?'left':'right') : (n%2===0?'left':'right');
       var t0=performance.now();
-      var ans=await ui.choice([['left','f'],['right','j']]);
-      var rt=performance.now()-t0; var ok=ans===correctSide;
-      results.push({ i:i+1, rule:rule, switched:switched, correct:ok, rt:T.round(rt) });
+      var ans=await ui.choice([['left','f'],['right','j']], P.tl||0);
+      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT); var ok=!timedOut && (ans===correctSide);
+      results.push({ i:i+1, rule:rule, switched:switched, correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
       prevRule=rule;
     }
@@ -689,9 +710,9 @@ var TEST_POOL = [
   measures:'Wie schnell das Auge ein Muster „schließt“ und ergänzt.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:10, grid:3 },
-    mittel:{ trials:14, grid:4 },
-    schwer:{ trials:18, grid:5 }
+    leicht:{ trials:10, grid:3, tl:10000 },
+    mittel:{ trials:14, grid:4, tl:8000  },
+    schwer:{ trials:18, grid:5, tl:7000  }
   },
   run: async function(P, ui){
     var results=[];
@@ -706,9 +727,9 @@ var TEST_POOL = [
           tr.options.map(function(op,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+(k+1)+'</kbd>'+op+'</button>'; }).join('')+
         '</div></div>';
       var t0=performance.now();
-      var ans=await ui.choice(tr.options.map(function(_,k){ return [String(k),String(k+1)]; }));
-      var rt=performance.now()-t0; var ok=Number(ans)===tr.correctIndex;
-      results.push({ i:i+1, correct:ok, rt:T.round(rt) });
+      var ans=await ui.choice(tr.options.map(function(_,k){ return [String(k),String(k+1)]; }), P.tl||0);
+      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT); var ok=!timedOut && (Number(ans)===tr.correctIndex);
+      results.push({ i:i+1, correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -731,9 +752,9 @@ var TEST_POOL = [
   measures:'Räumliches Planen wie beim Packen oder Spülmaschine-Einräumen.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:10, grid:4 },
-    mittel:{ trials:14, grid:5 },
-    schwer:{ trials:18, grid:6 }
+    leicht:{ trials:10, grid:4, tl:14000 },
+    mittel:{ trials:14, grid:5, tl:12000 },
+    schwer:{ trials:18, grid:6, tl:10000 }
   },
   run: async function(P, ui){
     var results=[];
@@ -752,9 +773,9 @@ var TEST_POOL = [
           '<button class="btn ans" data-a="no"><kbd>J</kbd> Passt nicht</button>'+
         '</div></div>';
       var t0=performance.now();
-      var ans=await ui.choice([['yes','f'],['no','j']]);
-      var rt=performance.now()-t0; var ok=(ans==='yes')===tr.fits;
-      results.push({ i:i+1, fits:tr.fits, correct:ok, rt:T.round(rt) });
+      var ans=await ui.choice([['yes','f'],['no','j']], P.tl||0);
+      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT); var ok=!timedOut && ((ans==='yes')===tr.fits);
+      results.push({ i:i+1, fits:tr.fits, correct:ok, rt:T.round(rt), timedOut:timedOut });
       await ui.flash(ok);
     }
     var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
@@ -777,9 +798,9 @@ var TEST_POOL = [
   measures:'Wie schnell das Auge im Gewimmel das Besondere findet.',
   defaultDifficulty:'mittel',
   difficulties:{
-    leicht:{ trials:10, items:16 },
-    mittel:{ trials:12, items:30 },
-    schwer:{ trials:14, items:48 }
+    leicht:{ trials:10, items:16, tl:12000 },
+    mittel:{ trials:12, items:30, tl:10000 },
+    schwer:{ trials:14, items:48, tl:9000  }
   },
   run: async function(P, ui){
     var results=[];
@@ -797,7 +818,7 @@ var TEST_POOL = [
                  '</button>';
         }).join('')+'</div><div class="status">Tippe das Kästchen mit dem blauen Punkt an</div></div>';
       var t0=performance.now();
-      var ok=await waitTargetTap(ui.host);
+      var ok=await waitTargetTap(ui, P.tl||0);
       var rt=performance.now()-t0;
       results.push({ i:i+1, items:n, correct:ok, rt:T.round(rt) });
       await ui.flash(ok);
@@ -909,16 +930,13 @@ function collectTaps(host, need){
     });
   });
 }
-function waitTargetTap(host){
+function waitTargetTap(ui, timeoutMs){
   return new Promise(function(resolve){
+    var host=ui.host, done=false, cancelCd=function(){};
     var items=host.querySelectorAll('.sitem');
-    items.forEach(function(it){
-      it.onclick=function(){
-        var ok=it.dataset.t==='1';
-        items.forEach(function(x){ x.onclick=null; });
-        resolve(ok);
-      };
-    });
+    function finish(v){ if(done) return; done=true; cancelCd(); items.forEach(function(x){ x.onclick=null; }); resolve(v); }
+    items.forEach(function(it){ it.onclick=function(){ finish(it.dataset.t==='1'); }; });
+    if(timeoutMs && timeoutMs>0 && ui.countdownStart){ cancelCd=ui.countdownStart(timeoutMs, function(){ finish(false); }); }
   });
 }
 function produceInterval(ui, targetSec){
@@ -936,111 +954,156 @@ function produceInterval(ui, targetSec){
   });
 }
 
-/* ----- Papier falten: Aufgabe erzeugen ----- */
+/* ----- Papier falten (Paper-Folding VZ-2-Stil): Aufgabe erzeugen -----
+   Originaler Generator (keine Kopien fremder Testbögen). Modell mit
+   stetigen Koordinaten im Einheitsquadrat [0,1]x[0,1].
+   Formen: achsenparalleles Rechteck ODER gleichschenklig-rechtwinkliges
+   Dreieck. Jeder Falz halbiert die aktuelle Form auf eine spiegel-
+   kongruente Hälfte (waagerecht, senkrecht oder diagonal). Beim Aufklappen
+   werden die Löcher in umgekehrter Reihenfolge an jeder Falzlinie
+   gespiegelt – die richtige Lösung wird also BERECHNET und ist immer korrekt. */
+function _fl_line(p0,p1){ var dx=p1[0]-p0[0], dy=p1[1]-p0[1]; var a=dy,b=-dx,n=Math.hypot(a,b); a/=n; b/=n; return {a:a,b:b,c:-(a*p0[0]+b*p0[1])}; }
+function _fl_reflect(p,L){ var d=L.a*p[0]+L.b*p[1]+L.c; return [p[0]-2*L.a*d, p[1]-2*L.b*d]; }
+function _fl_mid(p,q){ return [(p[0]+q[0])/2,(p[1]+q[1])/2]; }
+function _fl_poly(s){
+  if(s.kind==='rect'){ var x0=s.cx-s.w/2,x1=s.cx+s.w/2,y0=s.cy-s.h/2,y1=s.cy+s.h/2; return [[x0,y0],[x1,y0],[x1,y1],[x0,y1]]; }
+  return [s.p,s.q,s.r];
+}
+function _fl_centroid(s){ if(s.kind==='rect') return [s.cx,s.cy]; return [(s.r[0]+s.p[0]+s.q[0])/3,(s.r[1]+s.p[1]+s.q[1])/3]; }
+function _fl_rawPoint(s, margin){
+  if(s.kind==='rect'){ var mx=Math.min(margin,s.w*0.3), my=Math.min(margin,s.h*0.3);
+    return [ s.cx-s.w/2+mx+Math.random()*(s.w-2*mx), s.cy-s.h/2+my+Math.random()*(s.h-2*my) ]; }
+  var r=s.r,p=s.p,q=s.q, u=Math.random(), v=Math.random(); if(u+v>1){u=1-u;v=1-v;}
+  var x=r[0]+u*(p[0]-r[0])+v*(q[0]-r[0]), y=r[1]+u*(p[1]-r[1])+v*(q[1]-r[1]);
+  var c=_fl_centroid(s), k=0.3; return [x+(c[0]-x)*k, y+(c[1]-y)*k];
+}
+function _fl_interior(s, margin){
+  var c=_fl_centroid(s), diag=(s.kind==='rect')?Math.hypot(s.w,s.h):0.5, minOff=diag*0.18;
+  for(var t=0;t<60;t++){ var pt=_fl_rawPoint(s,margin); if(Math.hypot(pt[0]-c[0],pt[1]-c[1])>=minOff) return pt; }
+  return _fl_rawPoint(s,margin);
+}
+function _fl_foldOptions(s){
+  var out=[];
+  if(s.kind==='rect'){
+    var x0=s.cx-s.w/2,x1=s.cx+s.w/2,y0=s.cy-s.h/2,y1=s.cy+s.h/2;
+    out.push({ crease:_fl_line([s.cx,y0],[s.cx,y1]), halves:[
+      {kind:'rect',cx:s.cx-s.w/4,cy:s.cy,w:s.w/2,h:s.h},{kind:'rect',cx:s.cx+s.w/4,cy:s.cy,w:s.w/2,h:s.h}] });
+    out.push({ crease:_fl_line([x0,s.cy],[x1,s.cy]), halves:[
+      {kind:'rect',cx:s.cx,cy:s.cy-s.h/4,w:s.w,h:s.h/2},{kind:'rect',cx:s.cx,cy:s.cy+s.h/4,w:s.w,h:s.h/2}] });
+    if(Math.abs(s.w-s.h)<1e-9){
+      var TL=[x0,y0],TR=[x1,y0],BR=[x1,y1],BL=[x0,y1];
+      out.push({ crease:_fl_line(TL,BR), halves:[ {kind:'tri',r:TR,p:TL,q:BR},{kind:'tri',r:BL,p:BR,q:TL} ] });
+      out.push({ crease:_fl_line(TR,BL), halves:[ {kind:'tri',r:TL,p:BL,q:TR},{kind:'tri',r:BR,p:TR,q:BL} ] });
+    }
+  } else {
+    var m=_fl_mid(s.p,s.q);
+    out.push({ crease:_fl_line(s.r,m), halves:[ {kind:'tri',r:m,p:s.r,q:s.p},{kind:'tri',r:m,p:s.r,q:s.q} ] });
+  }
+  return out;
+}
 function makeFoldTrial(nFolds, nHoles){
-  // Echtes Faltmodell auf 4x4-Raster. Jeder Falz halbiert das aktuelle Papier
-  // entlang einer zufälligen Achse UND Richtung. Löcher liegen irgendwo im
-  // gefalteten Bereich; beim Aufklappen werden sie über die echten Falzlinien gespiegelt.
-  var N=4;
-  var region={x0:0,x1:N-1,y0:0,y1:N-1};
-  var folds=[], regionsSeq=[];
+  nHoles=nHoles||1;
+  var shape={kind:'rect',cx:0.5,cy:0.5,w:1,h:1}, creases=[], shapesSeq=[shape], flaps=[];
   for(var f=0; f<nFolds; f++){
-    regionsSeq.push({x0:region.x0,x1:region.x1,y0:region.y0,y1:region.y1});
-    var canV=(region.x1-region.x0+1)>=2, canH=(region.y1-region.y0+1)>=2;
-    var axis = (canV&&canH) ? T.pick(['v','h']) : (canV?'v':'h');
-    if(axis==='v'){
-      var mid=(region.x0+region.x1)/2, rl=Math.random()<0.5;
-      folds.push({axis:'v', crease:mid, dir: rl?'RL':'LR'});
-      if(rl) region.x1=Math.floor(mid); else region.x0=Math.ceil(mid);
-    }else{
-      var midy=(region.y0+region.y1)/2, bt=Math.random()<0.5;
-      folds.push({axis:'h', crease:midy, dir: bt?'BT':'TB'});
-      if(bt) region.y1=Math.floor(midy); else region.y0=Math.ceil(midy);
-    }
+    var opt=T.pick(_fl_foldOptions(shape)); var half=T.pick(opt.halves);
+    var other=(opt.halves[0]===half)?opt.halves[1]:opt.halves[0]; // die Hälfte, die umgeklappt wird
+    flaps.push({ flap:_fl_poly(other), from:_fl_centroid(other), to:_fl_centroid(half) });
+    creases.push(opt.crease); shape=half; shapesSeq.push(shape);
   }
-  regionsSeq.push({x0:region.x0,x1:region.x1,y0:region.y0,y1:region.y1}); // gefalteter Endzustand
-  var fin=region;
-  function randHole(){ return [T.rint(fin.x0,fin.x1), T.rint(fin.y0,fin.y1)]; }
-  var holes=[randHole()];
-  var cap=(fin.x1-fin.x0+1)*(fin.y1-fin.y0+1); nHoles=Math.min(nHoles||1, cap);
-  var g=0; while(holes.length<nHoles && g++<30){ var h=randHole(); if(!holes.some(function(c){return c[0]===h[0]&&c[1]===h[1];})) holes.push(h); }
-
-  function reflect(set, fd){ return set.map(function(c){ return fd.axis==='v' ? [2*fd.crease-c[0], c[1]] : [c[0], 2*fd.crease-c[1]]; }); }
-  function dedupe(set){ var s={},o=[]; set.forEach(function(c){var k=c[0]+','+c[1]; if(!s[k]){s[k]=1;o.push(c);}}); return o; }
-  function unfold(set, skipIdx){
-    var cur=set.map(function(c){return c.slice();});
-    for(var i=folds.length-1;i>=0;i--){ if(i===skipIdx) continue; cur=dedupe(cur.concat(reflect(cur,folds[i]))); }
-    return cur;
-  }
-  function keyOf(set){ return set.map(function(c){return c[0]+','+c[1];}).sort().join(';'); }
-
+  var holes=[], tries=0;
+  while(holes.length<nHoles && tries++<200){ var h=_fl_interior(shape,0.12);
+    if(holes.every(function(o){return Math.hypot(o[0]-h[0],o[1]-h[1])>0.18;})) holes.push(h); }
+  function dedupe(set){ var out=[]; set.forEach(function(p){ if(out.every(function(o){return Math.hypot(o[0]-p[0],o[1]-p[1])>0.02;})) out.push(p); }); return out; }
+  function unfold(set, skip){ var cur=set.map(function(p){return p.slice();});
+    for(var i=creases.length-1;i>=0;i--){ if(i===skip) continue; cur=dedupe(cur.concat(cur.map(function(p){return _fl_reflect(p,creases[i]);}))); } return cur; }
+  function keyOf(set){ return set.map(function(p){return Math.round(p[0]*1000)/1000+','+Math.round(p[1]*1000)/1000;}).sort().join(';'); }
   var correct=unfold(holes,-1), ckey=keyOf(correct);
-  // plausible Distraktoren
+  function setDist(A,B){ if(A.length!==B.length) return 1; var used={},tot=0;
+    A.forEach(function(p){ var best=9,bi=-1; for(var j=0;j<B.length;j++){ if(used[j])continue; var d=Math.hypot(p[0]-B[j][0],p[1]-B[j][1]); if(d<best){best=d;bi=j;} } used[bi]=1; tot+=best; }); return tot/A.length; }
+  function distinct(cd){ return cd.length>0 && setDist(cd,correct)>=0.09; }
   var cands=[];
-  if(folds.length>1) cands.push(unfold(holes, T.rint(0,folds.length-1)));        // einen Falz "vergessen"
-  cands.push(dedupe(correct.map(function(c){return [N-1-c[0],c[1]];})));          // ganz waagerecht gespiegelt
-  cands.push(dedupe(correct.map(function(c){return [c[0],N-1-c[1]];})));          // ganz senkrecht gespiegelt
-  cands.push(holes.map(function(c){return c.slice();}));                          // nur die gestanzten Punkte
-  var opts=[correct], oset={}; oset[ckey]=1;
-  for(var ci=0; ci<cands.length && opts.length<4; ci++){ var k=keyOf(cands[ci]); if(cands[ci].length && !oset[k]){ oset[k]=1; opts.push(cands[ci]); } }
-  var guard=0; while(opts.length<4 && guard++<60){ var rnd=unfold([randHole()],-1); var k2=keyOf(rnd); if(!oset[k2]){ oset[k2]=1; opts.push(rnd); } }
-  opts=T.shuffle(opts.slice(0,4));
-
-  // Visualisierung: pro Falz ein Bild (Papier wird sichtbar kleiner), zum Schluss gefaltet + gelocht
-  var stepSVGs=[];
-  for(var s=0;s<folds.length;s++) stepSVGs.push(paperFrameSVG(regionsSeq[s], folds[s], null, 90));
-  stepSVGs.push(paperFrameSVG(regionsSeq[folds.length], null, holes, 90));
-  return { folds:folds, holes:holes, options:opts, correctIndex:opts.findIndex(function(o){return keyOf(o)===ckey;}), stepSVGs:stepSVGs };
-}
-function _arrow(x0,y0,x1,y1,col){
-  var ang=Math.atan2(y1-y0,x1-x0), ah=6;
-  var hx1=x1-ah*Math.cos(ang-0.5), hy1=y1-ah*Math.sin(ang-0.5);
-  var hx2=x1-ah*Math.cos(ang+0.5), hy2=y1-ah*Math.sin(ang+0.5);
-  return '<line x1="'+x0.toFixed(1)+'" y1="'+y0.toFixed(1)+'" x2="'+x1.toFixed(1)+'" y2="'+y1.toFixed(1)+'" stroke="'+col+'" stroke-width="2"/>'+
-         '<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' L'+hx1.toFixed(1)+' '+hy1.toFixed(1)+' L'+hx2.toFixed(1)+' '+hy2.toFixed(1)+' Z" fill="'+col+'"/>';
-}
-// Ein Falt-Schritt: zeigt das AKTUELLE Papier (echte Größe/Position) + Flap, Falzlinie, Pfeil
-function paperFrameSVG(region, fold, holes, size){
-  size=size||90; var N=4, pad=9, cell=(size-2*pad)/N, r='';
-  var paper='#e4eaf7', edge='#8d97bd', cc='#22d3ee', holeFill='#0c1226';
-  function px(g){ return pad+g*cell; }
-  var rx=px(region.x0), ry=px(region.y0), rw=(region.x1-region.x0+1)*cell, rh=(region.y1-region.y0+1)*cell;
-  // ganz schwacher Umriss des Originalblatts (Orientierung, wie groß es mal war)
-  r+='<rect x="'+pad+'" y="'+pad+'" width="'+(N*cell)+'" height="'+(N*cell)+'" rx="4" fill="none" stroke="rgba(255,255,255,.10)" stroke-dasharray="2 3"/>';
-  // aktuelles Papier
-  r+='<rect x="'+rx.toFixed(1)+'" y="'+ry.toFixed(1)+'" width="'+rw.toFixed(1)+'" height="'+rh.toFixed(1)+'" rx="4" fill="'+paper+'" stroke="'+edge+'"/>';
-  if(fold){
-    if(fold.axis==='v'){
-      var cx=px(fold.crease+0.5);
-      var flapX=(fold.dir==='RL')?cx:rx, flapW=(fold.dir==='RL')?(rx+rw-cx):(cx-rx);
-      r+='<rect x="'+flapX.toFixed(1)+'" y="'+ry.toFixed(1)+'" width="'+flapW.toFixed(1)+'" height="'+rh.toFixed(1)+'" fill="rgba(34,211,238,.18)" stroke="'+cc+'" stroke-dasharray="3 2"/>';
-      r+='<line x1="'+cx.toFixed(1)+'" y1="'+ry.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+(ry+rh).toFixed(1)+'" stroke="'+cc+'" stroke-dasharray="4 3" stroke-width="2"/>';
-      var fcx=flapX+flapW/2, tcx=(fold.dir==='RL')?(cx-rw*0.12):(cx+rw*0.12);
-      r+=_arrow(fcx, ry+rh/2, tcx, ry+rh/2, cc);
-    }else{
-      var cy=px(fold.crease+0.5);
-      var flapY=(fold.dir==='BT')?cy:ry, flapH=(fold.dir==='BT')?(ry+rh-cy):(cy-ry);
-      r+='<rect x="'+rx.toFixed(1)+'" y="'+flapY.toFixed(1)+'" width="'+rw.toFixed(1)+'" height="'+flapH.toFixed(1)+'" fill="rgba(34,211,238,.18)" stroke="'+cc+'" stroke-dasharray="3 2"/>';
-      r+='<line x1="'+rx.toFixed(1)+'" y1="'+cy.toFixed(1)+'" x2="'+(rx+rw).toFixed(1)+'" y2="'+cy.toFixed(1)+'" stroke="'+cc+'" stroke-dasharray="4 3" stroke-width="2"/>';
-      var fcy=flapY+flapH/2, tcy=(fold.dir==='BT')?(cy-rh*0.12):(cy+rh*0.12);
-      r+=_arrow(rx+rw/2, fcy, rx+rw/2, tcy, cc);
-    }
+  if(creases.length>1) cands.push(unfold(holes, T.rint(0,creases.length-1)));
+  cands.push(dedupe(correct.map(function(p){return [1-p[0],p[1]];})));
+  cands.push(dedupe(correct.map(function(p){return [p[0],1-p[1]];})));
+  cands.push(holes.map(function(p){return p.slice();}));
+  cands.push(dedupe(correct.map(function(p){return [p[1],p[0]];})));
+  var opts=[correct], seen={}; seen[ckey]=1;
+  cands.forEach(function(cd){ if(opts.length<5 && distinct(cd)){ var k=keyOf(cd); if(!seen[k]){ seen[k]=1; opts.push(cd); } } });
+  var guard=0;
+  while(opts.length<5 && guard++<300){
+    var j=dedupe(correct.map(function(p){return [p[0]+(Math.random()-0.5)*0.5,p[1]+(Math.random()-0.5)*0.5];})
+      .filter(function(p){return p[0]>0.05&&p[0]<0.95&&p[1]>0.05&&p[1]<0.95;}));
+    var k=keyOf(j); if(distinct(j)&&!seen[k]){ seen[k]=1; opts.push(j); }
   }
-  if(holes){ holes.forEach(function(c){ var hx=px(c[0]+0.5), hy=px(c[1]+0.5); r+='<circle cx="'+hx.toFixed(1)+'" cy="'+hy.toFixed(1)+'" r="'+(cell*0.2).toFixed(1)+'" fill="'+holeFill+'" stroke="'+edge+'" stroke-width="1"/>'; }); }
+  opts=T.shuffle(opts.slice(0,5));
+  var correctIndex=-1; for(var oi=0;oi<opts.length;oi++){ if(keyOf(opts[oi])===ckey){ correctIndex=oi; break; } }
+  // Schritt-Bilder fürs Prompt + Antwort-Bögen
+  var stepSVGs=[];
+  for(var st=0; st<flaps.length; st++)
+    stepSVGs.push(foldStepSVG(_fl_poly(shapesSeq[st]), flaps[st].flap, creases[st], flaps[st].from, flaps[st].to, 96));
+  stepSVGs.push(foldFinalSVG(_fl_poly(shapesSeq[shapesSeq.length-1]), holes, 96));
+  var optionSVGs=opts.map(function(o){ return foldGridSVG(o,80); });
+  return { nFolds:nFolds, holes:holes, options:opts, optionSVGs:optionSVGs, stepSVGs:stepSVGs, correctIndex:correctIndex };
+}
+// kleiner Pfeil von (x0,y0) nach (x1,y1)
+function _fl_arrow(x0,y0,x1,y1,col){
+  var ang=Math.atan2(y1-y0,x1-x0), ah=6;
+  return '<line x1="'+x0.toFixed(1)+'" y1="'+y0.toFixed(1)+'" x2="'+x1.toFixed(1)+'" y2="'+y1.toFixed(1)+'" stroke="'+col+'" stroke-width="2" stroke-linecap="round"/>'+
+         '<path d="M'+x1.toFixed(1)+' '+y1.toFixed(1)+' L'+(x1-ah*Math.cos(ang-0.5)).toFixed(1)+' '+(y1-ah*Math.sin(ang-0.5)).toFixed(1)+
+         ' L'+(x1-ah*Math.cos(ang+0.5)).toFixed(1)+' '+(y1-ah*Math.sin(ang+0.5)).toFixed(1)+' Z" fill="'+col+'"/>';
+}
+// Ein Falt-Schritt: schwacher Umriss des Originalblatts + aktuelles Papier,
+// die umzuklappende Hälfte (Flap) türkis hervorgehoben, Falzlinie + Richtungspfeil.
+function foldStepSVG(prePoly, flapPoly, crease, from, to, size){
+  size=size||96; var pad=11, span=size-2*pad, r='';
+  var paper='#e4eaf7', edge='#8d97bd', cc='#22d3ee';
+  function P(x,y){ return (pad+x*span).toFixed(1)+','+(pad+y*span).toFixed(1); }
+  function pts(poly){ return poly.map(function(p){return P(p[0],p[1]);}).join(' '); }
+  // Originalblatt (zur Orientierung, wie groß es einmal war)
+  r+='<rect x="'+pad+'" y="'+pad+'" width="'+span+'" height="'+span+'" rx="3" fill="none" stroke="rgba(255,255,255,.12)" stroke-dasharray="2 3"/>';
+  // aktuelles Papier
+  r+='<polygon points="'+pts(prePoly)+'" fill="'+paper+'" stroke="'+edge+'" stroke-width="1.6" stroke-linejoin="round"/>';
+  // Flap (klappt um)
+  r+='<polygon points="'+pts(flapPoly)+'" fill="rgba(34,211,238,.20)" stroke="'+cc+'" stroke-width="1.4" stroke-dasharray="3 2" stroke-linejoin="round"/>';
+  // Falzlinie
+  if(crease){
+    var xs=prePoly.map(function(p){return p[0];}), ys=prePoly.map(function(p){return p[1];});
+    var minx=Math.min.apply(null,xs),maxx=Math.max.apply(null,xs),miny=Math.min.apply(null,ys),maxy=Math.max.apply(null,ys);
+    var L=crease, pis=[];
+    function addpt(x,y){ if(x>=minx-1e-6&&x<=maxx+1e-6&&y>=miny-1e-6&&y<=maxy+1e-6) pis.push([x,y]); }
+    if(Math.abs(L.b)>1e-9){ addpt(minx,-(L.a*minx+L.c)/L.b); addpt(maxx,-(L.a*maxx+L.c)/L.b); }
+    if(Math.abs(L.a)>1e-9){ addpt(-(L.b*miny+L.c)/L.a,miny); addpt(-(L.b*maxy+L.c)/L.a,maxy); }
+    if(pis.length>=2) r+='<line x1="'+P(pis[0][0],pis[0][1]).split(',')[0]+'" y1="'+P(pis[0][0],pis[0][1]).split(',')[1]+'" x2="'+P(pis[1][0],pis[1][1]).split(',')[0]+'" y2="'+P(pis[1][0],pis[1][1]).split(',')[1]+'" stroke="'+cc+'" stroke-width="2" stroke-dasharray="4 3"/>';
+  }
+  // Richtungspfeil: von der Flap-Mitte Richtung bleibender Hälfte
+  if(from && to){
+    var fx=pad+from[0]*span, fy=pad+from[1]*span, tx=pad+to[0]*span, ty=pad+to[1]*span;
+    // etwas einkürzen, damit der Pfeil nicht über die ganze Fläche läuft
+    var mx=fx+(tx-fx)*0.78, my=fy+(ty-fy)*0.78;
+    r+=_fl_arrow(fx+(tx-fx)*0.15, fy+(ty-fy)*0.15, mx, my, cc);
+  }
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+r+'</svg>';
 }
-// Antwortoption: aufgeklapptes Blatt (4x4) mit gestanzten Löchern
+// Endzustand: gefaltetes Papier + gestanzte Löcher (ausgefüllte Punkte)
+function foldFinalSVG(shapePoly, holes, size){
+  size=size||96; var pad=11, span=size-2*pad, r='';
+  var paper='#e4eaf7', edge='#8d97bd', holeFill='#0c1226';
+  function pts(poly){ return poly.map(function(p){return (pad+p[0]*span).toFixed(1)+','+(pad+p[1]*span).toFixed(1);}).join(' '); }
+  r+='<rect x="'+pad+'" y="'+pad+'" width="'+span+'" height="'+span+'" rx="3" fill="none" stroke="rgba(255,255,255,.12)" stroke-dasharray="2 3"/>';
+  r+='<polygon points="'+pts(shapePoly)+'" fill="'+paper+'" stroke="'+edge+'" stroke-width="1.6" stroke-linejoin="round"/>';
+  if(holes) holes.forEach(function(h){ r+='<circle cx="'+(pad+h[0]*span).toFixed(1)+'" cy="'+(pad+h[1]*span).toFixed(1)+'" r="'+(span*0.05).toFixed(1)+'" fill="'+holeFill+'" stroke="'+edge+'" stroke-width="1"/>'; });
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+r+'</svg>';
+}
+// Antwort-Option: aufgeklapptes Blatt mit feinem Orientierungsraster + gestanzten Löchern
 function foldGridSVG(holes, size){
-  size=size||76; var N=4, pad=6, cell=(size-2*pad)/N, r='';
-  r+='<rect x="'+pad+'" y="'+pad+'" width="'+(N*cell)+'" height="'+(N*cell)+'" rx="4" fill="#e4eaf7" stroke="#8d97bd"/>';
-  for(var i=1;i<N;i++){ var p=pad+i*cell;
-    r+='<line x1="'+p+'" y1="'+pad+'" x2="'+p+'" y2="'+(pad+N*cell)+'" stroke="rgba(20,29,58,.10)"/>'+
-       '<line x1="'+pad+'" y1="'+p+'" x2="'+(pad+N*cell)+'" y2="'+p+'" stroke="rgba(20,29,58,.10)"/>'; }
-  var set={}; holes.forEach(function(c){ set[c[0]+','+c[1]]=1; });
-  for(var y=0;y<N;y++) for(var x=0;x<N;x++){ if(set[x+','+y]){ var cx=pad+(x+0.5)*cell, cy=pad+(y+0.5)*cell; r+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(cell*0.22)+'" fill="#0c1226" stroke="#8d97bd"/>'; } }
+  size=size||80; var pad=8, span=size-2*pad, r='';
+  r+='<rect x="'+pad+'" y="'+pad+'" width="'+span+'" height="'+span+'" rx="3" fill="#e4eaf7" stroke="#8d97bd" stroke-width="1.6"/>';
+  for(var i=1;i<4;i++){ var p=pad+i*span/4;
+    r+='<line x1="'+p.toFixed(1)+'" y1="'+pad+'" x2="'+p.toFixed(1)+'" y2="'+(pad+span)+'" stroke="rgba(20,29,58,.10)"/>'+
+       '<line x1="'+pad+'" y1="'+p.toFixed(1)+'" x2="'+(pad+span)+'" y2="'+p.toFixed(1)+'" stroke="rgba(20,29,58,.10)"/>'; }
+  holes.forEach(function(h){ r+='<circle cx="'+(pad+h[0]*span).toFixed(1)+'" cy="'+(pad+h[1]*span).toFixed(1)+'" r="'+(span*0.06).toFixed(1)+'" fill="#0c1226" stroke="#8d97bd" stroke-width="1"/>'; });
   return '<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'">'+r+'</svg>';
 }
-
 /* ----- Muster vervollständigen: Aufgabe erzeugen ----- */
 function makePatternTrial(g){
   // Regelmäßiges Muster: Schachbrett ODER Streifen; ein Feld fehlt -> richtige Füllung wählen.

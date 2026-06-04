@@ -149,7 +149,7 @@ var FIELD_LABELS = {
   len:'Länge', seq:'Gezeigte Folge', resp:'Deine Eingabe', target:'Zielzeit (Sek)',
   producedMs:'Gestoppt bei', devMs:'Abweichung', rule:'Regel', switched:'Regelwechsel?',
   fits:'Passt rein?', items:'Anzahl Symbole', a:'Aufgabe', given:'Deine Antwort', sol:'Lösung',
-  q:'Aufgabe', value:'Wert', round:'Runde', hit:'Treffer?', kind:'Art', figure:'Figur', angle:'Drehwinkel', source:'Quelle',
+  q:'Aufgabe', value:'Wert', round:'Runde', hit:'Treffer?', kind:'Art', figure:'Figur', angle:'Drehwinkel', source:'Quelle', wait:'Wartezeit davor',
   correctCount:'Richtige gesamt', accuracy:'Trefferquote', avgMs:'Durchschnittszeit', medMs:'Typische Zeit',
   bestLength:'Längste Folge', totalTrials:'Durchgänge gesamt', hits:'Treffer', misses:'Verpasst',
   falseAlarms:'Fehlalarme', rounds:'Runden', switchMs:'Zeit nach Wechsel', stayMs:'Zeit ohne Wechsel',
@@ -164,7 +164,7 @@ function cellVal(k, v){
   if(k==='mirror' || k==='switched' || k==='fits') return v ? 'ja' : 'nein';
   if(k==='accuracy'){ var pc=Math.round(Number(v)*100); return isNaN(pc)?String(v):pc+' %'; }
   if(k==='angle'){ return v+'°'; }
-  if(k==='rt' || k==='producedMs' || k==='devMs' || k==='avgMs' || k==='medMs' || k==='switchMs' || k==='stayMs' || k==='switchCost'){
+  if(k==='rt' || k==='producedMs' || k==='devMs' || k==='avgMs' || k==='medMs' || k==='switchMs' || k==='stayMs' || k==='switchCost' || k==='wait'){
     var ms=Number(v); if(isNaN(ms)) return String(v);
     return (k==='devMs'||k==='switchCost' ? (ms>=0?'+':'') : '') + (ms/1000).toFixed(2).replace('.',',')+' s';
   }
@@ -182,7 +182,7 @@ function cellVal(k, v){
 function detailTable(arr){
   if(!arr || !arr.length) return '';
   // Spalten = Vereinigung aller Schlüssel, in sinnvoller Reihenfolge
-  var pref=['i','len','target','rule','items','answer','given','sol','seq','resp','mirror','switched','fits','correct','hit','rt','producedMs','devMs'];
+  var pref=['i','wait','len','target','rule','items','answer','given','sol','seq','resp','mirror','switched','fits','correct','hit','rt','producedMs','devMs'];
   var keys={}; arr.forEach(function(row){ Object.keys(row).forEach(function(k){ keys[k]=1; }); });
   var cols=pref.filter(function(k){return keys[k];}).concat(Object.keys(keys).filter(function(k){return pref.indexOf(k)<0;}));
   var head='<tr>'+cols.map(function(k){ return '<th>'+fieldLabel(k)+'</th>'; }).join('')+'</tr>';
