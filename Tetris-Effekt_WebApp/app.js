@@ -12,12 +12,9 @@ function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 
 /* ---------- Studientage / Phasen ---------- */
 var DAY_OPTIONS = [
-  { group:'Baseline (ohne Tetris)', items:[
-    {v:'baseline:-2', label:'Baseline 1'},{v:'baseline:-1', label:'Baseline 2'},{v:'baseline:0', label:'Baseline 3'} ]},
-  { group:'Intervention (täglich Tetris)', items:
-    Array.apply(null,{length:14}).map(function(_,i){ return {v:'intervention:'+(i+1), label:'Tag '+(i+1)}; }) },
-  { group:'Washout (ohne Tetris)', items:[
-    {v:'washout:1', label:'Washout 1'},{v:'washout:2', label:'Washout 2'},{v:'washout:3', label:'Washout 3'} ]}
+  { group:'Studientag', items:[
+    {v:'pre:0',  label:'Pre-Test'},
+    {v:'post:1', label:'Post-Test'} ]}
 ];
 
 /* ---------- Konfiguration laden ---------- */

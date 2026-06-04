@@ -562,7 +562,7 @@ var TEST_POOL = [
   difficulties:{
     leicht:{ trials:10, folds:1, holes:1, tl:18000 },
     mittel:{ trials:10, folds:2, holes:1, tl:20000 },
-    schwer:{ trials:10, folds:3, holes:1, tl:25000 }
+    schwer:{ trials:10, folds:3, holes:2, tl:25000 }
   },
   run: async function(P, ui){
     var LETTERS=['A','B','C','D','E'];
