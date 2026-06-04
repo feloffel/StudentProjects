@@ -89,7 +89,7 @@ async function screenWelcome(){
       '<div class="brand"><span class="logo">'+miniBlocks()+'</span><div><h1>Wahrnehmungs-Studie</h1>'+
         '<p class="sub">Tägliche Kurzmessung · ca. '+mins+'–'+(mins+5)+' Minuten</p></div></div>'+
       '<p class="lead">Heute sind <b>'+PLAN.length+' kurze Aufgaben</b> dran. Mach sie konzentriert und ungestört. Antworte zügig, aber sorgfältig.</p>'+
-      '<label class="fld"><span>Teilnehmer-Code</span><input id="pid" type="text" placeholder="z. B. TP-01" value="'+savedPid+'" autocomplete="off"></label>'+
+      '<label class="fld"><span>Name</span><input id="pid" type="text" placeholder="z. B. TP-01" value="'+savedPid+'" autocomplete="off"></label>'+
       '<label class="fld"><span>Heutiger Studientag</span><select id="day">'+opts+'</select></label>'+
       (last? '<p class="hint">Zuletzt: <b>'+escapeHtml(last.dayLabel)+'</b> ('+new Date(last.finishedAt||last.startedAt).toLocaleString('de-DE')+')</p>':'')+
       '<div class="cloud '+(cloudReady()?'on':'off')+'">'+(cloudReady()?'● Online-Sicherung aktiv':'○ Offline-Modus – Daten werden lokal gespeichert')+'</div>'+
