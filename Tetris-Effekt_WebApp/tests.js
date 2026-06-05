@@ -983,7 +983,7 @@ var TEST_POOL = [
       var s=e.target.closest('.csym'); if(!s) return;
       if(s.dataset.t==='1'){ hits++; rts.push(performance.now()-shownAt); }
       else { falseAlarms++; }
-      render();
+      // render();
     }
     // automatischer Wechsel, falls Ziel verpasst
     var swap=setInterval(function(){ if(!running) return; if(curHasTarget) misses++; render(); }, 1400);
