@@ -121,6 +121,12 @@ kbd{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(0,0,
 .csym:hover{transform:scale(1.2)}
 .csym.ct{color:#f5c451}
 .big-tick{display:flex;justify-content:center;margin-bottom:6px}
+/* DE/EN-Sprachschalter (schwebend) */
+.langtoggle{position:fixed;top:14px;right:14px;z-index:9999;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font:inherit;font-weight:600;font-size:.8rem;color:var(--muted);background:rgba(20,29,58,.72);border:1px solid var(--line);border-radius:999px;padding:7px 12px;backdrop-filter:blur(6px);transition:.16s}
+.langtoggle:hover{color:var(--ink);background:rgba(25,35,73,.9)}
+.langtoggle .lt-opt{padding:1px 5px;border-radius:6px;transition:.16s}
+.langtoggle .lt-opt.on{color:#fff;background:linear-gradient(180deg,var(--accent),#2563eb)}
+.langtoggle .lt-sep{opacity:.45}
 @media(max-width:560px){
   .card{padding:24px 18px}
   .answers.two{grid-template-columns:1fr}
@@ -136,6 +142,7 @@ kbd{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(0,0,
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="i18n.js"></script>
   <script src="MentalRotationImages/manifest.js"></script>
   <script src="tests.js"></script>
   <script src="app.js"></script>

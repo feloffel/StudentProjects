@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Studien-Dashboard · Wahrnehmungs-Studie</title>
+<title data-i18n-de="Studien-Dashboard · Wahrnehmungs-Studie" data-i18n-en="Study Dashboard · Perception Study">Studien-Dashboard · Wahrnehmungs-Studie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -107,62 +107,69 @@ select:focus{border-color:var(--accent)}
 .muted{color:var(--muted)}
 .empty{color:var(--muted);text-align:center;padding:34px 14px;font-size:.95rem}
 .note{color:var(--muted);font-size:.82rem;margin:16px 2px 0;line-height:1.6}
+/* DE/EN-Sprachschalter (schwebend) */
+.langtoggle{position:fixed;top:14px;right:14px;z-index:9999;display:inline-flex;align-items:center;gap:6px;cursor:pointer;font:inherit;font-weight:600;font-size:.8rem;color:var(--muted);background:rgba(20,29,58,.72);border:1px solid var(--line);border-radius:999px;padding:7px 12px;backdrop-filter:blur(6px);transition:.16s}
+.langtoggle:hover{color:var(--ink);background:rgba(25,35,73,.9)}
+.langtoggle .lt-opt{padding:1px 5px;border-radius:6px;transition:.16s}
+.langtoggle .lt-opt.on{color:#fff;background:linear-gradient(180deg,var(--accent),#2563eb)}
+.langtoggle .lt-sep{opacity:.45}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div>
-      <p class="tag-mono">STUDIEN-DASHBOARD</p>
-      <h1>Wahrnehmungs-Studie · Steuerung</h1>
-      <p class="sub">Tests f&uuml;r die Teilnehmer-App ausw&auml;hlen und Schwierigkeit einstellen &ndash; und die Ergebnisse einzelner Teilnehmer:innen in Klartext ansehen.</p>
+      <p class="tag-mono" data-i18n-de="STUDIEN-DASHBOARD" data-i18n-en="STUDY DASHBOARD">STUDIEN-DASHBOARD</p>
+      <h1 data-i18n-de="Wahrnehmungs-Studie · Steuerung" data-i18n-en="Perception Study · Control">Wahrnehmungs-Studie · Steuerung</h1>
+      <p class="sub" data-i18n-de-html="Tests f&uuml;r die Teilnehmer-App ausw&auml;hlen und Schwierigkeit einstellen &ndash; und die Ergebnisse einzelner Teilnehmer:innen in Klartext ansehen." data-i18n-en-html="Select the tests for the participant app and set their difficulty &ndash; and view individual participants&rsquo; results in plain language.">Tests f&uuml;r die Teilnehmer-App ausw&auml;hlen und Schwierigkeit einstellen &ndash; und die Ergebnisse einzelner Teilnehmer:innen in Klartext ansehen.</p>
     </div>
-    <div id="src" class="src off">&#9675; wird geladen &hellip;</div>
+    <div id="src" class="src off" data-i18n-de="&#9675; wird geladen &hellip;" data-i18n-en="&#9675; loading &hellip;">&#9675; wird geladen &hellip;</div>
   </header>
 
   <nav class="tabs">
-    <button id="nav-config" class="tabbtn active">Tests &amp; Schwierigkeit</button>
-    <button id="nav-results" class="tabbtn">Ergebnisse ansehen</button>
+    <button id="nav-config" class="tabbtn active" data-i18n-de-html="Tests &amp; Schwierigkeit" data-i18n-en-html="Tests &amp; difficulty">Tests &amp; Schwierigkeit</button>
+    <button id="nav-results" class="tabbtn" data-i18n-de="Ergebnisse ansehen" data-i18n-en="View results">Ergebnisse ansehen</button>
   </nav>
 
   <!-- ===== Tab: Konfiguration ===== -->
   <section id="tab-config" class="panel">
     <div class="bar">
       <div>
-        <h2>Test-Pool</h2>
-        <div class="meta">Angehakte Tests bekommt die Teilnehmer-App t&auml;glich angezeigt &middot; <span id="poolcount">0 ausgew&auml;hlt</span></div>
+        <h2 data-i18n-de="Test-Pool" data-i18n-en="Test pool">Test-Pool</h2>
+        <div class="meta"><span data-i18n-de-html="Angehakte Tests bekommt die Teilnehmer-App t&auml;glich angezeigt" data-i18n-en-html="Checked tests are shown to the participant app every day">Angehakte Tests bekommt die Teilnehmer-App t&auml;glich angezeigt</span> &middot; <span id="poolcount">0 ausgew&auml;hlt</span></div>
       </div>
       <div class="row-actions">
         <span id="savestate" class="savestate"></span>
-        <button id="savecfg" class="btn primary">Auswahl speichern</button>
+        <button id="savecfg" class="btn primary" data-i18n-de="Auswahl speichern" data-i18n-en="Save selection">Auswahl speichern</button>
       </div>
     </div>
     <div id="pool"></div>
-    <p class="note">Die gespeicherte Auswahl wird an die Teilnehmer-App &uuml;bergeben (&uuml;ber Firebase, sonst lokal als Fallback). Die App liest sie beim n&auml;chsten Start. Reihenfolge der Tests in der App = Reihenfolge im Pool.</p>
+    <p class="note" data-i18n-de-html="Die gespeicherte Auswahl wird an die Teilnehmer-App &uuml;bergeben (&uuml;ber Firebase, sonst lokal als Fallback). Die App liest sie beim n&auml;chsten Start. Reihenfolge der Tests in der App = Reihenfolge im Pool." data-i18n-en-html="The saved selection is handed to the participant app (via Firebase, otherwise locally as a fallback). The app reads it on its next start. The order of tests in the app = the order in the pool.">Die gespeicherte Auswahl wird an die Teilnehmer-App &uuml;bergeben (&uuml;ber Firebase, sonst lokal als Fallback). Die App liest sie beim n&auml;chsten Start. Reihenfolge der Tests in der App = Reihenfolge im Pool.</p>
   </section>
 
   <!-- ===== Tab: Ergebnisse ===== -->
   <section id="tab-results" class="panel" style="display:none">
     <div class="bar">
       <div>
-        <h2>Ergebnisse</h2>
-        <div class="meta"><span id="pcount">0 Teilnehmer:innen</span></div>
+        <h2 data-i18n-de="Ergebnisse" data-i18n-en="Results">Ergebnisse</h2>
+        <div class="meta"><span id="pcount" data-i18n-de="0 Teilnehmer:innen" data-i18n-en="0 participants">0 Teilnehmer:innen</span></div>
       </div>
       <div class="row-actions">
-        <select id="pfilter"><option value="">&ndash; Teilnehmer:in w&auml;hlen &ndash;</option></select>
-        <button id="refresh" class="btn small">Aktualisieren</button>
-        <button id="csv" class="btn small">CSV (Zusammenfassung)</button>
-        <button id="csvraw" class="btn small">CSV (alle Rohdaten)</button>
+        <select id="pfilter"><option value="" data-i18n-de="&ndash; Teilnehmer:in w&auml;hlen &ndash;" data-i18n-en="&ndash; choose participant &ndash;">&ndash; Teilnehmer:in w&auml;hlen &ndash;</option></select>
+        <button id="refresh" class="btn small" data-i18n-de="Aktualisieren" data-i18n-en="Refresh">Aktualisieren</button>
+        <button id="csv" class="btn small" data-i18n-de-html="CSV (Zusammenfassung)" data-i18n-en-html="CSV (summary)">CSV (Zusammenfassung)</button>
+        <button id="csvraw" class="btn small" data-i18n-de-html="CSV (alle Rohdaten)" data-i18n-en-html="CSV (all raw data)">CSV (alle Rohdaten)</button>
       </div>
     </div>
-    <div id="results"><div class="empty">Oben eine:n Teilnehmer:in ausw&auml;hlen, um die Ergebnisse zu sehen.</div></div>
-    <p class="note">Die Werte sind bewusst in Alltagssprache formuliert (z.&nbsp;B. &bdquo;Typische Antwortzeit&ldquo; statt &bdquo;Median-RT&ldquo;). Jede Karte = eine Tagessitzung; farbige Marke = Studienphase. Mit <b>&bdquo;Alle Daten anzeigen&ldquo;</b> klappt ihr pro Test die vollst&auml;ndige Liste aller Einzeldurchg&auml;nge auf (jede Antwort, richtig/falsch, Zeit). Den Export gibt es zweimal: <b>Zusammenfassung</b> (eine Zeile pro Sitzung) und <b>alle Rohdaten</b> (eine Zeile pro Durchgang).</p>
+    <div id="results"><div class="empty" data-i18n-de="Oben eine:n Teilnehmer:in ausw&auml;hlen, um die Ergebnisse zu sehen." data-i18n-en="Choose a participant above to view their results.">Oben eine:n Teilnehmer:in ausw&auml;hlen, um die Ergebnisse zu sehen.</div></div>
+    <p class="note" data-i18n-de-html="Die Werte sind bewusst in Alltagssprache formuliert (z.&nbsp;B. &bdquo;Typische Antwortzeit&ldquo; statt &bdquo;Median-RT&ldquo;). Jede Karte = eine Tagessitzung; farbige Marke = Studienphase. Mit <b>&bdquo;Alle Daten anzeigen&ldquo;</b> klappt ihr pro Test die vollst&auml;ndige Liste aller Einzeldurchg&auml;nge auf (jede Antwort, richtig/falsch, Zeit). Den Export gibt es zweimal: <b>Zusammenfassung</b> (eine Zeile pro Sitzung) und <b>alle Rohdaten</b> (eine Zeile pro Durchgang)." data-i18n-en-html="The values are deliberately phrased in everyday language (e.g. &bdquo;Typical response time&ldquo; instead of &bdquo;median RT&ldquo;). Each card = one daily session; the coloured tag = study phase. With <b>&bdquo;Show all data&ldquo;</b> you can expand the full list of all individual trials per test (every answer, correct/wrong, time). The export comes in two forms: <b>summary</b> (one row per session) and <b>all raw data</b> (one row per trial).">Die Werte sind bewusst in Alltagssprache formuliert (z.&nbsp;B. &bdquo;Typische Antwortzeit&ldquo; statt &bdquo;Median-RT&ldquo;). Jede Karte = eine Tagessitzung; farbige Marke = Studienphase. Mit <b>&bdquo;Alle Daten anzeigen&ldquo;</b> klappt ihr pro Test die vollst&auml;ndige Liste aller Einzeldurchg&auml;nge auf (jede Antwort, richtig/falsch, Zeit). Den Export gibt es zweimal: <b>Zusammenfassung</b> (eine Zeile pro Sitzung) und <b>alle Rohdaten</b> (eine Zeile pro Durchgang).</p>
   </section>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="i18n.js"></script>
 <script src="tests.js"></script>
 <script src="dashboard.js"></script>
 </body>

@@ -12,10 +12,16 @@ function sleep(ms){ return new Promise(function(r){ setTimeout(r,ms); }); }
 
 /* ---------- Studientage / Phasen ---------- */
 var DAY_OPTIONS = [
-  { group:'Studientag', items:[
+  { group:{de:'Studientag',en:'Study day'}, items:[
     {v:'pre:0',  label:'Pre-Test'},
     {v:'post:1', label:'Post-Test'} ]}
 ];
+
+/* Zeiger auf die aktuell sichtbare (statische) Screen-Render-Funktion.
+   Wird beim Sprachwechsel aufgerufen, damit der Bildschirm live umschaltet.
+   Während eines laufenden Tests ist er null (Wechsel greift dann ab dem
+   nächsten Bildschirm). */
+var CURRENT_RENDER = null;
 
 /* ---------- Konfiguration laden ---------- */
 var STUDY_CONFIG = null;
@@ -70,36 +76,44 @@ function setScreen(html){ app().innerHTML=html; try{ window.scrollTo(0,0); }catc
 
 function progressBar(){
   return '<div class="progress">'+ PLAN.map(function(p,i){
-    return '<div class="pstep '+(i<STEP?'done':'')+' '+(i===STEP?'active':'')+'"><span class="pdot"></span>'+escapeHtml(p.def.name)+'</div>';
+    return '<div class="pstep '+(i<STEP?'done':'')+' '+(i===STEP?'active':'')+'"><span class="pdot"></span>'+escapeHtml(L(p.def.name))+'</div>';
   }).join('')+'</div>';
 }
 function escapeHtml(s){ return String(s).replace(/[&<>"]/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
 
 /* ---------- Welcome ---------- */
 async function screenWelcome(){
-  setScreen('<div class="card"><div class="brand"><span class="logo">'+miniBlocks()+'</span><div><h1>Wahrnehmungs-Studie</h1><p class="sub">Lade Konfiguration…</p></div></div></div>');
+  CURRENT_RENDER = null;
+  setScreen('<div class="card"><div class="brand"><span class="logo">'+miniBlocks()+'</span><div><h1>'+tr('Wahrnehmungs-Studie','Perception Study')+'</h1><p class="sub">'+tr('Lade Konfiguration…','Loading configuration…')+'</p></div></div></div>');
   STUDY_CONFIG = await loadConfig();
   PLAN = resolveTests(STUDY_CONFIG);
-  var savedPid=localStorage.getItem('tetris_pid')||'';
+  renderWelcome();
+}
+function renderWelcome(){
+  CURRENT_RENDER = renderWelcome;   // beim Sprachwechsel diesen Bildschirm neu zeichnen
+  var typed = ($('#pid') && $('#pid').value) || '';   // bereits getippten Namen behalten
+  var savedPid = typed || localStorage.getItem('tetris_pid') || '';
+  var prevDay = $('#day') ? $('#day').value : null;
   var last=null; try{ last=JSON.parse(localStorage.getItem('tetris_lastSession')||'null'); }catch(e){}
-  var opts=DAY_OPTIONS.map(function(g){ return '<optgroup label="'+g.group+'">'+g.items.map(function(it){ return '<option value="'+it.v+'">'+it.label+'</option>'; }).join('')+'</optgroup>'; }).join('');
+  var opts=DAY_OPTIONS.map(function(g){ return '<optgroup label="'+escapeHtml(L(g.group))+'">'+g.items.map(function(it){ return '<option value="'+it.v+'">'+escapeHtml(L(it.label))+'</option>'; }).join('')+'</optgroup>'; }).join('');
   var mins = Math.max(5, Math.round(PLAN.length*2.5));
   setScreen(
     '<div class="card welcome">'+
-      '<div class="brand"><span class="logo">'+miniBlocks()+'</span><div><h1>Wahrnehmungs-Studie</h1>'+
-        '<p class="sub">Tägliche Kurzmessung · ca. '+mins+'–'+(mins+5)+' Minuten</p></div></div>'+
-      '<p class="lead">Heute sind <b>'+PLAN.length+' kurze Aufgaben</b> dran. Mach sie konzentriert und ungestört. Antworte zügig, aber sorgfältig.</p>'+
-      '<label class="fld"><span>Name</span><input id="pid" type="text" placeholder="z. B. TP-01" value="'+savedPid+'" autocomplete="off"></label>'+
-      '<label class="fld"><span>Heutiger Studientag</span><select id="day">'+opts+'</select></label>'+
-      (last? '<p class="hint">Zuletzt: <b>'+escapeHtml(last.dayLabel)+'</b> ('+new Date(last.finishedAt||last.startedAt).toLocaleString('de-DE')+')</p>':'')+
-      '<div class="cloud '+(cloudReady()?'on':'off')+'">'+(cloudReady()?'● Online-Sicherung aktiv':'○ Offline-Modus – Daten werden lokal gespeichert')+'</div>'+
-      '<button class="btn primary big" id="start">Sitzung starten</button>'+
-      '<button class="btn ghost" id="export">Bisherige Daten exportieren</button>'+
+      '<div class="brand"><span class="logo">'+miniBlocks()+'</span><div><h1>'+tr('Wahrnehmungs-Studie','Perception Study')+'</h1>'+
+        '<p class="sub">'+tr('Tägliche Kurzmessung · ca. ','Short daily measurement · approx. ')+mins+'–'+(mins+5)+tr(' Minuten',' minutes')+'</p></div></div>'+
+      '<p class="lead">'+tr('Heute sind ','Today there are ')+'<b>'+PLAN.length+tr(' kurze Aufgaben',' short tasks')+'</b>'+tr(' dran. Mach sie konzentriert und ungestört. Antworte zügig, aber sorgfältig.',' to do. Do them focused and undisturbed. Answer quickly but carefully.')+'</p>'+
+      '<label class="fld"><span>'+tr('Name','Name')+'</span><input id="pid" type="text" placeholder="'+tr('z. B. TP-01','e.g. TP-01')+'" value="'+escapeHtml(savedPid)+'" autocomplete="off"></label>'+
+      '<label class="fld"><span>'+tr('Heutiger Studientag','Today’s study day')+'</span><select id="day">'+opts+'</select></label>'+
+      (last? '<p class="hint">'+tr('Zuletzt: ','Last time: ')+'<b>'+escapeHtml(last.dayLabel)+'</b> ('+new Date(last.finishedAt||last.startedAt).toLocaleString(I18N.dateLocale())+')</p>':'')+
+      '<div class="cloud '+(cloudReady()?'on':'off')+'">'+(cloudReady()?tr('● Online-Sicherung aktiv','● Online backup active'):tr('○ Offline-Modus – Daten werden lokal gespeichert','○ Offline mode – data is stored locally'))+'</div>'+
+      '<button class="btn primary big" id="start">'+tr('Sitzung starten','Start session')+'</button>'+
+      '<button class="btn ghost" id="export">'+tr('Bisherige Daten exportieren','Export previous data')+'</button>'+
     '</div>');
+  if(prevDay){ var ds=$('#day'); if(ds) ds.value=prevDay; }
   $('#start').onclick=function(){
     var pid=$('#pid').value.trim();
     if(!pid){ $('#pid').classList.add('err'); $('#pid').focus(); return; }
-    if(!PLAN.length){ alert('Es sind keine Tests konfiguriert. Bitte im Dashboard Tests auswählen.'); return; }
+    if(!PLAN.length){ alert(tr('Es sind keine Tests konfiguriert. Bitte im Dashboard Tests auswählen.','No tests are configured. Please select tests in the dashboard.')); return; }
     localStorage.setItem('tetris_pid', pid);
     var sel=$('#day');
     SESSION=newSession(pid, sel.value, sel.options[sel.selectedIndex].text, PLAN);
@@ -111,25 +125,26 @@ async function screenWelcome(){
 
 /* ---------- Intro pro Test ---------- */
 function screenIntro(){
+  CURRENT_RENDER = screenIntro;
   var p=PLAN[STEP], def=p.def;
   setScreen('<div class="card">'+progressBar()+
-    '<h2 class="ttl">'+(STEP+1)+' · '+escapeHtml(def.name)+'</h2>'+
-    '<p class="lead">'+def.short+'</p>'+
+    '<h2 class="ttl">'+(STEP+1)+' · '+escapeHtml(L(def.name))+'</h2>'+
+    '<p class="lead">'+escapeHtml(L(def.short))+'</p>'+
     '<p class="keys">'+keyHint(def.id)+'</p>'+
-    '<button class="btn primary big" id="go">Los geht’s</button></div>');
+    '<button class="btn primary big" id="go">'+tr('Los geht’s','Let’s go')+'</button></div>');
   $('#go').onclick=runCurrent;
 }
 function keyHint(id){
   switch(id){
-    case 'rotation3d': return 'Tasten: <b>F</b> = dieselbe Figur · <b>J</b> = Spiegelbild';
-    case 'gapfit': case 'lineclose': case 'control_math': return 'Tasten: <b>1–4</b> für die Auswahl';
-    case 'paperfold': return 'Tasten: <b>1–5</b> (A–E) für die Auswahl';
-    case 'corsi': return 'Mit Maus/Finger antippen';
+    case 'rotation3d': return tr('Tasten: <b>F</b> = dieselbe Figur · <b>J</b> = Spiegelbild','Keys: <b>F</b> = same shape · <b>J</b> = mirror image');
+    case 'gapfit': case 'lineclose': case 'control_math': return tr('Tasten: <b>1–4</b> für die Auswahl','Keys: <b>1–4</b> to choose');
+    case 'paperfold': return tr('Tasten: <b>1–5</b> (A–E) für die Auswahl','Keys: <b>1–5</b> (A–E) to choose');
+    case 'corsi': return tr('Mit Maus/Finger antippen','Tap with mouse/finger');
     case 'timeprod': return '';
-    case 'deary_rt': return 'Tasten: <b>D F J K</b> für die vier Felder';
-    case 'taskswitch': return 'Tasten: <b>F</b> = linke Antwort · <b>J</b> = rechte Antwort';
-    case 'trunkpack': return 'Tasten: <b>F</b> = passt · <b>J</b> = passt nicht';
-    case 'visualsearch': case 'concentration': return 'Mit Maus/Finger antippen';
+    case 'deary_rt': return tr('Tasten: <b>D F J K</b> für die vier Felder','Keys: <b>D F J K</b> for the four boxes');
+    case 'taskswitch': return tr('Tasten: <b>F</b> = linke Antwort · <b>J</b> = rechte Antwort','Keys: <b>F</b> = left answer · <b>J</b> = right answer');
+    case 'trunkpack': return tr('Tasten: <b>F</b> = passt · <b>J</b> = passt nicht','Keys: <b>F</b> = fits · <b>J</b> = does not fit');
+    case 'visualsearch': case 'concentration': return tr('Mit Maus/Finger antippen','Tap with mouse/finger');
     default: return '';
   }
 }
@@ -180,8 +195,9 @@ var UI = {
   }
 };
 async function runCurrent(){
+  CURRENT_RENDER = null;   // laufender Test: Sprachwechsel erst ab nächstem Bildschirm
   var p=PLAN[STEP], def=p.def;
-  setScreen('<div class="card test"><div class="testhead"><span>'+escapeHtml(def.name)+'</span><span id="cnt"></span></div><div id="timerbar" class="timerbar"></div><div id="host"></div></div>');
+  setScreen('<div class="card test"><div class="testhead"><span>'+escapeHtml(L(def.name))+'</span><span id="cnt"></span></div><div id="timerbar" class="timerbar"></div><div id="host"></div></div>');
   UI.host=$('#host');
   var result;
   try { result = await def.run(p.params, UI); }
@@ -194,28 +210,32 @@ async function runCurrent(){
 
 /* ---------- Fertig + speichern ---------- */
 function screenDone(){
-  setScreen('<div class="card done"><h2 class="ttl">Fast geschafft</h2>'+
-    '<p class="lead">Zwei kurze, freiwillige Angaben – dann werden deine Daten gesichert.</p>'+
-    '<label class="fld"><span>Falls du heute schon gespielt hast: geschätzte Dauer (Minuten)</span><input id="play" type="number" min="0" inputmode="numeric" placeholder="optional"></label>'+
-    '<label class="fld"><span>Notiz (optional – etwas Auffälliges heute?)</span><textarea id="note" rows="3" placeholder="optional"></textarea></label>'+
-    '<button class="btn primary big" id="finish">Sitzung abschließen &amp; speichern</button></div>');
+  CURRENT_RENDER = screenDone;
+  var prevPlay = $('#play') ? $('#play').value : '';
+  var prevNote = $('#note') ? $('#note').value : '';
+  setScreen('<div class="card done"><h2 class="ttl">'+tr('Fast geschafft','Almost done')+'</h2>'+
+    '<p class="lead">'+tr('Zwei kurze, freiwillige Angaben – dann werden deine Daten gesichert.','Two short, optional questions – then your data will be saved.')+'</p>'+
+    '<label class="fld"><span>'+tr('Falls du heute schon gespielt hast: geschätzte Dauer (Minuten)','If you have already played today: estimated duration (minutes)')+'</span><input id="play" type="number" min="0" inputmode="numeric" placeholder="'+tr('optional','optional')+'" value="'+escapeHtml(prevPlay)+'"></label>'+
+    '<label class="fld"><span>'+tr('Notiz (optional – etwas Auffälliges heute?)','Note (optional – anything notable today?)')+'</span><textarea id="note" rows="3" placeholder="'+tr('optional','optional')+'">'+escapeHtml(prevNote)+'</textarea></label>'+
+    '<button class="btn primary big" id="finish">'+tr('Sitzung abschließen &amp; speichern','Finish &amp; save session')+'</button></div>');
   $('#finish').onclick=async function(){
     SESSION.estPlayMin = $('#play').value!==''? Number($('#play').value) : null;
     SESSION.note = $('#note').value.trim();
     SESSION.finishedAt = new Date().toISOString();
-    $('#finish').disabled=true; $('#finish').textContent='Speichere…';
+    $('#finish').disabled=true; $('#finish').textContent=tr('Speichere…','Saving…');
     var status=await saveSession(SESSION);
     localStorage.setItem('tetris_lastSession', JSON.stringify({ dayLabel:SESSION.dayLabel, finishedAt:SESSION.finishedAt }));
     screenThanks(status);
   };
 }
 function screenThanks(status){
+  CURRENT_RENDER = function(){ screenThanks(status); };
   setScreen('<div class="card thanks"><div class="big-tick">'+miniBlocks(true)+'</div>'+
-    '<h2 class="ttl">Danke – Sitzung gespeichert</h2>'+
-    '<p class="lead">'+(status.cloud?'✓ Online gesichert.':'✓ Lokal gespeichert. <b>Bitte vor dem Schließen exportieren.</b>')+'</p>'+
-    '<p class="muted center">Bis zur nächsten Sitzung. Du kannst dieses Fenster jetzt schließen.</p>'+
-    '<button class="btn ghost" id="export">Daten exportieren (CSV + JSON)</button>'+
-    '<button class="btn ghost" id="again">Neue Sitzung</button></div>');
+    '<h2 class="ttl">'+tr('Danke – Sitzung gespeichert','Thank you – session saved')+'</h2>'+
+    '<p class="lead">'+(status.cloud?tr('✓ Online gesichert.','✓ Backed up online.'):tr('✓ Lokal gespeichert. <b>Bitte vor dem Schließen exportieren.</b>','✓ Saved locally. <b>Please export before closing.</b>'))+'</p>'+
+    '<p class="muted center">'+tr('Bis zur nächsten Sitzung. Du kannst dieses Fenster jetzt schließen.','See you at the next session. You can close this window now.')+'</p>'+
+    '<button class="btn ghost" id="export">'+tr('Daten exportieren (CSV + JSON)','Export data (CSV + JSON)')+'</button>'+
+    '<button class="btn ghost" id="again">'+tr('Neue Sitzung','New session')+'</button></div>');
   $('#export').onclick=exportLocal;
   $('#again').onclick=screenWelcome;
 }
@@ -255,7 +275,7 @@ function toCSV(rows){
 }
 function download(name,text,type){ var b=new Blob([text],{type:type}),u=URL.createObjectURL(b),a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u); }
 function exportLocal(){
-  var all=localSessions(); if(!all.length){ alert('Noch keine Daten vorhanden.'); return; }
+  var all=localSessions(); if(!all.length){ alert(tr('Noch keine Daten vorhanden.','No data available yet.')); return; }
   var stamp=new Date().toISOString().slice(0,10);
   download('studie_zusammenfassung_'+stamp+'.csv', toCSV(all.map(summaryRow)), 'text/csv;charset=utf-8');
   download('studie_rohdaten_'+stamp+'.json', JSON.stringify(all,null,2), 'application/json');
@@ -271,4 +291,10 @@ function miniBlocks(big){
     '<rect x="21" y="21" width="17" height="17" rx="3" fill="'+c[3]+'"/></svg>';
 }
 
-window.addEventListener('DOMContentLoaded', screenWelcome);
+window.addEventListener('DOMContentLoaded', function(){
+  // DE/EN-Schalter: bei Wechsel den aktuellen (statischen) Bildschirm neu zeichnen
+  buildLangToggle(function(){ if (CURRENT_RENDER) CURRENT_RENDER(); });
+  document.title = tr('Wahrnehmungs-Studie','Perception Study');
+  I18N.onChange(function(){ document.title = tr('Wahrnehmungs-Studie','Perception Study'); });
+  screenWelcome();
+});

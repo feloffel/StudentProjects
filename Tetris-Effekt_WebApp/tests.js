@@ -28,9 +28,11 @@ var T = {
 };
 
 /* ---------- Formatierungs-Helfer fürs Dashboard ---------- */
-function fmtSec(ms){ if(ms==null) return "–"; return (ms/1000).toFixed(2).replace('.',',') + " Sek"; }
+// Dezimaltrennzeichen je nach Sprache (DE: Komma, EN: Punkt)
+function _dec(str){ return (typeof I18N!=='undefined' && I18N.lang==='en') ? str : str.replace('.',','); }
+function fmtSec(ms){ if(ms==null) return "–"; return _dec((ms/1000).toFixed(2)) + tr(" Sek"," s"); }
 function fmtPct(x){ if(x==null) return "–"; return Math.round(x*100) + " %"; }
-function fmtPlus(ms){ if(ms==null) return "–"; var s=(ms/1000); return (s>=0?"+":"") + s.toFixed(1).replace('.',',') + " Sek"; }
+function fmtPlus(ms){ if(ms==null) return "–"; var s=(ms/1000); return (s>=0?"+":"") + _dec(s.toFixed(1)) + tr(" Sek"," s"); }
 
 /* =====================================================================
    GEOMETRIE: 3D-Würfelfiguren (Shepard-Metzler-Stil)
@@ -272,8 +274,8 @@ async function rotationFallbackRun(P, ui){
         '<div class="shp3d">'+cubesSVG(refCells,{})+'</div><div class="vs">?</div>'+
         '<div class="shp3d">'+cubesSVG(cmpCells,{})+'</div></div>'+
         '<div class="answers two">'+
-          '<button class="btn ans" data-a="same"><kbd>F</kbd> Dieselbe Figur</button>'+
-          '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
+          '<button class="btn ans" data-a="same"><kbd>F</kbd> '+tr('Dieselbe Figur','Same shape')+'</button>'+
+          '<button class="btn ans" data-a="mir"><kbd>J</kbd> '+tr('Spiegelbild','Mirror image')+'</button>'+
         '</div></div>';
     var t0=performance.now();
     var ans=await ui.choice([['same','f'],['mir','j']], P.tl||0);
@@ -306,9 +308,9 @@ var TEST_POOL = [
 /* ---- 1. 3D-Figuren drehen (Mentale Rotation, Würfelfiguren) ---- */
 {
   id:'rotation3d',
-  name:'Figuren im Kopf drehen',
-  short:'Ein Bild mit zwei Figuren: ist die zweite dieselbe (nur gedreht) oder das Spiegelbild?',
-  measures:'Wie schnell und sicher räumlich gedreht wird.',
+  name:{de:'Figuren im Kopf drehen', en:'Rotating shapes in your head'},
+  short:{de:'Ein Bild mit zwei Figuren: ist die zweite dieselbe (nur gedreht) oder das Spiegelbild?', en:'An image with two shapes: is the second the same (just rotated) or the mirror image?'},
+  measures:{de:'Wie schnell und sicher räumlich gedreht wird.', en:'How quickly and reliably you mentally rotate in space.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:12, angles:[0,50],     cubes:9,  tl:12000 },
@@ -329,10 +331,10 @@ var TEST_POOL = [
           await ui.fixation();
           ui.host.innerHTML =
             '<div class="stage rot3d">'+
-              '<div class="shp3d single"><img class="rotimg" src="'+t.img+'" alt="Aufgabenbild"></div>'+
+              '<div class="shp3d single"><img class="rotimg" src="'+t.img+'" alt="'+tr('Aufgabenbild','Task image')+'"></div>'+
               '<div class="answers two">'+
-                '<button class="btn ans" data-a="same"><kbd>F</kbd> Dieselbe Figur</button>'+
-                '<button class="btn ans" data-a="mir"><kbd>J</kbd> Spiegelbild</button>'+
+                '<button class="btn ans" data-a="same"><kbd>F</kbd> '+tr('Dieselbe Figur','Same shape')+'</button>'+
+                '<button class="btn ans" data-a="mir"><kbd>J</kbd> '+tr('Spiegelbild','Mirror image')+'</button>'+
               '</div></div>';
           var t0=performance.now();
           var ans=await ui.choice([['same','f'],['mir','j']], P.tl||0);
@@ -355,18 +357,18 @@ var TEST_POOL = [
     return await rotationFallbackRun(P, ui);
   },
   format:function(r){ return [
-    {label:'Richtig erkannt', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
+    {label:tr('Richtig erkannt','Correctly identified'), value:fmtPct(r.accuracy)},
+    {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+    {label:tr('Aufgaben gesamt','Total tasks'), value:r.n}
   ]; }
 },
 
 /* ---- 2. Teile einpassen (neutrale Optik) ---- */
 {
   id:'gapfit',
-  name:'Teile einpassen',
-  short:'Oben ist ein Feld mit einer Lücke. Welches der vier Teile füllt sie genau?',
-  measures:'Wie schnell man erkennt, welche Form in eine Lücke passt.',
+  name:{de:'Teile einpassen', en:'Fitting pieces'},
+  short:{de:'Oben ist ein Feld mit einer Lücke. Welches der vier Teile füllt sie genau?', en:'At the top is a grid with a gap. Which of the four pieces fills it exactly?'},
+  measures:{de:'Wie schnell man erkennt, welche Form in eine Lücke passt.', en:'How quickly you recognise which shape fits a gap.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:10, mirrorFrom:99, tl:10000 },
@@ -400,7 +402,7 @@ var TEST_POOL = [
       await ui.fixation();
       ui.host.innerHTML =
         '<div class="stage gap">'+
-          '<div class="well">'+gridGapSVG(gapCells)+'<div class="welllbl">Welches Teil füllt die Lücke?</div></div>'+
+          '<div class="well">'+gridGapSVG(gapCells)+'<div class="welllbl">'+tr('Welches Teil füllt die Lücke?','Which piece fills the gap?')+'</div></div>'+
           '<div class="answers four">'+
             options.map(function(op,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+(k+1)+'</kbd>'+pieceSVG(op.cells,{size:88,cell:18})+'</button>'; }).join('')+
           '</div>'+
@@ -419,18 +421,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Richtig eingepasst', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
+    {label:tr('Richtig eingepasst','Correctly fitted'), value:fmtPct(r.accuracy)},
+    {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+    {label:tr('Aufgaben gesamt','Total tasks'), value:r.n}
   ]; }
 },
 
 /* ---- 3. Corsi Block-Tapping (1:1) ---- */
 {
   id:'corsi',
-  name:'Felder-Folge merken (Corsi)',
-  short:'Unregelmäßig verteilte Felder leuchten nacheinander auf; danach in gleicher Reihenfolge antippen.',
-  measures:'Wie viele Positionen man sich in der richtigen Reihenfolge merken kann.',
+  name:{de:'Felder-Folge merken (Corsi)', en:'Remember the sequence (Corsi)'},
+  short:{de:'Unregelmäßig verteilte Felder leuchten nacheinander auf; danach in gleicher Reihenfolge antippen.', en:'Irregularly placed squares light up one after another; then tap them in the same order.'},
+  measures:{de:'Wie viele Positionen man sich in der richtigen Reihenfolge merken kann.', en:'How many positions you can remember in the correct order.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ start:2, max:6, perLen:2 },
@@ -449,16 +451,16 @@ var TEST_POOL = [
       var correctAtLen=0;
       for(var rep=0; rep<P.perLen; rep++){
         var seq=T.shuffle(Array.apply(null,{length:N}).map(function(_,k){return k;})).slice(0,len);
-        ui.count('Länge '+len);
+        ui.count(tr('Länge ','Length ')+len);
         ui.host.innerHTML='<div class="stage corsi"><div class="corsiboard" id="cb">'+
           board.map(function(b,k){ return '<button class="cblk" data-k="'+k+'" disabled style="left:'+b[0]+'px;top:'+b[1]+'px"></button>'; }).join('')+
-          '</div><div class="status" id="st">Merke dir die Reihenfolge…</div></div>';
+          '</div><div class="status" id="st">'+tr('Merke dir die Reihenfolge…','Memorise the order…')+'</div></div>';
         await ui.sleep(700);
         for(var s=0;s<seq.length;s++){
           var b=ui.host.querySelector('.cblk[data-k="'+seq[s]+'"]');
           b.classList.add('lit'); await ui.sleep(650); b.classList.remove('lit'); await ui.sleep(250);
         }
-        ui.host.querySelector('#st').textContent='Jetzt antippen';
+        ui.host.querySelector('#st').textContent=tr('Jetzt antippen','Now tap');
         var resp=await collectTaps(ui.host, len);
         var ok = resp.length===seq.length && resp.every(function(v,idx){ return v===seq[idx]; });
         if(ok) correctAtLen++;
@@ -472,17 +474,17 @@ var TEST_POOL = [
     return { bestLength:span, correctCount:corr, totalTrials:trials.length, trials:trials };
   },
   format:function(r){ return [
-    {label:'Längste gemerkte Folge', value:(r.bestLength||0)+' Felder'},
-    {label:'Richtige Durchgänge', value:(r.correctCount||0)+' von '+(r.totalTrials||0)}
+    {label:tr('Längste gemerkte Folge','Longest sequence remembered'), value:(r.bestLength||0)+tr(' Felder',' squares')},
+    {label:tr('Richtige Durchgänge','Correct rounds'), value:(r.correctCount||0)+tr(' von ',' of ')+(r.totalTrials||0)}
   ]; }
 },
 
 /* ---- 4. Zeitgefühl (Zeitproduktion, OHNE blinkenden Punkt) ---- */
 {
   id:'timeprod',
-  name:'Zeitgefühl',
-  short:'Ohne Zählen anzeigen, wann eine bestimmte Zeitspanne vorbei ist (Start, dann Stopp).',
-  measures:'Wie genau das Zeitgefühl ist.',
+  name:{de:'Zeitgefühl', en:'Sense of time'},
+  short:{de:'Ohne Zählen anzeigen, wann eine bestimmte Zeitspanne vorbei ist (Start, dann Stopp).', en:'Without counting, signal when a given interval has passed (start, then stop).'},
+  measures:{de:'Wie genau das Zeitgefühl ist.', en:'How accurate your sense of time is.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ targets:[30] },
@@ -499,17 +501,17 @@ var TEST_POOL = [
     return { targets:out };
   },
   format:function(r){
-    if(!r.targets) return [{label:'Ergebnis', value:'–'}];
-    return r.targets.map(function(t){ return { label:t.target+' Sekunden geschätzt', value:'Abweichung '+fmtPlus(t.devMs) }; });
+    if(!r.targets) return [{label:tr('Ergebnis','Result'), value:'–'}];
+    return r.targets.map(function(t){ return { label:t.target+tr(' Sekunden geschätzt',' seconds estimated'), value:tr('Abweichung ','Deviation ')+fmtPlus(t.devMs) }; });
   }
 },
 
 /* ---- 5. Kopfrechnen (Kontrolle, ohne Raumbezug) ---- */
 {
   id:'control_math',
-  name:'Kopfrechnen (Kontrolle)',
-  short:'Einfache Plus- und Minus-Aufgaben lösen. Hat absichtlich nichts mit Raum zu tun.',
-  measures:'Allgemeines Tempo & Konzentration – als Vergleichswert.',
+  name:{de:'Kopfrechnen (Kontrolle)', en:'Mental arithmetic (control)'},
+  short:{de:'Einfache Plus- und Minus-Aufgaben lösen. Hat absichtlich nichts mit Raum zu tun.', en:'Solve simple addition and subtraction. Deliberately has nothing to do with space.'},
+  measures:{de:'Allgemeines Tempo & Konzentration – als Vergleichswert.', en:'General speed & concentration – as a baseline for comparison.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:15, max:50,  tl:9000 },
@@ -542,18 +544,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Richtig gerechnet', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
+    {label:tr('Richtig gerechnet','Calculated correctly'), value:fmtPct(r.accuracy)},
+    {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+    {label:tr('Aufgaben gesamt','Total tasks'), value:r.n}
   ]; }
 },
 
 /* ---- 6. Papier falten (Paper Folding VZ-2-Stil) ---- */
 {
   id:'paperfold',
-  name:'Papier im Kopf falten',
-  short:'Ein Blatt wird gefaltet und gelocht. Wo sind die Löcher, wenn man es wieder aufklappt?',
-  measures:'Räumliches Vorstellungsvermögen (mehrschrittiges Denken).',
+  name:{de:'Papier im Kopf falten', en:'Folding paper in your head'},
+  short:{de:'Ein Blatt wird gefaltet und gelocht. Wo sind die Löcher, wenn man es wieder aufklappt?', en:'A sheet is folded and punched. Where are the holes once it is unfolded again?'},
+  measures:{de:'Räumliches Vorstellungsvermögen (mehrschrittiges Denken).', en:'Spatial visualisation (multi-step reasoning).'},
   defaultDifficulty:'mittel',
   // Pro Durchgang werden "trials" Aufgaben FRISCH aus dem Generator gezogen
   // (zufällige Faltungen + zufällig gestanztes Loch). Standard = 10 Aufgaben.
@@ -564,47 +566,148 @@ var TEST_POOL = [
     mittel:{ trials:10, folds:2, holes:1, tl:20000 },
     schwer:{ trials:10, folds:3, holes:2, tl:25000 }
   },
-  run: async function(P, ui){
-    var LETTERS=['A','B','C','D','E'];
-    var results=[];
-    for(var i=0;i<P.trials;i++){
-      var tr=makeFoldTrial(P.folds, P.holes||1);
-      ui.count((i+1)+' / '+P.trials);
+  run: async function(P, ui) {
+    var totalTrials = P.trials || 10;
+    var results = [];
+    var timeUp = false;
+    var TOTAL_MS = 2 * 60 * 1000; // 2 Minuten für alle Aufgaben zusammen
+
+    var startTime = performance.now();
+
+    // Globaler Timer startet jetzt und bleibt für alle Aufgaben sichtbar.
+    // Er läuft in #timerbar (per ui.countdownStart, wie bei anderen Tests).
+    var resolveCurrentChoice = null;  // Zeiger auf die aktive choice-Auflösung
+
+    var cancelTimer = ui.countdownStart(TOTAL_MS, function() {
+      timeUp = true;
+      if (resolveCurrentChoice) resolveCurrentChoice(ui.TIMEOUT);
+    });
+
+    for (var i = 0; i < totalTrials; i++) {
+      if (timeUp) break;
+
+      var elapsed = performance.now() - startTime;
+      var remaining = Math.max(0, TOTAL_MS - elapsed);
+      if (remaining <= 0) break;
+
+      // Aufgabe generieren mit makeFoldTrial() – der echte Generator in tests.js
+      var tr = makeFoldTrial(P.folds || 2, P.holes || 1);
+      // tr.stepSVGs  = Schritt-Bilder (Faltungen + gestanztes Loch)
+      // tr.optionSVGs = die 5 Antwort-SVGs
+      // tr.correctIndex = Index der richtigen Antwort (0–4)
+
+      ui.count((i + 1) + ' / ' + totalTrials);
       await ui.fixation();
+
       ui.host.innerHTML =
-        '<div class="stage fold">'+
-          '<div class="foldsteps">'+tr.stepSVGs.join('<span class="arrow">→</span>')+'</div>'+
-          '<div class="foldq">Wo sind die Löcher nach dem Aufklappen?</div>'+
-          '<div class="answers five">'+
-            tr.optionSVGs.map(function(svg,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+LETTERS[k]+'</kbd>'+svg+'</button>'; }).join('')+
-          '</div>'+
+        '<div class="stage paperfold" style="flex-direction:column;gap:14px;padding:12px 0">' +
+          '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center">' +
+            tr.stepSVGs.map(function(svg, si) {
+              return '<div style="text-align:center">' +
+                '<div style="font-size:.72rem;color:var(--muted);margin-bottom:3px">' +
+                  (si < tr.stepSVGs.length - 1 ? I18N.t('Schritt ','Step ') + (si + 1) : '📍 ' + I18N.t('Loch','Hole')) +
+                '</div>' + svg + '</div>';
+            }).join('<div style="color:var(--muted);align-self:center">→</div>') +
+          '</div>' +
+          '<div class="conhead" style="font-size:.9rem">' + I18N.t('Wie sieht das aufgeklappte Blatt aus?','What does the unfolded sheet look like?') + '</div>' +
+          '<div class="answers five">' +
+            tr.optionSVGs.map(function(svg, idx) {
+              return '<button class="btn ans opt" data-a="' + idx + '">' +
+                svg +
+                '<span style="font-size:.78rem;color:var(--accent2)">' + String.fromCharCode(65 + idx) + '</span>' +
+                '</button>';
+            }).join('') +
+          '</div>' +
         '</div>';
-      var t0=performance.now();
-      var ans=await ui.choice(tr.options.map(function(_,k){ return [String(k),String(k+1)]; }), P.tl||0);
-      var rt=performance.now()-t0; var timedOut=(ans===ui.TIMEOUT);
-      var chosen=Number(ans); var ok=!timedOut && (chosen===tr.correctIndex);
-      results.push({ i:i+1, correct:ok, rt:T.round(rt),
-                     chosen:(timedOut?'—':LETTERS[chosen]), correctAnswer:LETTERS[tr.correctIndex], folds:tr.nFolds });
+
+      // Tastenbelegung: 1–5 für A–E (wie in keyHint definiert)
+      var keyMap = tr.optionSVGs.map(function(_, idx) {
+        return [String(idx), String(idx + 1)];
+      });
+
+      var t0 = performance.now();
+      var ans = await new Promise(function(resolve) {
+        resolveCurrentChoice = resolve;
+        ui.choice(keyMap, 0).then(resolve);
+      });
+      resolveCurrentChoice = null;
+      var rt = performance.now() - t0;
+
+      var timedOut = (ans === ui.TIMEOUT);
+      if (timedOut) {
+        // Zeit lief ab, während diese Aufgabe noch offen war -> als "unbeantwortet" protokollieren.
+        results.push({
+          i: i + 1,
+          given: '—',                                       // keine Antwort gegeben
+          sol:   String.fromCharCode(65 + tr.correctIndex),  // richtige Antwort A–E
+          correct: null,                                     // weder richtig noch falsch -> "–"
+          status: 'unbeantwortet',                           // <- Zeit abgelaufen, Aufgabe gezeigt
+          rt: null,
+          folds: tr.nFolds
+        });
+        timeUp = true;
+        break;
+      }
+
+      var chosenIdx = Number(ans);
+      var ok = (chosenIdx === tr.correctIndex);
+      results.push({
+        i: i + 1,
+        given: String.fromCharCode(65 + chosenIdx),       // gewählte Antwort A–E
+        sol:   String.fromCharCode(65 + tr.correctIndex),  // richtige Antwort A–E
+        correct: ok,
+        status: 'beantwortet',
+        rt: T.round(rt),
+        folds: tr.nFolds                                   // Anzahl Faltungen in dieser Aufgabe
+      });
       await ui.flash(ok);
     }
-    var rts=results.filter(function(r){return r.correct;}).map(function(r){return r.rt;});
-    return { n:results.length, correctCount:results.filter(function(r){return r.correct;}).length,
-             accuracy:T.round(results.filter(function(r){return r.correct;}).length/results.length,3),
-             avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
+
+    // Timer stoppen und aus #timerbar entfernen
+    cancelTimer();
+
+    // Alle restlichen, gar nicht mehr gezeigten Aufgaben als "nicht erreicht" auffüllen.
+    // (generisch: füllt von der nächsten Nummer bis "total" auf – nutzbar für jeden Test mit Gesamt-Timer)
+    var nextNum = (results.length ? results[results.length - 1].i : 0) + 1;
+    for (var num = nextNum; num <= totalTrials; num++) {
+      results.push({ i: num, given: '—', sol: '—', correct: null, status: 'nicht_erreicht', rt: null, folds: null });
+    }
+
+    // Kennzahlen NUR aus beantworteten Aufgaben (un-/nicht-beantwortete verfälschen die Quote nicht)
+    var answeredList   = results.filter(function(r){ return r.status === 'beantwortet'; });
+    var unansweredCnt  = results.filter(function(r){ return r.status === 'unbeantwortet'; }).length;
+    var notReachedCnt  = results.filter(function(r){ return r.status === 'nicht_erreicht'; }).length;
+    var correctCount   = answeredList.filter(function(r){ return r.correct; }).length;
+    return {
+      completed: (unansweredCnt === 0 && notReachedCnt === 0),  // wirklich alle Aufgaben geschafft?
+      trials_completed: answeredList.length,                    // tatsächlich beantwortete Aufgaben
+      unanswered: unansweredCnt,                                // gezeigt, aber Zeit lief ab
+      not_reached: notReachedCnt,                               // gar nicht mehr gezeigt
+      correct: correctCount,
+      total: totalTrials,
+      accuracy: answeredList.length ? T.round(correctCount / answeredList.length, 3) : null,
+      medMs: T.round(T.median(answeredList.map(function(r){ return r.rt; })), 0),
+      details: results
+    };
   },
-  format:function(r){ return [
-    {label:'Richtig gelöst', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
-  ]; }
+  format:function(r){
+    var rows=[
+      {label:tr('Richtig gelöst','Solved correctly'), value:fmtPct(r.accuracy)},
+      {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+      {label:tr('Aufgaben abgeschlossen','Tasks completed'), value: (r.trials_completed != null ? r.trials_completed + ' / ' + r.total : '–')}
+    ];
+    if(r.unanswered){ rows.push({label:tr('Unbeantwortet (Zeit abgelaufen)','Unanswered (time ran out)'), value:r.unanswered}); }
+    if(r.not_reached){ rows.push({label:tr('Nicht erreicht (Zeit abgelaufen)','Not reached (time ran out)'), value:r.not_reached}); }
+    return rows;
+  }
 },
 
 /* ---- 7. Reaktionstest (Deary-Liewald-Stil, Wahlreaktion) ---- */
 {
   id:'deary_rt',
-  name:'Schnell reagieren',
-  short:'Es leuchtet eines von vier Feldern auf – so schnell wie möglich die passende Taste drücken.',
-  measures:'Reine Reaktionsgeschwindigkeit.',
+  name:{de:'Schnell reagieren', en:'React quickly'},
+  short:{de:'Es leuchtet eines von vier Feldern auf – so schnell wie möglich die passende Taste drücken.', en:'One of four boxes lights up – press the matching key as fast as possible.'},
+  measures:{de:'Reine Reaktionsgeschwindigkeit.', en:'Pure reaction speed.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:15, tl:3500 },
@@ -618,11 +721,11 @@ var TEST_POOL = [
       ui.count((i+1)+' / '+P.trials);
       ui.host.innerHTML='<div class="stage rt"><div class="rtrow">'+
         [0,1,2,3].map(function(k){ return '<div class="rtbox" data-k="'+k+'"><kbd>'+keys[k].toUpperCase()+'</kbd></div>'; }).join('')+
-        '</div><div class="status">Warten…</div></div>';
+        '</div><div class="status">'+tr('Warten…','Wait…')+'</div></div>';
       await ui.sleep(waits[i]);
       var target=T.rint(0,3);
       var box=ui.host.querySelector('.rtbox[data-k="'+target+'"]'); box.classList.add('lit');
-      ui.host.querySelector('.status').textContent='Jetzt!';
+      ui.host.querySelector('.status').textContent=tr('Jetzt!','Now!');
       var t0=performance.now();
       var ans=await ui.choice([[String(target),keys[target]]].concat(
         [0,1,2,3].filter(function(k){return k!==target;}).map(function(k){ return ['wrong'+k, keys[k]]; })
@@ -640,18 +743,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Typische Reaktionszeit', value:fmtSec(r.medMs)},
-    {label:'Richtige Taste', value:fmtPct(r.accuracy)},
-    {label:'Durchgänge', value:r.n}
+    {label:tr('Typische Reaktionszeit','Typical reaction time'), value:fmtSec(r.medMs)},
+    {label:tr('Richtige Taste','Correct key'), value:fmtPct(r.accuracy)},
+    {label:tr('Durchgänge','Rounds'), value:r.n}
   ]; }
 },
 
 /* ---- 8. Regeln wechseln (Task Switching) ---- */
 {
   id:'taskswitch',
-  name:'Regeln wechseln',
-  short:'Mal soll man beurteilen, ob eine Zahl groß/klein ist, mal ob sie gerade/ungerade ist. Die Regel wechselt.',
-  measures:'Wie flexibel man zwischen Aufgaben umschaltet.',
+  name:{de:'Regeln wechseln', en:'Switching rules'},
+  short:{de:'Mal soll man beurteilen, ob eine Zahl groß/klein ist, mal ob sie gerade/ungerade ist. Die Regel wechselt.', en:'Sometimes judge whether a number is big/small, sometimes whether it is even/odd. The rule keeps switching.'},
+  measures:{de:'Wie flexibel man zwischen Aufgaben umschaltet.', en:'How flexibly you switch between tasks.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:18, tl:4000 },
@@ -665,9 +768,9 @@ var TEST_POOL = [
       var n=T.pick([1,2,3,4,6,7,8,9]);
       var switched = prevRule!==null && rule!==prevRule;
       ui.count((i+1)+' / '+P.trials);
-      var qLabel = rule==='groesse' ? 'GRÖSSE: kleiner oder größer als 5?' : 'ZAHL: gerade oder ungerade?';
-      var leftLabel = rule==='groesse' ? '&lt; 5' : 'gerade';
-      var rightLabel= rule==='groesse' ? '&gt; 5' : 'ungerade';
+      var qLabel = rule==='groesse' ? tr('GRÖSSE: kleiner oder größer als 5?','SIZE: smaller or larger than 5?') : tr('ZAHL: gerade oder ungerade?','NUMBER: even or odd?');
+      var leftLabel = rule==='groesse' ? '&lt; 5' : tr('gerade','even');
+      var rightLabel= rule==='groesse' ? '&gt; 5' : tr('ungerade','odd');
       await ui.fixation();
       ui.host.innerHTML='<div class="stage switch '+(rule==='groesse'?'r-size':'r-par')+'">'+
         '<div class="ruleban">'+qLabel+'</div>'+
@@ -695,19 +798,19 @@ var TEST_POOL = [
              trials:results };
   },
   format:function(r){ return [
-    {label:'Richtig beurteilt', value:fmtPct(r.accuracy)},
-    {label:'Antwortzeit normal', value:fmtSec(r.stayMs)},
-    {label:'Antwortzeit nach Regelwechsel', value:fmtSec(r.switchMs)},
-    {label:'Mehraufwand durch Wechsel', value:(r.switchCost!=null? fmtPlus(r.switchCost):'–')}
+    {label:tr('Richtig beurteilt','Judged correctly'), value:fmtPct(r.accuracy)},
+    {label:tr('Antwortzeit normal','Response time, no switch'), value:fmtSec(r.stayMs)},
+    {label:tr('Antwortzeit nach Regelwechsel','Response time after a rule switch'), value:fmtSec(r.switchMs)},
+    {label:tr('Mehraufwand durch Wechsel','Extra cost of switching'), value:(r.switchCost!=null? fmtPlus(r.switchCost):'–')}
   ]; }
 },
 
 /* ---- 9. Muster vervollständigen (Linien-/Einrast-Effekt, Gestalt) ---- */
 {
   id:'lineclose',
-  name:'Muster vervollständigen',
-  short:'Ein Raster-Muster hat eine fehlende Stelle. Welches Teil vervollständigt das Muster?',
-  measures:'Wie schnell das Auge ein Muster „schließt“ und ergänzt.',
+  name:{de:'Muster vervollständigen', en:'Complete the pattern'},
+  short:{de:'Ein Raster-Muster hat eine fehlende Stelle. Welches Teil vervollständigt das Muster?', en:'A grid pattern has a missing spot. Which piece completes the pattern?'},
+  measures:{de:'Wie schnell das Auge ein Muster „schließt“ und ergänzt.', en:'How quickly the eye “closes” and completes a pattern.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:10, grid:3, tl:10000 },
@@ -722,7 +825,7 @@ var TEST_POOL = [
       await ui.fixation();
       ui.host.innerHTML='<div class="stage pattern">'+
         '<div class="pgrid">'+tr.gridSVG+'</div>'+
-        '<div class="welllbl">Welches Teil schließt das Muster?</div>'+
+        '<div class="welllbl">'+I18N.t('Welches Teil schließt das Muster?','Which piece completes the pattern?')+'</div>'+
         '<div class="answers four">'+
           tr.options.map(function(op,k){ return '<button class="btn ans opt" data-a="'+k+'"><kbd>'+(k+1)+'</kbd>'+op+'</button>'; }).join('')+
         '</div></div>';
@@ -738,18 +841,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Richtig ergänzt', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
+    {label:tr('Richtig ergänzt','Correctly completed'), value:fmtPct(r.accuracy)},
+    {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+    {label:tr('Aufgaben gesamt','Total tasks'), value:r.n}
   ]; }
 },
 
 /* ---- 10. Kofferraum packen (Pack-Logik / Alltag) ---- */
 {
   id:'trunkpack',
-  name:'Kofferraum packen',
-  short:'Eine Kiste ist halb gefüllt. Passt das übrige Teil noch hinein (auch gedreht)?',
-  measures:'Räumliches Planen wie beim Packen oder Spülmaschine-Einräumen.',
+  name:{de:'Kofferraum packen', en:'Packing the boot'},
+  short:{de:'Eine Kiste ist halb gefüllt. Passt das übrige Teil noch hinein (auch gedreht)?', en:'A box is half full. Does the remaining piece still fit (even rotated)?'},
+  measures:{de:'Räumliches Planen wie beim Packen oder Spülmaschine-Einräumen.', en:'Spatial planning, like packing or loading a dishwasher.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:10, grid:4, tl:14000 },
@@ -764,13 +867,13 @@ var TEST_POOL = [
       await ui.fixation();
       ui.host.innerHTML='<div class="stage pack">'+
         '<div class="packrow">'+
-          '<div class="packbox"><div class="packlbl">Kiste</div>'+tr.boxSVG+'</div>'+
-          '<div class="packpiece"><div class="packlbl">Dieses Teil</div>'+tr.pieceSVG+'</div>'+
+          '<div class="packbox"><div class="packlbl">'+I18N.t('Kiste','Box')+'</div>'+tr.boxSVG+'</div>'+
+          '<div class="packpiece"><div class="packlbl">'+I18N.t('Dieses Teil','This piece')+'</div>'+tr.pieceSVG+'</div>'+
         '</div>'+
-        '<div class="welllbl">Passt das Teil noch hinein (auch gedreht)?</div>'+
+        '<div class="welllbl">'+I18N.t('Passt das Teil noch hinein (auch gedreht)?','Does the piece still fit (even rotated)?')+'</div>'+
         '<div class="answers two">'+
-          '<button class="btn ans" data-a="yes"><kbd>F</kbd> Passt</button>'+
-          '<button class="btn ans" data-a="no"><kbd>J</kbd> Passt nicht</button>'+
+          '<button class="btn ans" data-a="yes"><kbd>F</kbd> '+I18N.t('Passt','Fits')+'</button>'+
+          '<button class="btn ans" data-a="no"><kbd>J</kbd> '+I18N.t('Passt nicht','Does not fit')+'</button>'+
         '</div></div>';
       var t0=performance.now();
       var ans=await ui.choice([['yes','f'],['no','j']], P.tl||0);
@@ -784,18 +887,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Richtig entschieden', value:fmtPct(r.accuracy)},
-    {label:'Typische Antwortzeit', value:fmtSec(r.medMs)},
-    {label:'Aufgaben gesamt', value:r.n}
+    {label:tr('Richtig entschieden','Decided correctly'), value:fmtPct(r.accuracy)},
+    {label:tr('Typische Antwortzeit','Typical response time'), value:fmtSec(r.medMs)},
+    {label:tr('Aufgaben gesamt','Total tasks'), value:r.n}
   ]; }
 },
 
 /* ---- 11. Symbol suchen (visuelle Suche mit Störern) ---- */
 {
   id:'visualsearch',
-  name:'Symbol suchen',
-  short:'In einem Raster aus ähnlichen Kästchen das eine abweichende finden und antippen.',
-  measures:'Wie schnell das Auge im Gewimmel das Besondere findet.',
+  name:{de:'Symbol suchen', en:'Find the symbol'},
+  short:{de:'In einem Raster aus ähnlichen Kästchen das eine abweichende finden und antippen.', en:'In a grid of similar boxes, find the one odd box and tap it.'},
+  measures:{de:'Wie schnell das Auge im Gewimmel das Besondere findet.', en:'How quickly the eye finds the odd one out in a clutter.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:10, items:16, tl:12000 },
@@ -816,7 +919,7 @@ var TEST_POOL = [
                    '<svg viewBox="0 0 24 24" width="24" height="24"><path d="M19 5 H7 V19 H19" fill="none" stroke="#9aa6c8" stroke-width="3"/>'+
                    (isT?'<circle cx="19" cy="5" r="2.6" fill="#22d3ee"/>':'')+'</svg>'+
                  '</button>';
-        }).join('')+'</div><div class="status">Tippe das Kästchen mit dem blauen Punkt an</div></div>';
+        }).join('')+'</div><div class="status">'+tr('Tippe das Kästchen mit dem blauen Punkt an','Tap the box with the blue dot')+'</div></div>';
       var t0=performance.now();
       var ok=await waitTargetTap(ui, P.tl||0);
       var rt=performance.now()-t0;
@@ -829,18 +932,18 @@ var TEST_POOL = [
              avgMs:T.round(T.mean(rts),0), medMs:T.round(T.median(rts),0), trials:results };
   },
   format:function(r){ return [
-    {label:'Typische Suchzeit', value:fmtSec(r.medMs)},
-    {label:'Treffer', value:fmtPct(r.accuracy)},
-    {label:'Suchdurchgänge', value:r.n}
+    {label:tr('Typische Suchzeit','Typical search time'), value:fmtSec(r.medMs)},
+    {label:tr('Treffer','Hits'), value:fmtPct(r.accuracy)},
+    {label:tr('Suchdurchgänge','Search rounds'), value:r.n}
   ]; }
 },
 
 /* ---- 12. Konzentration unter Ablenkung ---- */
 {
   id:'concentration',
-  name:'Konzentration unter Ablenkung',
-  short:'Immer wieder erscheint ein Symbol unter vielen anderen – nur ein bestimmtes Ziel antippen, während es ringsum flackert.',
-  measures:'Konzentration, wenn drumherum viel los ist.',
+  name:{de:'Konzentration unter Ablenkung', en:'Concentration under distraction'},
+  short:{de:'Immer wieder erscheint ein Symbol unter vielen anderen – nur ein bestimmtes Ziel antippen, während es ringsum flackert.', en:'A symbol keeps appearing among many others – tap only one specific target while everything around it flickers.'},
+  measures:{de:'Konzentration, wenn drumherum viel los ist.', en:'Concentration when there is a lot going on around you.'},
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ seconds:40, items:12 },
@@ -851,7 +954,7 @@ var TEST_POOL = [
     var symbols=['◆','●','▲','★','■','✦','✚','◗'];
     var targetSym='★';
     var hits=0, misses=0, falseAlarms=0, total=0, rts=[];
-    ui.host.innerHTML='<div class="stage concentration"><div class="conhead">Tippe jedes <b class="tgt">'+targetSym+'</b> an – ignoriere den Rest. <span id="clock"></span></div><div class="congrid" id="cg"></div></div>';
+    ui.host.innerHTML='<div class="stage concentration"><div class="conhead">'+tr('Tippe jedes','Tap every')+' <b class="tgt">'+targetSym+'</b> '+tr('an – ignoriere den Rest.','– ignore the rest.')+' <span id="clock"></span></div><div class="congrid" id="cg"></div></div>';
     var grid=ui.host.querySelector('#cg'), clock=ui.host.querySelector('#clock');
     var endAt=performance.now()+P.seconds*1000, running=true, shownAt=0, curHasTarget=false;
     function render(){
@@ -888,10 +991,10 @@ var TEST_POOL = [
     return { hits:hits, misses:misses, falseAlarms:falseAlarms, rounds:total, medMs:T.round(T.median(rts),0) };
   },
   format:function(r){ return [
-    {label:'Richtig getroffen', value:(r.hits||0)},
-    {label:'Übersehen', value:(r.misses||0)},
-    {label:'Daneben getippt', value:(r.falseAlarms||0)},
-    {label:'Typische Reaktionszeit', value:fmtSec(r.medMs)}
+    {label:tr('Richtig getroffen','Correct hits'), value:(r.hits||0)},
+    {label:tr('Übersehen','Missed'), value:(r.misses||0)},
+    {label:tr('Daneben getippt','Tapped wrongly'), value:(r.falseAlarms||0)},
+    {label:tr('Typische Reaktionszeit','Typical reaction time'), value:fmtSec(r.medMs)}
   ]; }
 }
 
@@ -942,13 +1045,13 @@ function waitTargetTap(ui, timeoutMs){
 function produceInterval(ui, targetSec){
   return new Promise(function(resolve){
     ui.host.innerHTML='<div class="stage time">'+
-      '<p class="lead center">Drücke <b>Start</b> und dann <b>Stopp</b>, wenn du glaubst, dass <b>'+targetSec+' Sekunden</b> vergangen sind.<br>'+
-      '<span class="muted">Bitte nicht mitzählen und nicht auf eine Uhr schauen.</span></p>'+
+      '<p class="lead center">'+tr('Drücke','Press')+' <b>Start</b> '+tr('und dann','and then')+' <b>'+tr('Stopp','Stop')+'</b>, '+tr('wenn du glaubst, dass','when you think that')+' <b>'+targetSec+' '+tr('Sekunden','seconds')+'</b> '+tr('vergangen sind.','have passed.')+'<br>'+
+      '<span class="muted">'+tr('Bitte nicht mitzählen und nicht auf eine Uhr schauen.','Please do not count along and do not look at a clock.')+'</span></p>'+
       '<div class="timebox"><button class="btn primary big" id="tstart">Start</button></div></div>';
     ui.host.querySelector('#tstart').onclick=function(){
       var t0=performance.now();
       // bewusst KEIN blinkender Punkt / keine Anzeige -> erschwert das Zählen nicht künstlich
-      ui.host.querySelector('.timebox').innerHTML='<div class="timewait">Konzentrier dich… und drücke Stopp, wenn es so weit ist.</div><button class="btn primary big" id="tstop">Stopp</button>';
+      ui.host.querySelector('.timebox').innerHTML='<div class="timewait">'+tr('Konzentrier dich… und drücke Stopp, wenn es so weit ist.','Concentrate… and press Stop when the time feels right.')+'</div><button class="btn primary big" id="tstop">'+tr('Stopp','Stop')+'</button>';
       ui.host.querySelector('#tstop').onclick=function(){ resolve(performance.now()-t0); };
     };
   });
