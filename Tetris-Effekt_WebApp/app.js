@@ -228,11 +228,34 @@ function screenDone(){
     screenThanks(status);
   };
 }
+/* ---------- Kurze Leistungs-Zusammenfassung pro Test (für die Testperson) ---------- */
+function performanceSummaryHTML(){
+  if(!SESSION || !SESSION.results) return '';
+  var cards = PLAN.map(function(p){
+    var def=p.def, r=SESSION.results[def.id];
+    if(!r || r.error) return '';                 // nicht absolvierte / fehlerhafte Tests überspringen
+    var rows=[];
+    try { rows = def.format(r) || []; } catch(e){ rows=[]; }
+    if(!rows.length) return '';
+    var rowsHtml = rows.map(function(x){
+      return '<div class="sr-row"><span>'+escapeHtml(String(x.label))+'</span><b>'+escapeHtml(String(x.value))+'</b></div>';
+    }).join('');
+    return '<div class="sr-card"><div class="sr-name">'+escapeHtml(L(def.name))+'</div>'+rowsHtml+'</div>';
+  }).filter(Boolean).join('');
+  if(!cards) return '';
+  return '<div class="summary">'+
+    '<h3 class="sr-h">'+tr('Deine Ergebnisse','Your results')+'</h3>'+
+    '<p class="sr-sub">'+tr('Kurzer Überblick über deine heutige Sitzung – nur zur Orientierung.','A short overview of today’s session – just for your information.')+'</p>'+
+    cards+
+  '</div>';
+}
+
 function screenThanks(status){
   CURRENT_RENDER = function(){ screenThanks(status); };
   setScreen('<div class="card thanks"><div class="big-tick">'+miniBlocks(true)+'</div>'+
     '<h2 class="ttl">'+tr('Danke – Sitzung gespeichert','Thank you – session saved')+'</h2>'+
     '<p class="lead">'+(status.cloud?tr('✓ Online gesichert.','✓ Backed up online.'):tr('✓ Lokal gespeichert. <b>Bitte vor dem Schließen exportieren.</b>','✓ Saved locally. <b>Please export before closing.</b>'))+'</p>'+
+    performanceSummaryHTML()+
     '<p class="muted center">'+tr('Bis zur nächsten Sitzung. Du kannst dieses Fenster jetzt schließen.','See you at the next session. You can close this window now.')+'</p>'+
     '<button class="btn ghost" id="export">'+tr('Daten exportieren (CSV + JSON)','Export data (CSV + JSON)')+'</button>'+
     '<button class="btn ghost" id="again">'+tr('Neue Sitzung','New session')+'</button></div>');

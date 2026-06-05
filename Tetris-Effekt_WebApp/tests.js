@@ -561,10 +561,13 @@ var TEST_POOL = [
   // (zufällige Faltungen + zufällig gestanztes Loch). Standard = 10 Aufgaben.
   // Jede Aufgabe hat 5 Antwortmöglichkeiten A–E wie im VZ-2; die richtige
   // Lösung wird geometrisch berechnet (kein fester Antwortschlüssel nötig).
+  // sim = Ähnlichkeit der falschen Optionen zur richtigen
+  //   0 = leicht (deutlich verschieden), 1 = mittel (gleiche Lochzahl, ein Loch erkennbar daneben),
+  //   2 = schwer (gleiche Lochzahl, nur ein Loch leicht verschoben -> man muss genau prüfen)
   difficulties:{
-    leicht:{ trials:10, folds:1, holes:1, tl:18000 },
-    mittel:{ trials:10, folds:2, holes:1, tl:20000 },
-    schwer:{ trials:10, folds:3, holes:2, tl:25000 }
+    leicht:{ trials:10, folds:1, holes:1, tl:18000, sim:0 },
+    mittel:{ trials:10, folds:2, holes:1, tl:20000, sim:1 },
+    schwer:{ trials:10, folds:3, holes:2, tl:25000, sim:2 }
   },
   run: async function(P, ui) {
     var totalTrials = P.trials || 10;
@@ -591,7 +594,7 @@ var TEST_POOL = [
       if (remaining <= 0) break;
 
       // Aufgabe generieren mit makeFoldTrial() – der echte Generator in tests.js
-      var tr = makeFoldTrial(P.folds || 2, P.holes || 1);
+      var tr = makeFoldTrial(P.folds || 2, P.holes || 1, P.sim || 0);
       // tr.stepSVGs  = Schritt-Bilder (Faltungen + gestanztes Loch)
       // tr.optionSVGs = die 5 Antwort-SVGs
       // tr.correctIndex = Index der richtigen Antwort (0–4)
@@ -1104,8 +1107,9 @@ function _fl_foldOptions(s){
   }
   return out;
 }
-function makeFoldTrial(nFolds, nHoles){
+function makeFoldTrial(nFolds, nHoles, hardness){
   nHoles=nHoles||1;
+  var sim = (typeof hardness==='number') ? hardness : 0;   // 0=leicht, 1=mittel, 2=schwer
   var shape={kind:'rect',cx:0.5,cy:0.5,w:1,h:1}, creases=[], shapesSeq=[shape], flaps=[];
   for(var f=0; f<nFolds; f++){
     var opt=T.pick(_fl_foldOptions(shape)); var half=T.pick(opt.halves);
@@ -1123,20 +1127,67 @@ function makeFoldTrial(nFolds, nHoles){
   var correct=unfold(holes,-1), ckey=keyOf(correct);
   function setDist(A,B){ if(A.length!==B.length) return 1; var used={},tot=0;
     A.forEach(function(p){ var best=9,bi=-1; for(var j=0;j<B.length;j++){ if(used[j])continue; var d=Math.hypot(p[0]-B[j][0],p[1]-B[j][1]); if(d<best){best=d;bi=j;} } used[bi]=1; tot+=best; }); return tot/A.length; }
-  function distinct(cd){ return cd.length>0 && setDist(cd,correct)>=0.09; }
-  var cands=[];
-  if(creases.length>1) cands.push(unfold(holes, T.rint(0,creases.length-1)));
-  cands.push(dedupe(correct.map(function(p){return [1-p[0],p[1]];})));
-  cands.push(dedupe(correct.map(function(p){return [p[0],1-p[1]];})));
-  cands.push(holes.map(function(p){return p.slice();}));
-  cands.push(dedupe(correct.map(function(p){return [p[1],p[0]];})));
+
+  // Ein einzelnes Loch der korrekten Lösung an eine plausible, aber falsche Stelle schieben.
+  // Lochzahl bleibt gleich -> man muss wirklich jedes Loch prüfen statt das "vollständige" Muster zu raten.
+  function nudgeOne(set, mag){
+    if(!set.length) return null;
+    var s=set.map(function(p){return p.slice();});
+    var idx=T.rint(0,s.length-1);
+    var dirs=T.shuffle([[1,0],[-1,0],[0,1],[0,-1],[0.71,0.71],[-0.71,0.71],[0.71,-0.71],[-0.71,-0.71]]);
+    for(var d=0; d<dirs.length; d++){
+      var np=[ s[idx][0]+dirs[d][0]*mag, s[idx][1]+dirs[d][1]*mag ];
+      if(np[0]<0.06||np[0]>0.94||np[1]<0.06||np[1]>0.94) continue;
+      var clash=false;
+      for(var k=0;k<s.length;k++){ if(k===idx) continue; if(Math.hypot(np[0]-s[k][0],np[1]-s[k][1])<0.07){ clash=true; break; } }
+      if(clash) continue;
+      s[idx]=np; return s;
+    }
+    return null;
+  }
+  // Spiegelungen/Drehungen des GANZEN Musters (gleiche Lochzahl, sehen plausibel "gefaltet" aus)
+  var reflTransforms=[
+    function(p){return [1-p[0],p[1]];},      // an senkrechter Mittelachse
+    function(p){return [p[0],1-p[1]];},      // an waagerechter Mittelachse
+    function(p){return [p[1],p[0]];},        // an Hauptdiagonale
+    function(p){return [1-p[1],1-p[0]];},    // an Nebendiagonale
+    function(p){return [1-p[0],1-p[1]];}     // 180°-Drehung
+  ];
+
+  // Mindestabstand zur korrekten Lösung: je schwerer, desto näher dürfen die Distraktoren sein.
+  var minDist = (sim>=2) ? 0.012 : (sim>=1 ? 0.03 : 0.09);
   var opts=[correct], seen={}; seen[ckey]=1;
-  cands.forEach(function(cd){ if(opts.length<5 && distinct(cd)){ var k=keyOf(cd); if(!seen[k]){ seen[k]=1; opts.push(cd); } } });
+  function tryAdd(cd){
+    if(!cd || opts.length>=5) return;
+    if(sim>0 && cd.length!==correct.length) return;   // mittel/schwer: gleiche Lochzahl erzwingen
+    if(cd.length===0) return;
+    if(setDist(cd,correct) < minDist) return;          // zu identisch -> unfair, verwerfen
+    var k=keyOf(cd); if(seen[k]) return; seen[k]=1; opts.push(cd);
+  }
+
+  if(sim===0){
+    // leicht: wie bisher – auch deutlich verschiedene Muster (z. B. weniger Löcher) erlaubt
+    if(creases.length>1) tryAdd(unfold(holes, T.rint(0,creases.length-1)));
+    tryAdd(dedupe(correct.map(function(p){return [1-p[0],p[1]];})));
+    tryAdd(dedupe(correct.map(function(p){return [p[0],1-p[1]];})));
+    tryAdd(holes.map(function(p){return p.slice();}));
+    tryAdd(dedupe(correct.map(function(p){return [p[1],p[0]];})));
+  } else {
+    // mittel/schwer: gleiche Lochzahl + "Beinahe-Treffer"
+    var mag = (sim>=2) ? 0.15 : 0.22;
+    // ein paar plausible Spiegelungen (falls sie sich überhaupt vom Original unterscheiden)
+    T.shuffle(reflTransforms.slice()).forEach(function(fn){ tryAdd(dedupe(correct.map(fn))); });
+    // hauptsächlich: je ein Loch leicht verschoben
+    var att=0; while(opts.length<5 && att++<200){ tryAdd(nudgeOne(correct, mag)); }
+    // Notfall: zwei Löcher verschieben, falls noch nicht genug eindeutige Varianten
+    att=0; while(opts.length<5 && att++<200){ var two=nudgeOne(correct, mag); if(two) tryAdd(nudgeOne(two, mag)); }
+  }
+  // Letzte Absicherung (sollte selten greifen): Zufalls-Jitter
   var guard=0;
   while(opts.length<5 && guard++<300){
     var j=dedupe(correct.map(function(p){return [p[0]+(Math.random()-0.5)*0.5,p[1]+(Math.random()-0.5)*0.5];})
       .filter(function(p){return p[0]>0.05&&p[0]<0.95&&p[1]>0.05&&p[1]<0.95;}));
-    var k=keyOf(j); if(distinct(j)&&!seen[k]){ seen[k]=1; opts.push(j); }
+    if(j.length && keyOf(j)!==ckey && !seen[keyOf(j)]){ seen[keyOf(j)]=1; opts.push(j); }
   }
   opts=T.shuffle(opts.slice(0,5));
   var correctIndex=-1; for(var oi=0;oi<opts.length;oi++){ if(keyOf(opts[oi])===ckey){ correctIndex=oi; break; } }
