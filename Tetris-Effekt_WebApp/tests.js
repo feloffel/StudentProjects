@@ -315,7 +315,7 @@ var TEST_POOL = [
   difficulties:{
     leicht:{ trials:12, angles:[0,50],     cubes:9,  tl:12000 },
     mittel:{ trials:18, angles:[50,100],   cubes:11, tl:10000 },
-    schwer:{ trials:24, angles:[100,150],  cubes:14, tl:8000  }
+    schwer:{ trials:30, angles:[100,150],  cubes:14, tl:8000  }
   },
   run: async function(P, ui){
     var man = loadRotationImages();
@@ -516,7 +516,7 @@ var TEST_POOL = [
   difficulties:{
     leicht:{ trials:15, max:50,  tl:9000 },
     mittel:{ trials:20, max:90,  tl:7000 },
-    schwer:{ trials:25, max:140, tl:6000 }
+    schwer:{ trials:30, max:140, tl:6000 }
   },
   run: async function(P, ui){
     var results=[];
@@ -566,8 +566,8 @@ var TEST_POOL = [
   //   2 = schwer (gleiche Lochzahl, nur ein Loch leicht verschoben -> man muss genau prüfen)
   difficulties:{
     leicht:{ trials:10, folds:1, holes:1, tl:18000, sim:0 },
-    mittel:{ trials:10, folds:2, holes:1, tl:20000, sim:1 },
-    schwer:{ trials:10, folds:3, holes:2, tl:25000, sim:2 }
+    mittel:{ trials:20, folds:2, holes:1, tl:20000, sim:1 },
+    schwer:{ trials:20, folds:3, holes:2, tl:25000, sim:2 }
   },
   run: async function(P, ui) {
     var totalTrials = P.trials || 10;
@@ -714,8 +714,8 @@ var TEST_POOL = [
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:15, tl:3500 },
-    mittel:{ trials:24, tl:3000 },
-    schwer:{ trials:32, tl:2500 }
+    mittel:{ trials:25, tl:3000 },
+    schwer:{ trials:40, tl:2500 }
   },
   run: async function(P, ui){
     var results=[]; var keys=['d','f','j','k'];
@@ -905,8 +905,8 @@ var TEST_POOL = [
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ trials:10, items:16, tl:12000 },
-    mittel:{ trials:12, items:30, tl:10000 },
-    schwer:{ trials:14, items:48, tl:9000  }
+    mittel:{ trials:20, items:30, tl:10000 },
+    schwer:{ trials:30, items:48, tl:9000  }
   },
   run: async function(P, ui){
     var results=[];
@@ -950,8 +950,8 @@ var TEST_POOL = [
   defaultDifficulty:'mittel',
   difficulties:{
     leicht:{ seconds:40, items:12 },
-    mittel:{ seconds:45, items:20 },
-    schwer:{ seconds:50, items:28 }
+    mittel:{ seconds:60, items:20 },
+    schwer:{ seconds:120, items:28 }
   },
   run: async function(P, ui){
     var symbols=['◆','●','▲','★','■','✦','✚','◗'];

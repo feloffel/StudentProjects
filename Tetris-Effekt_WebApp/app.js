@@ -246,7 +246,7 @@ function performanceSummaryHTML(){
   return '<div class="summary">'+
     '<h3 class="sr-h">'+tr('Deine Ergebnisse','Your results')+'</h3>'+
     '<p class="sr-sub">'+tr('Kurzer Überblick über deine heutige Sitzung – nur zur Orientierung.','A short overview of today’s session – just for your information.')+'</p>'+
-    cards+
+    '<div class="sr-grid">'+cards+'</div>'+
   '</div>';
 }
 
