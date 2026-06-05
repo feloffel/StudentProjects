@@ -961,7 +961,7 @@ var TEST_POOL = [
     var grid=ui.host.querySelector('#cg'), clock=ui.host.querySelector('#clock');
     var endAt=performance.now()+P.seconds*1000, running=true, shownAt=0, curHasTarget=false;
     function render(){
-      var hasTarget = Math.random()<0.5;
+      var hasTarget = Math.random()<0.35;
       curHasTarget=hasTarget; shownAt=performance.now(); total++;
       var n=P.items, tIdx = hasTarget? T.rint(0,n-1) : -1, html='';
       for(var k=0;k<n;k++){
