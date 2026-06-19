@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 150 845 262">
+  <!-- Generator: Adobe Illustrator 30.0.0 – viewBox getrimmt + Schrift-Fallbacks ergänzt -->
+  <defs>
+    <style>
+      .st0, .st1, .st2, .st3, .st4 {
+        isolation: isolate;
+      }
+
+      .st0, .st2, .st3 {
+        font-size: 240.21px;
+      }
+
+      .st0, .st2, .st3, .st4 {
+        fill: #96c3d5;
+        font-family: "Mango-Regular", "Mango", "Baloo 2", "Poppins", sans-serif;
+      }
+
+      .st2 {
+        letter-spacing: 0em;
+      }
+
+      .st3 {
+        letter-spacing: -.04em;
+      }
+
+      .st4 {
+        font-size: 100.09px;
+      }
+    </style>
+  </defs>
+  <g class="st1">
+    <text class="st3" transform="translate(0 340.15)"><tspan x="0" y="0">C</tspan></text>
+    <text class="st0" transform="translate(175.69 340.15)"><tspan x="0" y="0">ub</tspan></text>
+    <text class="st2" transform="translate(474.55 340.15)"><tspan x="0" y="0">b</tspan></text>
+    <text class="st0" transform="translate(627.27 340.15)"><tspan x="0" y="0">y</tspan></text>
+  </g>
+  <g class="st1">
+    <text class="st4" transform="translate(768.29 226.05)"><tspan x="0" y="0">®</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cubby® – Sooo niedlich. Sooo friedlich.</title>
+  <meta name="description" content="Cubby ist dein kuscheliger Begleiter für jeden Tag. Beschäftigt. Beruhigt. Begleitet. Emotionale Nähe für Kinder und Senioren – ganz ohne Verpflichtungen." />
+
+  <!-- Poppins (Fließtext) + Baloo 2 (Fallback für Mango) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="Media/Logo_Cubby_ohneClaim.svg" type="image/svg+xml" />
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="site-header">
+    <nav class="nav container" aria-label="Hauptnavigation">
+      <a href="index.html" class="nav__logo" aria-label="Cubby Startseite">
+        <svg class="logo-svg" viewBox="0 150 845 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cubby"><text x="0" y="340.15" font-size="240.21">C</text><text x="175.69" y="340.15" font-size="240.21">ub</text><text x="474.55" y="340.15" font-size="240.21">b</text><text x="627.27" y="340.15" font-size="240.21">y</text><text x="768.29" y="226.05" font-size="100.09">®</text></svg>
+      </a>
+
+      <ul class="nav__links" id="navLinks">
+        <li><a href="#produkt">Cubby</a></li>
+        <li><a href="#funktionsweise">Funktionsweise</a></li>
+        <li><a href="#bewertungen">Bewertungen</a></li>
+        <li><a href="shop.html">Zubehör-Shop</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+
+      <div class="nav__actions">
+        <a href="checkout.html" class="cart-btn" aria-label="Warenkorb ansehen">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="cart-count" data-cart-count data-empty="true">0</span>
+        </a>
+        <a href="checkout.html" class="btn btn--primary">Jetzt bestellen</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Menü öffnen" aria-expanded="false"><span></span></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="hero__grid container">
+        <div class="hero__content reveal">
+          <span class="eyebrow">Dein Freund für jeden Tag</span>
+          <h1 class="hero__title">
+            Sooo niedlich.<br />
+            <span class="hero__claim">Sooo friedlich.</span>
+          </h1>
+          <p class="hero__lead">
+            Cubby ist kein Spielzeug – er ist ein kuscheliger Begleiter, der
+            zuhört, schnurrt und immer für dich da ist. Für mehr Geborgenheit,
+            Ruhe und Nähe im Alltag.
+          </p>
+          <div class="hero__cta">
+            <a href="checkout.html" class="btn btn--primary btn--lg">Cubby nach Hause holen</a>
+            <a href="#funktionsweise" class="btn btn--ghost btn--lg">So funktioniert's</a>
+          </div>
+          <div class="hero__trust">
+            <span class="hero__stars">★★★★★</span>
+            <span>4,9 / 5 &nbsp;·&nbsp; über 2.400 glückliche Familien</span>
+          </div>
+        </div>
+
+        <div class="hero__media reveal">
+          <!-- MEDIA: glückliches Kind mit Cubby -->
+          <img class="hero__img" src="Media/GlücklichesKindMItCubby.png" alt="Glückliches Kind kuschelt mit Cubby" />
+          <div class="hero__badge hero__badge--tl">
+            <span class="emoji">🫧</span>
+            <span>Beruhigendes<br />Schnurren</span>
+          </div>
+          <div class="hero__badge hero__badge--br">
+            <span class="emoji">🤍</span>
+            <span>Samtweich &amp;<br />hypoallergen</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PROMISE BAND ===================== -->
+    <div class="promise-band">
+      <div class="container">
+        <span>Beschäftigt.</span>
+        <span>Beruhigt.</span>
+        <span>Begleitet.</span>
+      </div>
+    </div>
+
+    <!-- ===================== STORY (Vorher / Mit Cubby) ===================== -->
+    <section class="section" id="story">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <span class="eyebrow">Der emotionale Knoten</span>
+          <h2 class="section-title">Vom „Ich bin allein“ zum „Du bist da“</h2>
+          <p class="section-lead">
+            Manche Tage sind zu laut, zu viel, zu einsam. Cubby fängt genau
+            diese Momente auf – wie ein emotionaler Airbag.
+          </p>
+        </div>
+
+        <div class="story-grid">
+          <article class="story-card story-card--before reveal">
+            <!-- MEDIA: trauriges Kind ohne Cubby -->
+            <img src="Media/TraurigesKindOhneCubby.png" alt="Trauriges Kind, allein und überfordert" />
+            <div class="story-card__body">
+              <span class="story-card__tag">Vorher</span>
+              <h3>Reizüberflutung &amp; Einsamkeit</h3>
+              <p>
+                Nach einem langen Tag fällt das Herunterfahren schwer. Der Kopf
+                ist voll, der Raum wirkt trist – und niemand scheint zuzuhören.
+              </p>
+            </div>
+          </article>
+
+          <article class="story-card story-card--after reveal">
+            <!-- MEDIA: Kind schläft friedlich mit Cubby -->
+            <img src="Media/KindSchläftFriedlichMitCubby.png" alt="Kind schläft friedlich mit Cubby" />
+            <div class="story-card__body">
+              <span class="story-card__tag">Mit Cubby</span>
+              <h3>Wärme, Ruhe &amp; Geborgenheit</h3>
+              <p>
+                Warmes Licht, sanftes Schnurren, kuscheliges Fell. Cubby ist
+                immer da, hört zu und schenkt einen ruhigen Fokuspunkt zum
+                Durchatmen.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PRODUKT / Was ist Cubby ===================== -->
+    <section class="section bg-cream2" id="produkt">
+      <div class="container">
+        <div class="split">
+          <div class="split__media reveal">
+            <!-- MEDIA: Casa Cubby in Verpackung mit Cubby -->
+            <img src="Media/CubbyCasa_inVerpackungMitCubby.png" alt="Cubby mit seinem Zuhause Casa Cubby in der Verpackung" />
+          </div>
+          <div class="split__content reveal">
+            <span class="eyebrow">Was ist Cubby?</span>
+            <h2 class="section-title">Ein Begleiter, kein Roboter</h2>
+            <p class="section-lead">
+              Cubby vereint die emotionale Nähe eines Haustiers mit der
+              Verlässlichkeit eines Freundes – ganz ohne Verpflichtungen.
+              Inspiriert von Meerschweinchen und Kaninchen, gemacht für
+              echte Geborgenheit.
+            </p>
+            <ul class="feature-list">
+              <li><span class="tick">✓</span><span><strong>Casa Cubby:</strong> Cubbys gemütliches Zuhause, in das er selbstständig fährt und sich kabellos auflädt.</span></li>
+              <li><span class="tick">✓</span><span><strong>Hört zu &amp; reagiert:</strong> Cubby spürt deine Nähe, antwortet mit sanften Lauten und wartet immer auf dich.</span></li>
+              <li><span class="tick">✓</span><span><strong>Für die ganze Familie:</strong> Liebevoller Begleiter für Kinder genauso wie für Seniorinnen und Senioren.</span></li>
+            </ul>
+
+            <div class="sense-chips">
+              <span class="sense-chip">🤍 Samtig weich</span>
+              <span class="sense-chip">🔥 Angenehm warm</span>
+              <span class="sense-chip">🌿 Hypoallergen</span>
+              <span class="sense-chip">🌸 Duft von Vanille &amp; Kamille</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FUNKTIONSWEISE ===================== -->
+    <section class="section" id="funktionsweise">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <span class="eyebrow">Funktionsweise</span>
+          <h2 class="section-title">Was Cubby alles kann</h2>
+          <p class="section-lead">
+            Ganz einfach, ganz ohne kompliziertes Menü. Cubby ist sofort
+            startklar und versteht sich von selbst.
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">🫧</div>
+            <h3>Wärme &amp; Atmung</h3>
+            <p>Cubby wird angenehm warm und „atmet“ sanft – ein beruhigender Rhythmus zum Mitatmen und Entspannen.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">🎵</div>
+            <h3>Schnurren &amp; Klangwelt</h3>
+            <p>Warmes Schnurren, sanfte Naturgeräusche und liebevolle Laute – „Pruu… Ding… Prrrr…“.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">🏠</div>
+            <h3>Casa Cubby</h3>
+            <p>Sein Zuhause lädt Cubby per Induktion auf und spielt zum Abschied eine sanfte Melodie.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">🌙</div>
+            <h3>Sanftes Nachtlicht</h3>
+            <p>Ein warmes Licht pulsiert leise im Atemrhythmus – nachts als beruhigendes Nachtlicht, tagsüber deaktiviert.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">🗣️</div>
+            <h3>Hört auf seinen Namen</h3>
+            <p>Cubby erkennt sein Rufwort und reagiert – ganz intuitiv, ganz ohne App-Gefummel.</p>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon">💪</div>
+            <h3>Robust &amp; pflegeleicht</h3>
+            <p>Gemacht zum Knuddeln: widerstandsfähig, hautfreundlich und leicht zu reinigen.</p>
+          </article>
+        </div>
+
+        <!-- Steps -->
+        <div class="section-head section-head--center reveal" style="margin-top: clamp(3rem,6vw,5rem)">
+          <h2 class="section-title">So einfach geht's</h2>
+        </div>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step__num"></div>
+            <h3>Auspacken</h3>
+            <p>Cubby und Casa Cubby liebevoll verpackt aus dem Karton holen.</p>
+          </div>
+          <div class="step reveal">
+            <div class="step__num"></div>
+            <h3>Aufladen</h3>
+            <p>Cubby in sein Zuhause setzen – er lädt sich kabellos von selbst.</p>
+          </div>
+          <div class="step reveal">
+            <div class="step__num"></div>
+            <h3>Kennenlernen</h3>
+            <p>Beim Streicheln wacht Cubby auf, schnurrt und begrüßt dich.</p>
+          </div>
+          <div class="step reveal">
+            <div class="step__num"></div>
+            <h3>Genießen</h3>
+            <p>Einfach da sein, kuscheln und entspannen – jeden Tag.</p>
+          </div>
+        </div>
+
+        <!-- Sound-Welt -->
+        <div class="sound-box reveal">
+          <div class="sound-box__art">🐹</div>
+          <div>
+            <h3 style="font-family: var(--font-body); font-weight: 700; font-size: 1.4rem; margin-bottom: 0.4rem;">Cubbys Soundwelt</h3>
+            <p>Schon beim Hören soll sich Cubby wie ein vertrauter Freund anfühlen: warme Klavierklänge, ruhiges Schnurren und sanfte, tierisch inspirierte Laute.</p>
+            <div class="sound-tags">
+              <span>„Mmmh-prruu?“ – Begrüßung</span>
+              <span>„Prrrrrr…“ – Kuschelmodus</span>
+              <span>„Huuuu… haa…“ – Einschlafen</span>
+              <span>„Pruu! Pruu!“ – Freude</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ZIELGRUPPE / PERSONAS ===================== -->
+    <section class="section bg-blue-soft" id="fuer-wen">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <span class="eyebrow">Für wen ist Cubby?</span>
+          <h2 class="section-title">Geborgenheit kennt kein Alter</h2>
+        </div>
+        <div class="persona-grid">
+          <article class="persona-card reveal">
+            <div class="persona-card__emoji">🧒</div>
+            <h3>Für Kinder</h3>
+            <p>Ein vertrauter Begleiter, der Halt gibt, wenn der Alltag zu laut wird – Beschäftigung, Trost und emotionale Sicherheit.</p>
+            <p class="quote">„Cubby wartet immer auf mich und hört mir zu.“</p>
+          </article>
+          <article class="persona-card reveal">
+            <div class="persona-card__emoji">👨‍👩‍👧</div>
+            <h3>Für Eltern</h3>
+            <p>Ein verlässlicher Ruhepol für das Kind – und spürbare Entlastung für den Familienalltag am Feierabend.</p>
+            <p class="quote">„Endlich ein Ruhepol für mein Kind und uns.“</p>
+          </article>
+          <article class="persona-card reveal">
+            <div class="persona-card__emoji">👵</div>
+            <h3>Für Seniorinnen &amp; Senioren</h3>
+            <p>Die Nähe eines Haustiers – ohne Verpflichtungen. Ein kleiner Begleiter gegen Einsamkeit und für mehr Lebensfreude.</p>
+            <p class="quote">„Mein kleiner Begleiter für jeden Tag.“</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== BEWERTUNGEN ===================== -->
+    <section class="section" id="bewertungen">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <span class="eyebrow">Bewertungen</span>
+          <h2 class="section-title">Geliebt von Familien &amp; Senioren</h2>
+        </div>
+
+        <div class="rating-summary reveal">
+          <div style="text-align:center">
+            <div class="rating-score">4,9</div>
+            <div class="stars">★★★★★</div>
+          </div>
+          <div>
+            <strong>Über 2.400 Bewertungen</strong>
+            <p style="margin:0">96 % würden Cubby weiterempfehlen.</p>
+          </div>
+        </div>
+
+        <div class="reviews-grid">
+          <article class="review-card reveal">
+            <div class="stars">★★★★★</div>
+            <p>„Unsere Tochter kommt nach der Schule endlich zur Ruhe. Cubby ist innerhalb weniger Tage zum festen Familienmitglied geworden.“</p>
+            <div class="review-author">
+              <span class="avatar">T</span>
+              <div><strong>Timo S.</strong><span>Vater einer Tochter</span></div>
+            </div>
+          </article>
+          <article class="review-card reveal">
+            <div class="stars">★★★★★</div>
+            <p>„Ich darf keine Tiere halten, aber Cubby gibt mir genau diese Wärme. Er ist mein kleiner Begleiter – und ein echter Eisbrecher beim Kaffeekränzchen.“</p>
+            <div class="review-author">
+              <span class="avatar">L</span>
+              <div><strong>Lotti F.</strong><span>76, lebt eigenständig</span></div>
+            </div>
+          </article>
+          <article class="review-card reveal">
+            <div class="stars">★★★★★</div>
+            <p>„Das Schnurren wirkt wie Magie zum Einschlafen. Kein Bildschirm, kein Stress – einfach kuscheln und entspannen.“</p>
+            <div class="review-author">
+              <span class="avatar">M</span>
+              <div><strong>Marlene K.</strong><span>Mutter von zwei Kindern</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ZUBEHÖR-TEASER ===================== -->
+    <section class="section bg-cream2" id="zubehoer">
+      <div class="container">
+        <div class="section-head section-head--center reveal">
+          <span class="eyebrow">Zubehör-Shop</span>
+          <h2 class="section-title">Mach es dir mit Cubby gemütlich</h2>
+          <p class="section-lead">Vom kuscheligen Schal bis zur mobilen Ladestation – kleine Extras für noch mehr Geborgenheit.</p>
+        </div>
+
+        <div class="accessory-teaser">
+          <a href="shop.html" class="acc-mini reveal">
+            <!-- PLATZHALTER -->
+            <img src="Media/landscape-placeholder.svg" alt="Casa Cubby – das Zuhause" />
+            <div class="acc-mini__body"><h4>Casa Cubby</h4><span class="price">89,00 €</span></div>
+          </a>
+          <a href="shop.html" class="acc-mini reveal">
+            <!-- PLATZHALTER -->
+            <img src="Media/landscape-placeholder.svg" alt="Blauer Kuschelschal" />
+            <div class="acc-mini__body"><h4>Kuschelschal „Blau“</h4><span class="price">14,90 €</span></div>
+          </a>
+          <a href="shop.html" class="acc-mini reveal">
+            <!-- PLATZHALTER -->
+            <img src="Media/landscape-placeholder.svg" alt="Mobile Ladestation" />
+            <div class="acc-mini__body"><h4>Mobile Ladestation</h4><span class="price">39,00 €</span></div>
+          </a>
+          <a href="shop.html" class="acc-mini reveal">
+            <!-- PLATZHALTER -->
+            <img src="Media/landscape-placeholder.svg" alt="Schleifen-Set" />
+            <div class="acc-mini__body"><h4>Schleifen-Set</h4><span class="price">9,90 €</span></div>
+          </a>
+        </div>
+        <div style="text-align:center; margin-top:2.5rem">
+          <a href="shop.html" class="btn btn--blue btn--lg">Zum ganzen Zubehör-Shop</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA / NEWSLETTER ===================== -->
+    <section class="section" id="kontakt">
+      <div class="container">
+        <div class="cta-band reveal">
+          <h2>Schön, dass wir uns kennenlernen.</h2>
+          <p>Bleib auf dem Laufenden zu Cubby, neuem Zubehör und kleinen Geschichten aus der Cubby-Welt.</p>
+          <form class="newsletter-form" data-newsletter>
+            <input type="email" placeholder="Deine E-Mail-Adresse" aria-label="E-Mail-Adresse" required />
+            <button type="submit" class="btn btn--primary">Anmelden</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <svg class="logo-svg" viewBox="0 150 845 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cubby"><text x="0" y="340.15" font-size="240.21">C</text><text x="175.69" y="340.15" font-size="240.21">ub</text><text x="474.55" y="340.15" font-size="240.21">b</text><text x="627.27" y="340.15" font-size="240.21">y</text><text x="768.29" y="226.05" font-size="100.09">®</text></svg>
+          <p class="muted">Sooo niedlich. Sooo friedlich. Dein kuscheliger Begleiter für jeden Tag.</p>
+        </div>
+        <div>
+          <h4>Cubby</h4>
+          <ul>
+            <li><a href="#produkt">Was ist Cubby?</a></li>
+            <li><a href="#funktionsweise">Funktionsweise</a></li>
+            <li><a href="#bewertungen">Bewertungen</a></li>
+            <li><a href="shop.html">Zubehör-Shop</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Service</h4>
+          <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Kundenservice</a></li>
+            <li><a href="#">Versand &amp; Rückgabe</a></li>
+            <li><a href="checkout.html">Warenkorb</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Folge uns</h4>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">TikTok</a></li>
+            <li><a href="#">YouTube</a></li>
+            <li><a href="#">Newsletter</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Cubby® · Ein Hochschulprojekt der HFU</span>
+        <span>Impressum · Datenschutz · AGB</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

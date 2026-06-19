@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zubehör-Shop – Cubby®</title>
+  <meta name="description" content="Kuscheliges Zubehör für Cubby: Casa Cubby, mobile Ladestation, Schals, Kleidung und liebevolle Accessoires." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="Media/Logo_Cubby_ohneClaim.svg" type="image/svg+xml" />
+</head>
+<body>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="site-header">
+    <nav class="nav container" aria-label="Hauptnavigation">
+      <a href="index.html" class="nav__logo" aria-label="Cubby Startseite">
+        <svg class="logo-svg" viewBox="0 150 845 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cubby"><text x="0" y="340.15" font-size="240.21">C</text><text x="175.69" y="340.15" font-size="240.21">ub</text><text x="474.55" y="340.15" font-size="240.21">b</text><text x="627.27" y="340.15" font-size="240.21">y</text><text x="768.29" y="226.05" font-size="100.09">®</text></svg>
+      </a>
+      <ul class="nav__links" id="navLinks">
+        <li><a href="index.html#produkt">Cubby</a></li>
+        <li><a href="index.html#funktionsweise">Funktionsweise</a></li>
+        <li><a href="index.html#bewertungen">Bewertungen</a></li>
+        <li><a href="shop.html">Zubehör-Shop</a></li>
+        <li><a href="index.html#kontakt">Kontakt</a></li>
+      </ul>
+      <div class="nav__actions">
+        <a href="checkout.html" class="cart-btn" aria-label="Warenkorb ansehen">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="cart-count" data-cart-count data-empty="true">0</span>
+        </a>
+        <a href="checkout.html" class="btn btn--primary">Warenkorb</a>
+        <button class="nav__toggle" id="navToggle" aria-label="Menü öffnen" aria-expanded="false"><span></span></button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== PAGE HERO ===================== -->
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href="index.html">Start</a> <span>/</span> <span>Zubehör-Shop</span></div>
+        <h1>Zubehör-Shop</h1>
+        <p>Kleine Extras für noch mehr Geborgenheit – warm, weich und liebevoll gemacht für deinen Cubby.</p>
+      </div>
+    </section>
+
+    <!-- ===================== PRODUCTS ===================== -->
+    <section class="section--tight section">
+      <div class="container">
+        <div class="shop-filters" id="shopFilters">
+          <button class="chip-filter is-active" data-filter="alle">Alle</button>
+          <button class="chip-filter" data-filter="cubby">Cubby &amp; Zuhause</button>
+          <button class="chip-filter" data-filter="kleidung">Kleidung</button>
+          <button class="chip-filter" data-filter="accessoires">Accessoires</button>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+
+          <!-- Cubby selbst -->
+          <article class="product-card" data-cat="cubby"
+                   data-id="cubby" data-name="Cubby Begleiter" data-cat-label="Cubby & Zuhause"
+                   data-price="199" data-img="Media/GlücklichesKindMItCubby.png">
+            <div class="product-card__media">
+              <span class="product-tag">Bestseller</span>
+              <!-- MEDIA: Cubby -->
+              <img src="Media/GlücklichesKindMItCubby.png" alt="Cubby, der kuschelige Begleiter" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Cubby &amp; Zuhause</span>
+              <h3>Cubby Begleiter</h3>
+              <p>Der kuschelige Begleiter inkl. Casa Cubby. Sooo niedlich. Sooo friedlich.</p>
+              <div class="product-card__foot">
+                <span class="product-price">199,00 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Casa Cubby -->
+          <article class="product-card" data-cat="cubby"
+                   data-id="casa" data-name="Casa Cubby" data-cat-label="Cubby & Zuhause"
+                   data-price="89" data-img="Media/CubbyCasa_inVerpackungMitCubby.png">
+            <div class="product-card__media">
+              <!-- MEDIA: Casa Cubby -->
+              <img src="Media/CubbyCasa_inVerpackungMitCubby.png" alt="Casa Cubby – das Zuhause von Cubby" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Cubby &amp; Zuhause</span>
+              <h3>Casa Cubby</h3>
+              <p>Cubbys gemütlicher Rückzugsort mit kabelloser Induktionsladung.</p>
+              <div class="product-card__foot">
+                <span class="product-price">89,00 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Mobile Ladestation -->
+          <article class="product-card" data-cat="cubby"
+                   data-id="ladestation" data-name="Mobile Ladestation" data-cat-label="Cubby & Zuhause"
+                   data-price="39" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <span class="product-tag product-tag--env">Für Reisen</span>
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Mobile Ladestation für unterwegs" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Cubby &amp; Zuhause</span>
+              <h3>Mobile Ladestation</h3>
+              <p>Damit Cubby auch auf Reisen immer aufgeladen mit dabei ist.</p>
+              <div class="product-card__foot">
+                <span class="product-price">39,00 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Kuschelschal -->
+          <article class="product-card" data-cat="kleidung"
+                   data-id="schal" data-name="Kuschelschal „Blau“" data-cat-label="Kleidung"
+                   data-price="14.9" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Blauer Kuschelschal für Cubby" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Kleidung</span>
+              <h3>Kuschelschal „Blau“</h3>
+              <p>Der kleine blaue Schal – Cubbys liebstes Markenzeichen.</p>
+              <div class="product-card__foot">
+                <span class="product-price">14,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Strickpullover -->
+          <article class="product-card" data-cat="kleidung"
+                   data-id="pullover" data-name="Strick-Pullover" data-cat-label="Kleidung"
+                   data-price="19.9" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Strick-Pullover für Cubby" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Kleidung</span>
+              <h3>Strick-Pullover</h3>
+              <p>Weicher Strickpullover für besonders gemütliche Tage.</p>
+              <div class="product-card__foot">
+                <span class="product-price">19,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Schlummermütze -->
+          <article class="product-card" data-cat="kleidung"
+                   data-id="muetze" data-name="Schlummer-Mützchen" data-cat-label="Kleidung"
+                   data-price="12.9" data-img="Media/KindSchläftFriedlichMitCubby.png">
+            <div class="product-card__media">
+              <!-- MEDIA: schlafender Cubby-Moment -->
+              <img src="Media/KindSchläftFriedlichMitCubby.png" alt="Schlummer-Mützchen für Cubby" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Kleidung</span>
+              <h3>Schlummer-Mützchen</h3>
+              <p>Kuscheliges Mützchen für den Einschlafmodus „Huuuu… haa…“.</p>
+              <div class="product-card__foot">
+                <span class="product-price">12,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Kostüm-Set -->
+          <article class="product-card" data-cat="kleidung"
+                   data-id="kostuem" data-name="Kostüm-Set „Pilz“" data-cat-label="Kleidung"
+                   data-price="24.9" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Pilz-Kostüm-Set für Cubby" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Kleidung</span>
+              <h3>Kostüm-Set „Pilz“</h3>
+              <p>Verspieltes Kostüm-Set für kleine Foto-Momente.</p>
+              <div class="product-card__foot">
+                <span class="product-price">24,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Schleifen -->
+          <article class="product-card" data-cat="accessoires"
+                   data-id="schleifen" data-name="Schleifen-Set" data-cat-label="Accessoires"
+                   data-price="9.9" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Schleifen-Set in Pastellfarben" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Accessoires</span>
+              <h3>Schleifen-Set</h3>
+              <p>Zwei Schleifen in zarten Pastelltönen – rosa &amp; blau.</p>
+              <div class="product-card__foot">
+                <span class="product-price">9,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Socken -->
+          <article class="product-card" data-cat="accessoires"
+                   data-id="socken" data-name="Cubby-Socken" data-cat-label="Accessoires"
+                   data-price="7.9" data-img="Media/landscape-placeholder.svg">
+            <div class="product-card__media">
+              <!-- PLATZHALTER -->
+              <img src="Media/landscape-placeholder.svg" alt="Socken mit Cubby-Motiv" />
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Accessoires</span>
+              <h3>Cubby-Socken</h3>
+              <p>Kuschelsocken mit Cubby-Motiv – für dich, nicht für Cubby. 😊</p>
+              <div class="product-card__foot">
+                <span class="product-price">7,90 €</span>
+                <button class="add-btn" data-add>In den Warenkorb</button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <svg class="logo-svg" viewBox="0 150 845 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cubby"><text x="0" y="340.15" font-size="240.21">C</text><text x="175.69" y="340.15" font-size="240.21">ub</text><text x="474.55" y="340.15" font-size="240.21">b</text><text x="627.27" y="340.15" font-size="240.21">y</text><text x="768.29" y="226.05" font-size="100.09">®</text></svg>
+          <p class="muted">Sooo niedlich. Sooo friedlich. Dein kuscheliger Begleiter für jeden Tag.</p>
+        </div>
+        <div>
+          <h4>Cubby</h4>
+          <ul>
+            <li><a href="index.html#produkt">Was ist Cubby?</a></li>
+            <li><a href="index.html#funktionsweise">Funktionsweise</a></li>
+            <li><a href="index.html#bewertungen">Bewertungen</a></li>
+            <li><a href="shop.html">Zubehör-Shop</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Service</h4>
+          <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Kundenservice</a></li>
+            <li><a href="#">Versand &amp; Rückgabe</a></li>
+            <li><a href="checkout.html">Warenkorb</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Folge uns</h4>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">TikTok</a></li>
+            <li><a href="#">YouTube</a></li>
+            <li><a href="#">Newsletter</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Cubby® · Ein Hochschulprojekt der HFU</span>
+        <span>Impressum · Datenschutz · AGB</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="main.js"></script>
+</body>
+</html>
