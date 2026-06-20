@@ -1,32 +1,43 @@
 /* =========================================================================
    DER TETRIS-EFFEKT — App-Logik
-   Liest die CSV und berechnet & zeichnet die Auswertung.
-   (Es findet KEINE Aussortierung von Probanden statt — die Seite nutzt
-    exakt das, was in der CSV steht. Bereinigung passiert in der CSV selbst.)
+   Liest die CSV und berechnet & zeichnet die komplette Auswertung
+   (alle Metriken pro Test) inkl. spielerischem Tipp-&-Aufdecken.
+   Keine Aussortierung von Probanden.
    ========================================================================= */
 (() => {
   "use strict";
 
-  const MINT = "#a6ecc6", PINK = "#f4b9e2", INK = "#d0c9b8";
-  const INK_DIM = "rgba(208,201,184,.55)", LINE = "rgba(208,201,184,.2)";
+  const ACCENT = "#2fc8ff";   // cyan  (Verbesserung erwartet)
+  const ACCENT2 = "#ffd23d";  // gold  (Kontrolle / Stagnation)
+  const INK = "#ffffff", INK_DIM = "rgba(255,255,255,.6)", LINE = "rgba(126,156,255,.28)";
+  const SURFACE = "#0f1657";
   const META = window.TEST_META || {};
   const DOMAINS = window.DOMAINS || {};
+  const FRAGEN = window.FRAGEBOGEN || [];
 
-  /* ---------- 1) CSV laden (Server bevorzugt, sonst eingebettet) -------- */
-  let DATA_SOURCE = "";   // für die Anzeige im Footer
+  // Jede kognitive Domäne hat ihre eigene Tetromino-Farbe
+  const DOMAIN_COLORS = {
+    raeumlich: "#2fc8ff",   // cyan
+    tempo: "#ff3d9a",       // magenta
+    gedaechtnis: "#3fd64a", // grün
+    exekutiv: "#ffd23d",    // gold
+    reaktion: "#ff9f1f",    // orange
+    kontrolle: "#b46bff",   // violett
+  };
+  const domColor = d => DOMAIN_COLORS[d] || "#2fc8ff";
+  const STAT_COLORS = ["#2fc8ff", "#ff3d9a", "#3fd64a", "#ffd23d"];
+
+  /* ---------- 1) CSV laden --------------------------------------------- */
   async function loadCSV() {
     try {
       const r = await fetch("data/rohdaten_alle.csv", { cache: "no-store" });
-      if (r.ok) { DATA_SOURCE = "live: data/rohdaten_alle.csv"; return await r.text(); }
-    } catch (_) { /* file:// — fällt auf Embed zurück */ }
-    const stamp = (window.TETRIS_CSV || "").match(/Stand:\s*([\d-]+)/);
-    DATA_SOURCE = "eingebettet (dataset.js, Stand " + (stamp ? stamp[1] : "?") + ")";
-    console.warn("[Tetris-Effekt] CSV konnte nicht per fetch geladen werden (file://?). " +
-      "Es werden die EINGEBETTETEN Daten genutzt. Nach CSV-Änderung bitte 'python3 tools/build-data.py' " +
-      "ausführen oder die Seite über einen lokalen Server / GitHub Pages öffnen.");
+      if (r.ok) return await r.text();
+    } catch (_) {
+      console.warn("[Tetris-Effekt] CSV nicht per fetch geladen (file://?). Eingebettete Daten aktiv. " +
+        "Nach CSV-Änderung 'python3 tools/build-data.py' ausführen oder über Server/GitHub Pages öffnen.");
+    }
     return window.TETRIS_CSV || "";
   }
-
   function parseCSV(text) {
     const lines = text.replace(/\r/g, "").split("\n").filter(l => l.trim() !== "");
     if (!lines.length) return [];
@@ -39,49 +50,71 @@
   }
 
   const num = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : null; };
-  // PRE = der eigentliche Pre-Test. (phase "baseline" ist nur Kalibrierung und bleibt außen vor.)
+  const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
   const isPre = r => r.phase === "pre";
   const isPost = r => r.phase === "post";
 
-  /* ---------- 2) Metriken ---------------------------------------------- */
+  /* ---------- 2) Metrik-Berechnung ------------------------------------- */
   function median(arr) {
     const a = arr.filter(x => x != null).sort((x, y) => x - y);
     if (!a.length) return null;
     const m = Math.floor(a.length / 2);
     return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
   }
-  function metricValue(rows, metric) {
+  const validTimes = rows => rows.map(r => num(r["Zeit"])).filter(z => z != null && z > 100 && z < 60000);
+
+  function calcMetric(rows, m) {
     if (!rows.length) return null;
-    if (metric === "rt") {
-      const t = rows.map(r => num(r["Zeit"])).filter(z => z != null && z > 100 && z < 60000);
-      return median(t);                          // ms
-    }
-    if (metric === "acc") {
-      const v = rows.filter(r => r["Richtig?"] === "true" || r["Richtig?"] === "false");
-      if (!v.length) return null;
-      return 100 * v.filter(r => r["Richtig?"] === "true").length / v.length; // %
-    }
-    if (metric === "span") {
-      const ok = rows.filter(r => r["Richtig?"] === "true").map(r => num(r["Länge"])).filter(x => x != null);
-      const all = rows.map(r => num(r["Länge"])).filter(x => x != null);
-      const src = ok.length ? ok : all;
-      return src.length ? src.reduce((a, b) => a + b, 0) / src.length : null; // mittlere Länge
+    switch (m.calc) {
+      case "acc": {
+        const v = rows.filter(r => r["Richtig?"] === "true" || r["Richtig?"] === "false");
+        return v.length ? 100 * v.filter(r => r["Richtig?"] === "true").length / v.length : null;
+      }
+      case "rt":
+        return median(validTimes(m.correctOnly ? rows.filter(r => r["Richtig?"] === "true") : rows));
+      case "maxspan": {
+        const ok = rows.filter(r => r["Richtig?"] === "true").map(r => num(r["Länge"])).filter(x => x != null);
+        return ok.length ? Math.max(...ok) : null;
+      }
+      case "meanspan": {
+        const all = rows.map(r => num(r["Länge"])).filter(x => x != null);
+        return all.length ? mean(all) : null;
+      }
+      case "mean": {
+        const xs = rows.map(r => num(r[m.col])).filter(x => x != null);
+        return xs.length ? mean(xs) : null;
+      }
+      case "ratioTrue": {
+        const w = rows.filter(r => r[m.col] === "true" || r[m.col] === "false");
+        return w.length ? 100 * w.filter(r => r[m.col] === "true").length / w.length : null;
+      }
+      case "ratioEquals": {
+        const w = rows.filter(r => (r[m.col] || "") !== "");
+        return w.length ? 100 * w.filter(r => r[m.col] === m.equals).length / w.length : null;
+      }
+      case "switchcost": {
+        const sw = validTimes(rows.filter(r => r["Regelwechsel?"] === "true"));
+        const no = validTimes(rows.filter(r => r["Regelwechsel?"] === "false"));
+        return (sw.length && no.length) ? median(sw) - median(no) : null;
+      }
     }
     return null;
   }
-  function fmt(val, metric) {
-    if (val == null) return "k. A.";
-    if (metric === "rt") return (val / 1000).toFixed(1) + " s";
-    if (metric === "acc") return Math.round(val) + " %";
-    if (metric === "span") return val.toFixed(1);
-    return String(val);
+  function fmtVal(v, unit) {
+    if (v == null) return "k. A.";
+    if (unit === "pct") return Math.round(v) + " %";
+    if (unit === "ms") return Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + " s" : Math.round(v) + " ms";
+    if (unit === "int") return String(Math.round(v));
+    if (unit === "count") return v.toFixed(1);
+    return String(v);
   }
-  const unit = m => m === "rt" ? "Zeit (s)" : m === "acc" ? "Trefferquote (%)" : "Merkspanne";
+  const axisTick = (v, unit) => unit === "pct" ? v + "%" : (unit === "ms" ? (v >= 1000 ? (v / 1000) + "s" : v) : v);
 
   /* ---------- 3) State -------------------------------------------------- */
-  let ROWS = [];
-  let PARTS = [];                 // [{name, rows, pre, post}]
-  const manualOff = new Set();    // vom Nutzer in der Ansicht abgewählte Probanden
+  let ROWS = [], PARTS = [];
+  const manualOff = new Set();
+  let activeTest = Object.keys(META)[0];
+  let revealed = false, guess = null;   // Tipp-Spiel-Zustand
 
   function buildParticipants() {
     const map = new Map();
@@ -94,44 +127,42 @@
     });
     PARTS = [...map.values()].sort((a, b) => b.rows.length - a.rows.length);
   }
-
-  // aktive (nicht in der Ansicht abgewählte) Probanden
   const activeNames = () => new Set(PARTS.filter(p => !manualOff.has(p.name)).map(p => p.name));
 
-  /* ---------- 4) Rendering --------------------------------------------- */
+  /* ---------- 4) Statik ------------------------------------------------- */
   function renderStats() {
-    const trials = ROWS.length;
-    const nTests = Object.values(META).filter(m => m.show).length;
     const el = document.getElementById("statStrip");
     const cards = [
       ["Proband:innen", PARTS.length, ""],
-      ["Kognitive Tests", nTests, ""],
-      ["Erfasste Datenpunkte", trials.toLocaleString("de-DE"), ""],
+      ["Kognitive Tests", Object.keys(META).length, ""],
+      ["Erfasste Datenpunkte", ROWS.length.toLocaleString("de-DE"), ""],
       ["Trainingsdauer", "14", "<small> Tage · 30 min</small>"],
     ];
-    el.innerHTML = cards.map(([k, v, s]) =>
-      `<div class="stat reveal"><div class="k">${k}</div><div class="v">${v}${s}</div></div>`
-    ).join("");
+    el.innerHTML = cards.map(([k, v, s], i) => {
+      const c = STAT_COLORS[i % STAT_COLORS.length];
+      return `<div class="stat reveal" style="border-top:3px solid ${c}"><div class="k" style="color:${c}">${k}</div><div class="v">${v}${s}</div></div>`;
+    }).join("");
   }
-
   function renderTestCards() {
     const grid = document.getElementById("testGrid");
-    const entries = Object.entries(META).filter(([, m]) => m.show);
-    grid.innerHTML = entries.map(([name, m]) => {
+    grid.innerHTML = Object.entries(META).map(([name, m]) => {
       const dom = DOMAINS[m.domain] || {};
       const flat = m.domain === "kontrolle";
-      return `<div class="card reveal">
-        <h3>${m.short}</h3>
+      const c = domColor(m.domain);
+      return `<div class="card reveal" style="border-top:3px solid ${c}">
+        <h3 style="color:${c}">${m.short}</h3>
         <p>${m.measures}</p>
         <div class="tagrow">
-          <span class="tag">${dom.label || m.domain}</span>
+          <span class="tag" style="color:${c};border-color:${c}99">${dom.label || m.domain}</span>
           <span class="tag ${flat ? "flat" : "up"}">${dom.expectation || ""}</span>
         </div>
-        <div class="why ${flat ? "flat" : ""}">${m.why}</div>
+        <div class="why" style="border-left-color:${c}">${m.why}</div>
+        <div class="metric-list">Erfasst: ${m.metrics.map(x => x.label).join(" · ")}</div>
       </div>`;
     }).join("");
   }
 
+  /* ---------- 5) Ergebnisse -------------------------------------------- */
   function renderChips() {
     const box = document.getElementById("pchips");
     box.innerHTML = PARTS.map(p => {
@@ -141,106 +172,178 @@
     box.querySelectorAll(".chip").forEach(c => c.onclick = () => {
       const n = c.dataset.p;
       manualOff.has(n) ? manualOff.delete(n) : manualOff.add(n);
-      renderChips(); renderCharts();
+      renderChips(); renderMetrics();
+    });
+  }
+  function renderTabs() {
+    const tabs = document.getElementById("testTabs");
+    tabs.innerHTML = Object.entries(META).map(([name, m]) => {
+      const c = domColor(m.domain), on = name === activeTest;
+      const style = on ? ` style="background:${c};border-color:${c};color:#0c1140"` : ` style="border-color:${c}66"`;
+      return `<button class="tab ${on ? "on" : ""}"${style} data-t="${name}">${m.short}</button>`;
+    }).join("");
+    tabs.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+      activeTest = b.dataset.t; revealed = false; guess = null;   // neuer Test = neuer Tipp
+      renderTabs(); renderMetrics();
     });
   }
 
   let CHARTS = [];
-  function renderCharts() {
+  function renderMetrics() {
     CHARTS.forEach(c => c.destroy()); CHARTS = [];
     const names = activeNames();
     const sel = ROWS.filter(r => names.has(r.teilnehmer));
+    const m = META[activeTest];
+    const dom = DOMAINS[m.domain] || {};
+    const flat = m.domain === "kontrolle";
+    const color = domColor(m.domain);
 
-    const anyPost = sel.some(isPost);
+    const testRows = sel.filter(r => r.test === activeTest);
+    const postRows = testRows.filter(isPost);
+    const paired = new Set(postRows.map(r => r.teilnehmer));
+    const preRows = paired.size ? testRows.filter(r => isPre(r) && paired.has(r.teilnehmer)) : testRows.filter(isPre);
+    const hasPost = postRows.length > 0;
+    const playable = hasPost && names.size > 0;
+
+    // Hinweis zur Datenlage
     const notice = document.getElementById("resultNotice");
-    if (!names.size) {
-      notice.innerHTML = `<div class="notice">Keine Proband:innen ausgewählt. Klicke oben mindestens einen Chip an.</div>`;
-    } else if (!anyPost) {
-      notice.innerHTML = `<div class="notice">Aktuell liegen nur <b>Pre-Test-Daten</b> vor, die Post-Tests laufen noch. Die Balken zeigen die <span class="mint">Ausgangswerte (Baseline)</span>. Sobald Post-Daten in der CSV stehen, erscheint hier automatisch der gepaarte Pre&nbsp;→&nbsp;Post-Vergleich.</div>`;
+    if (!names.size) notice.innerHTML = `<div class="notice">Keine Proband:innen ausgewählt. Klicke unten mindestens einen Chip an.</div>`;
+    else if (!sel.some(isPost)) notice.innerHTML = `<div class="notice">Aktuell liegen nur <b>Pre-Test-Daten</b> vor, die Post-Tests laufen noch. Die Balken zeigen die <span class="accent">Ausgangswerte (Baseline)</span>. Sobald Post-Daten in der CSV stehen, lässt sich hier auch tippen und aufdecken.</div>`;
+    else notice.innerHTML = "";
+
+    // Test-Kontext
+    document.getElementById("testContext").innerHTML =
+      `<span class="tag" style="color:${color};border-color:${color}99">${dom.label || m.domain}</span>
+       <span class="tag ${flat ? "flat" : "up"}">${dom.expectation || ""}</span>
+       <p>${m.why}</p>`;
+
+    // Tipp-Spiel
+    const guessPanel = document.getElementById("guessPanel");
+    const verdictEl = document.getElementById("verdict");
+    const showPost = revealed || !playable;   // ohne Post-Daten gibt es nichts zu verdecken
+    if (playable && !revealed) {
+      guessPanel.innerHTML = `<div class="guess">
+        <div class="guess-q">Glaubst du, 2&nbsp;Wochen Tetris haben bei <span class="accent">${m.short}</span> geholfen?</div>
+        <div class="guess-btns">
+          <button class="gbtn" data-g="besser">Ja, besser geworden</button>
+          <button class="gbtn" data-g="gleich">Kein Unterschied</button>
+          <button class="gbtn" data-g="schlechter">Nein, schlechter</button>
+          <button class="gbtn reveal-now" data-g="">Direkt aufdecken</button>
+        </div></div>`;
+      guessPanel.querySelectorAll(".gbtn").forEach(b => b.onclick = () => {
+        guess = b.dataset.g || null; revealed = true; renderMetrics();
+      });
+      verdictEl.innerHTML = "";
     } else {
-      notice.innerHTML = "";
+      guessPanel.innerHTML = "";
     }
 
-    const grid = document.getElementById("chartGrid");
-    const entries = Object.entries(META).filter(([, m]) => m.show);
-    grid.innerHTML = entries.map(([name, m], i) => {
-      const dom = DOMAINS[m.domain] || {};
-      return `<div class="chart-card reveal">
-        <div class="ch-head"><h4>${m.short}</h4><span class="dom">${dom.label || ""}</span></div>
+    // Metrik-Charts
+    const grid = document.getElementById("metricGrid");
+    grid.innerHTML = m.metrics.map((mt, i) =>
+      `<div class="chart-card">
+        <div class="ch-head"><h4>${mt.label}</h4></div>
         <div class="sub" id="sub${i}"></div>
         <div class="chart-box"><canvas id="cv${i}"></canvas></div>
-      </div>`;
-    }).join("");
+      </div>`).join("");
 
-    entries.forEach(([name, m], i) => {
-      const rows = sel.filter(r => r.test === name);
-      // Gepaart: gibt es Post-Daten, werden Pre UND Post nur über dieselben
-      // Personen gerechnet (fairer Vergleich). Sonst Pre-Baseline aller Aktiven.
-      const postRows = rows.filter(isPost);
-      const paired = new Set(postRows.map(r => r.teilnehmer));
-      const preRows = paired.size
-        ? rows.filter(r => isPre(r) && paired.has(r.teilnehmer))
-        : rows.filter(isPre);
-      const pre = metricValue(preRows, m.metric);
-      const post = metricValue(postRows, m.metric);
-      const flat = m.domain === "kontrolle";
-      const color = flat ? PINK : MINT;
+    let nBetter = 0, nWorse = 0, nSame = 0;
+    m.metrics.forEach((mt, i) => {
+      const pre = calcMetric(preRows, mt);
+      const post = (hasPost && showPost) ? calcMetric(postRows, mt) : null;
       const sub = document.getElementById("sub" + i);
 
-      let delta = "";
       if (pre != null && post != null) {
-        const better = (m.better === "down") ? post < pre : post > pre;
-        const pct = m.metric === "acc"
-          ? Math.round(post - pre) + " %-Pkt."
-          : Math.round(100 * (post - pre) / pre) + " %";
-        delta = `${unit(m.metric)} · Δ ${pct} ${better ? "✓ besser" : "schlechter"}`;
+        const same = Math.abs(post - pre) < 1e-9;
+        const better = (mt.better === "down") ? post < pre : post > pre;
+        if (same) nSame++; else if (better) nBetter++; else nWorse++;
+        const d = (mt.unit === "pct")
+          ? (post - pre >= 0 ? "+" : "") + Math.round(post - pre) + " %-Pkt."
+          : (post - pre >= 0 ? "+" : "") + Math.round(100 * (post - pre) / pre) + " %";
+        sub.textContent = `Δ ${d} · ${same ? "gleich" : (better ? "✓ besser" : "schlechter")}`;
+      } else if (pre != null && hasPost && !showPost) {
+        sub.textContent = "Pre sichtbar · tippe oben, um Post aufzudecken";
       } else if (pre != null) {
-        delta = `${unit(m.metric)} · Post-Test ausstehend`;
+        sub.textContent = "Post-Test ausstehend";
       } else {
-        delta = "keine Daten";
+        sub.textContent = "keine Daten";
       }
-      sub.textContent = delta;
 
-      const ctx = document.getElementById("cv" + i);
-      CHARTS.push(new Chart(ctx, {
+      CHARTS.push(new Chart(document.getElementById("cv" + i), {
         type: "bar",
         data: {
           labels: ["Pre", "Post"],
           datasets: [{
             data: [pre, post],
             backgroundColor: [color + "66", color],
-            borderColor: color, borderWidth: 1, borderRadius: 2,
-            maxBarThickness: 70,
+            borderColor: color, borderWidth: 1, borderRadius: 3, maxBarThickness: 64,
           }],
         },
         options: {
           responsive: true, maintainAspectRatio: false,
+          animation: { duration: 650 },
           plugins: {
             legend: { display: false },
             tooltip: {
-              callbacks: { label: c => fmt(c.raw, m.metric) },
-              backgroundColor: "#2c1327", borderColor: LINE, borderWidth: 1,
-              titleColor: INK, bodyColor: INK,
+              callbacks: { label: c => c.raw == null ? "k. A." : fmtVal(c.raw, mt.unit) },
+              backgroundColor: SURFACE, borderColor: LINE, borderWidth: 1, titleColor: INK, bodyColor: INK,
             },
           },
           scales: {
             x: { grid: { display: false }, ticks: { color: INK_DIM } },
-            y: { beginAtZero: true, grid: { color: LINE }, ticks: { color: INK_DIM,
-                 callback: v => m.metric === "rt" ? (v / 1000) + "s" : v } },
+            y: { beginAtZero: true, grid: { color: LINE }, ticks: { color: INK_DIM, callback: v => axisTick(v, mt.unit) } },
           },
         },
       }));
     });
+
+    // Auflösung des Tipps
+    if (playable && revealed) {
+      const actual = nBetter > nWorse ? "besser" : (nWorse > nBetter ? "schlechter" : "gleich");
+      let cls, emoji, text;
+      if (guess === null) { cls = "neutral"; emoji = "👀"; text = "Aufgedeckt!"; }
+      else if (guess === actual) { cls = "hit"; emoji = "🎉"; text = "Richtig getippt!"; }
+      else { cls = "miss"; emoji = "🤔"; text = "Knapp daneben!"; }
+      verdictEl.innerHTML = `<div class="verdict ${cls}">
+        <span class="v-emoji">${emoji}</span>
+        <span class="v-text">${text}</span>
+        <span class="v-sub">Über die Kennzahlen: ${nBetter}× besser, ${nWorse}× schlechter, ${nSame}× gleich.
+          <button class="gbtn" id="againBtn" style="margin-left:10px;padding:6px 12px">Nochmal tippen</button></span>
+      </div>`;
+      const again = document.getElementById("againBtn");
+      if (again) again.onclick = () => { revealed = false; guess = null; renderMetrics(); };
+    } else {
+      verdictEl.innerHTML = "";
+    }
+  }
+
+  /* ---------- 6) Abschluss-Fragebogen (Audio-Antworten) ---------------- */
+  function renderFragebogen() {
+    const grid = document.getElementById("qgrid");
+    if (!grid) return;
+    const palette = ["#2fc8ff", "#ff3d9a", "#3fd64a", "#ffd23d", "#ff9f1f", "#b46bff"];
+    grid.innerHTML = FRAGEN.map((q, i) => {
+      const c = palette[i % palette.length];
+      const ans = q.antworten || [];
+      const body = ans.length
+        ? `<div class="qanswers">` + ans.map(a =>
+            `<div class="qanswer"><span class="alabel">${a.label || "Antwort"}</span>
+             <audio controls preload="none" src="${a.src}"></audio></div>`).join("") + `</div>`
+        : `<div class="qpending">Antworten folgen — Audiodatei in <code>assets/audio/</code> ablegen und in <code>config.js</code> verknüpfen.</div>`;
+      return `<div class="qcard reveal" style="border-top:3px solid ${c}">
+        <div class="qtop"><span class="qnum" style="color:${c}">${String(i + 1).padStart(2, "0")}</span>
+          <span class="qcat">${q.kategorie}</span></div>
+        <p class="qtext">${q.frage}</p>${body}</div>`;
+    }).join("");
     revealInit();
   }
 
-  /* ---------- 5) Menü, Reveal ------------------------------------------ */
+  /* ---------- 7) Menü, Reveal, Init ------------------------------------ */
   function wireUI() {
     const mb = document.getElementById("menuBtn"), nav = document.getElementById("nav");
     mb.onclick = () => nav.classList.toggle("open");
     nav.querySelectorAll("a").forEach(a => a.onclick = () => nav.classList.remove("open"));
   }
-
   let io;
   function revealInit() {
     if (!io) io = new IntersectionObserver(es => es.forEach(e => {
@@ -249,18 +352,16 @@
     document.querySelectorAll(".reveal:not(.in)").forEach(el => io.observe(el));
   }
 
-  /* ---------- 6) Init -------------------------------------------------- */
   (async function init() {
-    const text = await loadCSV();
-    ROWS = parseCSV(text);
+    ROWS = parseCSV(await loadCSV());
     buildParticipants();
     renderStats();
     renderTestCards();
     renderChips();
-    renderCharts();
+    renderTabs();
+    renderMetrics();
+    renderFragebogen();
     wireUI();
     revealInit();
-    const ds = document.getElementById("dataStamp");
-    if (ds) ds.textContent = DATA_SOURCE;
   })();
 })();

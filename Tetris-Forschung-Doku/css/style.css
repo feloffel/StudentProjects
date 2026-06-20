@@ -1,42 +1,50 @@
 /* =========================================================================
-   DER TETRIS-EFFEKT — Stylesheet  (Look angelehnt an Prof. G. Kuschmirz)
+   DER TETRIS-EFFEKT — Stylesheet
+   Farbwelt nach dem Tetris-Game: kräftiges Royalblau, Cyan, Gold, Magenta/Grün.
    ========================================================================= */
 :root{
-  --bg:#3b1a34;          /* Aubergine */
-  --bg-2:#2c1327;        /* dunkler */
-  --bg-teal:#5e8389;     /* alternative Sektionsfläche */
-  --ink:#d0c9b8;         /* warmes Beige (Haupttext) */
-  --ink-dim:rgba(208,201,184,.6);
-  --mint:#a6ecc6;        /* Akzent grün */
-  --pink:#f4b9e2;        /* Akzent rosa */
-  --line:rgba(208,201,184,.20);
+  --bg:#141d6b;          /* kräftiges Royalblau */
+  --bg-2:#0f1657;        /* Panel / Fläche (dunkler) */
+  --bg-3:#1b2596;        /* helle Box (wie Score-Felder im Spiel) */
+  --bg-teal:#1b2596;     /* Alias */
+  --ink:#ffffff;         /* weißer Haupttext */
+  --ink-dim:rgba(255,255,255,.62);
+  --mint:#2fc8ff;        /* PRIMÄR-Akzent: Cyan (Verbesserung) */
+  --pink:#ffd23d;        /* SEKUNDÄR-Akzent: Gold (Kontrolle / Highlights) */
+  --magenta:#ff3d9a;     /* Tetromino-Akzent */
+  --green:#3fd64a;       /* Tetromino-Akzent */
+  --line:rgba(126,156,255,.28);
+  --border-bright:#3b50e0;
   --mono:'Space Mono',ui-monospace,monospace;
   --disp:'Space Grotesk',system-ui,sans-serif;
   --maxw:1280px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--ink);font-family:var(--disp);line-height:1.5;
-  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{color:var(--ink);font-family:var(--disp);line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background-color:var(--bg);
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 1.6px);
+  background-size:5px 5px;}
 a{color:inherit}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,5vw,72px)}
 .mono{font-family:var(--mono)}
-.mint{color:var(--mint)}
-.pink{color:var(--pink)}
+.mint,.accent{color:var(--mint)}
+.pink,.accent-2{color:var(--pink)}
 .dot{display:inline-block;width:.4em;height:.4em;border-radius:50%;background:var(--pink);vertical-align:.1em;margin:0 .1em}
 
 /* ---- Section scaffolding ---------------------------------------------- */
 section{padding:clamp(56px,9vw,120px) 0;border-bottom:1px solid var(--line)}
 .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--mint);margin-bottom:22px;display:flex;align-items:center;gap:10px}
-.kicker::before{content:"";width:28px;height:1px;background:var(--mint)}
+  color:var(--kc,var(--mint));margin-bottom:22px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:28px;height:3px;border-radius:2px;background:var(--kc,var(--mint))}
 h2.title{font-family:var(--disp);font-weight:700;text-transform:uppercase;line-height:.95;
   font-size:clamp(30px,5.5vw,68px);letter-spacing:-.01em;margin-bottom:28px}
 .lead{font-size:clamp(16px,1.7vw,20px);max-width:760px;color:var(--ink);opacity:.92}
 .lead.mono{font-family:var(--mono);font-size:clamp(13px,1.4vw,16px);text-transform:none;line-height:1.6}
 
 /* ---- Header / Nav ----------------------------------------------------- */
-header.site{position:sticky;top:0;z-index:50;background:rgba(59,26,52,.86);
+header.site{position:sticky;top:0;z-index:50;background:rgba(15,22,87,.9);
   backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:16px 0;
   font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
@@ -56,10 +64,11 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(59,26,52,.86);
 .hero{border-bottom:1px solid var(--line);padding:clamp(40px,8vw,104px) 0 clamp(36px,6vw,80px)}
 .hero .eyebrow{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;
   opacity:.8;margin-bottom:28px}
-h1.big{font-family:var(--disp);font-weight:700;line-height:.9;letter-spacing:-.015em;
-  font-size:clamp(52px,13vw,176px);text-transform:uppercase}
+h1.big{font-family:var(--disp);font-weight:700;line-height:.96;letter-spacing:-.015em;
+  font-size:clamp(40px,7.5vw,98px);text-transform:uppercase}
 h1.big .out{-webkit-text-stroke:2px var(--ink);color:transparent}
-h1.big .mint{color:var(--mint)}
+h1.big .mint,h1.big .accent{color:var(--mint)}
+h1.big .title-sub{display:inline-block;font-size:.66em;line-height:1.02;margin-top:.12em}
 .hero .question{margin-top:38px;max-width:820px;font-family:var(--mono);
   font-size:clamp(14px,1.8vw,21px);line-height:1.55;text-transform:uppercase;letter-spacing:.01em}
 .hero .question b{color:var(--mint);font-weight:700}
@@ -68,14 +77,15 @@ h1.big .mint{color:var(--mint)}
   text-decoration:none;padding:14px 24px;border:1px solid var(--ink);transition:.2s;cursor:pointer;
   background:none;color:var(--ink)}
 .btn:hover{background:var(--ink);color:var(--bg)}
-.btn.play{background:var(--mint);border-color:var(--mint);color:#0d3324}
-.btn.play:hover{background:#bdf3d6}
+.btn.play{background:var(--mint);border-color:var(--mint);color:#0c1140}
+.btn.play:hover{background:#7af0e4}
+
 
 /* ---- Stat strip ------------------------------------------------------- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;
   background:var(--line);border:1px solid var(--line)}
-.stat{background:var(--bg);padding:30px clamp(18px,3vw,34px)}
-.stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.stat{background:var(--bg-2);padding:30px clamp(18px,3vw,34px)}
+.stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mint)}
 .stat .v{font-family:var(--disp);font-weight:700;font-size:clamp(30px,4.4vw,52px);margin-top:10px;line-height:1}
 .stat .v small{font-size:.42em;opacity:.6;font-weight:400}
 
@@ -89,8 +99,8 @@ h1.big .mint{color:var(--mint)}
 .card .tagrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
   padding:4px 9px;border:1px solid var(--line);border-radius:99px;color:var(--ink-dim)}
-.tag.up{color:var(--mint);border-color:rgba(166,236,198,.5)}
-.tag.flat{color:var(--pink);border-color:rgba(244,185,226,.5)}
+.tag.up{color:var(--mint);border-color:rgba(47,200,255,.5)}
+.tag.flat{color:var(--pink);border-color:rgba(255,210,61,.5)}
 .card .why{font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--ink-dim);
   border-left:2px solid var(--mint);padding-left:12px;margin-top:14px}
 .card .why.flat{border-color:var(--pink)}
@@ -104,6 +114,14 @@ h1.big .mint{color:var(--mint)}
 .phase h4{font-family:var(--disp);font-weight:700;font-size:19px;text-transform:uppercase;margin:12px 0 8px}
 .phase p{font-size:14px;opacity:.85}
 .phase .num{position:absolute;top:22px;right:24px;font-family:var(--mono);font-size:13px;opacity:.4}
+.phase{border-top:3px solid var(--mint)}
+.phase:nth-child(1){border-top-color:#2fc8ff}.phase:nth-child(1) .step{color:#2fc8ff}
+.phase:nth-child(2){border-top-color:#ff3d9a}.phase:nth-child(2) .step{color:#ff3d9a}
+.phase:nth-child(3){border-top-color:#3fd64a}.phase:nth-child(3) .step{color:#3fd64a}
+.phase:nth-child(4){border-top-color:#ffd23d}.phase:nth-child(4) .step{color:#ffd23d}
+.method .col:nth-child(1) h4{color:#2fc8ff}
+.method .col:nth-child(2) h4{color:#ff3d9a}
+.method .col:nth-child(3) h4{color:#ffd23d}
 
 /* ---- Charts / Results ------------------------------------------------- */
 .controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:30px 0 8px;
@@ -163,11 +181,11 @@ footer .credits{margin-top:30px;font-size:11px;opacity:.5;line-height:1.8}
 #tetrisRoot{outline:none;display:block}
 #tetrisRoot canvas{display:block;width:100%;height:auto;max-width:480px;margin:0 auto}
 #tetrisRoot:focus-visible{box-shadow:none}
-.game-stage:focus-within{border-color:rgba(166,236,198,.5)}
+.game-stage:focus-within{border-color:rgba(47,200,255,.5)}
 .game-start{position:absolute;inset:0;margin:auto;width:fit-content;height:fit-content;
   font-family:var(--mono);font-size:14px;letter-spacing:.06em;text-transform:uppercase;
-  background:var(--mint);color:#0d3324;border:none;padding:16px 30px;cursor:pointer;transition:.2s}
-.game-start:hover{background:#bdf3d6}
+  background:var(--mint);color:#0c1140;border:none;padding:16px 30px;cursor:pointer;transition:.2s}
+.game-start:hover{background:#7af0e4}
 .game-help h4{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--mint);border-top:1px solid var(--line);padding-top:14px;margin-bottom:14px}
 .game-help ul{list-style:none}
@@ -176,6 +194,62 @@ footer .credits{margin-top:30px;font-size:11px;opacity:.5;line-height:1.8}
   border:1px solid var(--line);border-radius:4px;padding:3px 7px;color:var(--ink)}
 .game-help p{font-size:13px;opacity:.7;margin-top:18px;line-height:1.6}
 @media(max-width:760px){.game{grid-template-columns:1fr}}
+
+/* ---- Ergebnisse: Einordnung, Tabs, Test-Kontext ----------------------- */
+.interpret{background:var(--bg-2);border:1px solid var(--line);border-left:3px solid var(--mint);
+  padding:24px clamp(18px,3vw,28px);margin:6px 0 34px;max-width:880px}
+.interpret p{font-size:15px;line-height:1.7;opacity:.92;margin-bottom:10px}
+.interpret .prov-note{font-family:var(--mono);font-size:12px;opacity:.55;margin-bottom:0}
+.badge-prov{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--pink);border:1px solid var(--pink);border-radius:99px;
+  padding:4px 11px;margin-bottom:14px}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 4px}
+.tab{font-family:var(--mono);font-size:12px;letter-spacing:.03em;text-transform:uppercase;
+  background:none;color:var(--ink);border:1px solid var(--line);padding:10px 16px;cursor:pointer;transition:.15s}
+.tab:hover{border-color:var(--mint)}
+.tab.on{background:var(--mint);border-color:var(--mint);color:#0c1140}
+
+.test-context{margin:22px 0 6px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.test-context p{flex-basis:100%;font-family:var(--mono);font-size:13px;line-height:1.6;
+  color:var(--ink-dim);margin-top:6px;max-width:780px}
+.metric-list{font-family:var(--mono);font-size:11px;opacity:.55;margin-top:14px}
+
+/* ---- Ergebnisse: Tipp-Spiel (spielerisches Aufdecken) ----------------- */
+.guess{background:var(--bg-2);border:1px solid var(--line);border-top:3px solid var(--mint);
+  padding:22px clamp(18px,3vw,26px);margin:24px 0 6px}
+.guess-q{font-family:var(--disp);font-weight:700;font-size:clamp(17px,2vw,22px);margin-bottom:16px}
+.guess-q .accent{color:var(--mint)}
+.guess-btns{display:flex;flex-wrap:wrap;gap:10px}
+.gbtn{font-family:var(--mono);font-size:13px;letter-spacing:.03em;text-transform:uppercase;
+  background:none;color:var(--ink);border:1px solid var(--line);padding:12px 20px;cursor:pointer;transition:.15s}
+.gbtn:hover{border-color:var(--mint);color:var(--mint)}
+.gbtn.reveal-now{margin-left:auto;border-color:var(--ink-dim)}
+.verdict{margin:24px 0 4px;padding:18px 22px;background:var(--bg-2);border:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.verdict .v-emoji{font-size:26px;line-height:1}
+.verdict .v-text{font-family:var(--disp);font-weight:700;font-size:clamp(16px,1.8vw,20px)}
+.verdict .v-sub{font-family:var(--mono);font-size:12px;color:var(--ink-dim);flex-basis:100%}
+.verdict.hit{border-left:3px solid var(--green)}
+.verdict.miss{border-left:3px solid var(--magenta)}
+.verdict.neutral{border-left:3px solid var(--pink)}
+
+/* ---- Fragebogen / Stimmen (Audio-Antworten) --------------------------- */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line)}
+.qcard{background:var(--bg);padding:26px clamp(18px,2.5vw,28px);display:flex;flex-direction:column}
+.qtop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.qnum{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--mint)}
+.qcat{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-dim);border:1px solid var(--line);border-radius:99px;padding:4px 10px}
+.qtext{font-size:16px;line-height:1.55;flex:1}
+.qanswers{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+.qanswer{background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.qanswer .alabel{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--mint);display:block;margin-bottom:8px}
+.qanswer audio{width:100%;height:34px;display:block}
+.qpending{font-family:var(--mono);font-size:11px;color:var(--ink-dim);opacity:.7;
+  border:1px dashed var(--line);border-radius:8px;padding:12px;margin-top:18px;line-height:1.5}
 
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}

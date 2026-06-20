@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 
@@ -23,6 +23,7 @@
       <a href="#ergebnisse">Ergebnisse</a>
       <a href="#spielen">Spielen</a>
       <a href="#testen">Selbst&nbsp;testen</a>
+      <a href="#fragebogen">Stimmen</a>
       <a href="#medien">Medien</a>
       <a href="#team">Team</a>
     </nav>
@@ -33,7 +34,7 @@
 <section class="hero" style="border-bottom:none">
   <div class="wrap">
     <div class="eyebrow">Forschungsprojekt · Marius Dauner · Kim Chi Dinh · Lukas Rudolph · Prof. Gregor Kuschmirz</div>
-    <h1 class="big">DER<br><span class="out">TETRIS</span><span class="dot"></span><span class="mint">EFFEKT</span></h1>
+    <h1 class="big">Wie <span class="out">Tetris</span><span class="dot"></span><br><span class="title-sub accent">unser Gehirn beeinflusst</span></h1>
     <p class="question">
       Forschungsfrage: <b>Wie beeinflusst 2&nbsp;Wochen Tetris das kognitive Leistungsprofil?</b>
       Ein Pre-/Post-Experiment mit neuropsychologischen Tests, einer Trainings- und einer Kontrollgruppe.
@@ -49,7 +50,7 @@
 <!-- ================= STAT STRIP ================= -->
 <section style="padding-top:0;border-bottom:none">
   <div class="wrap">
-    <div class="kicker" style="margin-top:48px">Die Studie in Zahlen</div>
+    <div class="kicker" style="margin-top:48px;--kc:#2fc8ff">Die Studie in Zahlen</div>
     <div class="stats" id="statStrip"><!-- JS --></div>
   </div>
 </section>
@@ -57,7 +58,7 @@
 <!-- ================= STUDIE / WARUM TETRIS ================= -->
 <section id="studie">
   <div class="wrap">
-    <div class="kicker">Worum es geht</div>
+    <div class="kicker" style="--kc:#ff3d9a">Worum es geht</div>
     <h2 class="title">Warum<br>ausgerechnet<br>Tetris?</h2>
     <p class="lead">
       Tetris ist mehr als ein Spiel: Es verlangt sekündlich mentale Rotation, räumliche Planung
@@ -66,16 +67,16 @@
       <em>abstrakte</em> kognitive Tests übertragen, also gibt es einen echten <b>kognitiven Transfer</b>?
     </p>
     <div class="grid cols-3">
-      <div class="card">
-        <h3 class="mint">Geschwindigkeit</h3>
+      <div class="card" style="border-top:3px solid #2fc8ff">
+        <h3 style="color:#2fc8ff">Geschwindigkeit</h3>
         <p>Werden Reaktions- und Bearbeitungszeiten nach dem Training kürzer?</p>
       </div>
-      <div class="card">
-        <h3 class="mint">Präzision</h3>
+      <div class="card" style="border-top:3px solid #ff3d9a">
+        <h3 style="color:#ff3d9a">Präzision</h3>
         <p>Steigt die Trefferquote bei räumlichen Aufgaben?</p>
       </div>
-      <div class="card">
-        <h3 class="mint">Kapazität</h3>
+      <div class="card" style="border-top:3px solid #3fd64a">
+        <h3 style="color:#3fd64a">Kapazität</h3>
         <p>Wächst die Merkspanne im räumlichen Arbeitsgedächtnis?</p>
       </div>
     </div>
@@ -90,7 +91,7 @@
 <!-- ================= METHODIK ================= -->
 <section id="methodik">
   <div class="wrap">
-    <div class="kicker">Versuchsaufbau</div>
+    <div class="kicker" style="--kc:#3fd64a">Versuchsaufbau</div>
     <h2 class="title">Der Versuchs­verlauf</h2>
     <p class="lead">Drei Phasen, zwei Gruppen, so isolieren wir den Effekt des Spielens.</p>
     <div class="timeline">
@@ -130,10 +131,10 @@
 <!-- ================= TESTS ================= -->
 <section id="tests">
   <div class="wrap">
-    <div class="kicker">Die Testbatterie</div>
+    <div class="kicker" style="--kc:#ffd23d">Die Testbatterie</div>
     <h2 class="title">Was wir<br>gemessen haben</h2>
     <p class="lead">Jeder Test zielt auf eine kognitive Domäne, und jede Auswahl hat einen Grund.
-      <span class="mint">Mint</span> = Verbesserung erwartet, <span class="pink">Rosa</span> = Stagnation erwartet (Kontrolle).</p>
+      Jede Domäne hat ihre eigene Farbe, die sich in den Ergebnis-Charts wiederfindet. Das Label sagt, ob wir eine Verbesserung oder eine Stagnation erwarten.</p>
     <div class="grid cols-2" id="testGrid"><!-- JS --></div>
   </div>
 </section>
@@ -141,25 +142,42 @@
 <!-- ================= ERGEBNISSE ================= -->
 <section id="ergebnisse">
   <div class="wrap">
-    <div class="kicker">Auswertung</div>
+    <div class="kicker" style="--kc:#2fc8ff">Auswertung</div>
     <h2 class="title">Ergebnisse</h2>
-    <p class="lead">Pre → Post pro Test.
-      Niedrigere Zeit bzw. höhere Quote = bessere Leistung.</p>
+    <p class="lead">Wähle einen Test und sieh dir <b>alle</b> erfassten Kennzahlen im Pre&nbsp;→&nbsp;Post-Vergleich an.
+      Niedrigere Zeiten bzw. höhere Quoten und Spannen bedeuten bessere Leistung.</p>
 
-    <div class="controls">
-      <span style="opacity:.6">Klicke einzelne Proband:innen an, um sie in der Ansicht ein-/auszublenden.</span>
+    <div class="interpret reveal">
+      <span class="badge-prov">Vorläufige Einordnung</span>
+      <p>Bislang haben erst einige Proband:innen den Post-Test abgeschlossen, die Auswertung ist daher eine
+        <b>Tendenz, kein gesichertes Ergebnis</b>. Über die bisher vollständigen Fälle zeigt sich ein erwartetes Muster:
+        die <span class="accent">visuell-räumlichen Tests</span> (mentale Rotation, Falten, visuelle Suche, Corsi)
+        verbessern sich in Geschwindigkeit und Präzision deutlicher als die
+        <span class="accent-2">numerische Kontrollaufgabe</span>. Ein Teil des Effekts dürfte ein allgemeiner
+        Übungseffekt durch das wiederholte Testen sein, den wir über die Kontrollaufgabe und die Kontrollgruppe
+        einordnen. Eine belastbare Aussage über echten kognitiven Transfer ist erst möglich, wenn alle Post-Tests
+        und die Kontrollgruppe vollständig vorliegen.</p>
+      <p class="prov-note">Hinweis: Dieser Text wird nach Abschluss aller Post-Tests aktualisiert.</p>
     </div>
 
+    <div class="controls">
+      <span style="opacity:.6">Tipp: Klicke einzelne Proband:innen an, um sie aus der Ansicht zu nehmen (z.&nbsp;B. eine Person isolieren).</span>
+    </div>
     <div class="pchips" id="pchips"><!-- JS: Probanden-Filter --></div>
     <div id="resultNotice"></div>
-    <div class="chart-grid" id="chartGrid"><!-- JS --></div>
+
+    <div class="tabs" id="testTabs"><!-- JS: Test-Auswahl --></div>
+    <div class="test-context" id="testContext"><!-- JS --></div>
+    <div id="guessPanel"><!-- JS: Tipp-Spiel --></div>
+    <div id="verdict"><!-- JS: Auflösung --></div>
+    <div class="chart-grid" id="metricGrid"><!-- JS: Metriken des gewählten Tests --></div>
   </div>
 </section>
 
 <!-- ================= TETRIS SPIELEN ================= -->
 <section id="spielen">
   <div class="wrap">
-    <div class="kicker">Trainingsspiel</div>
+    <div class="kicker" style="--kc:#ff9f1f">Trainingsspiel</div>
     <h2 class="title">Tetris<br>spielen</h2>
     <p class="lead">Spiele hier selbst Tetris für 2 Wochen und mache dann den Wahrnehmungs-Test!</p>
     <div class="game">
@@ -184,7 +202,7 @@
 <!-- ================= SELBST TESTEN ================= -->
 <section id="testen">
   <div class="wrap">
-    <div class="kicker">Mitmachen</div>
+    <div class="kicker" style="--kc:#ff3d9a">Mitmachen</div>
     <h2 class="title">Test selbst<br>machen</h2>
     <p class="lead">Mache hier selbst den Wahrnehmungs-Test!</p>
     <div class="embed">
@@ -197,10 +215,22 @@
   </div>
 </section>
 
+<!-- ================= ABSCHLUSS-FRAGEBOGEN ================= -->
+<section id="fragebogen">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#3fd64a">Abschluss</div>
+    <h2 class="title">Stimmen der<br>Proband:innen</h2>
+    <p class="lead">Zum Abschluss stellen wir unseren Proband:innen ein paar Fragen zum Projekt, zu unserer
+      Vorgehensweise und zu ihrem eigenen Erleben. Unter jeder Frage kannst du dir die aufgenommenen
+      Antworten anhören. Wir ergänzen die Audio-Aufnahmen laufend.</p>
+    <div class="qgrid" id="qgrid"><!-- JS: Fragen + Audio-Antworten --></div>
+  </div>
+</section>
+
 <!-- ================= MEDIEN ================= -->
 <section id="medien">
   <div class="wrap">
-    <div class="kicker">Galerie</div>
+    <div class="kicker" style="--kc:#b46bff">Galerie</div>
     <h2 class="title">Medien &<br>Eindrücke</h2>
     <div class="gallery">
       <div class="shot">Screenshot<br>Dashboard</div>
@@ -216,7 +246,7 @@
 <!-- ================= TEAM / FOOTER ================= -->
 <footer class="site" id="team">
   <div class="wrap">
-    <div class="kicker">Team & Kontext</div>
+    <div class="kicker" style="--kc:#ffd23d">Team & Kontext</div>
     <div class="row">
       <span>Marius Dauner · Kim Chi Dinh · Lukas Rudolph</span>
       <span>HFU · Medientheorie & Designgeschichte · 2026</span>
@@ -228,9 +258,9 @@
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="data/dataset.js?v=4"></script>
-<script src="js/config.js?v=4"></script>
-<script src="js/app.js?v=4"></script>
-<script src="js/tetris.js?v=4"></script>
+<script src="data/dataset.js?v=9"></script>
+<script src="js/config.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
+<script src="js/tetris.js?v=9"></script>
 </body>
 </html>

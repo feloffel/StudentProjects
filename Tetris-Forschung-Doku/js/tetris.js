@@ -226,28 +226,28 @@
   }
 
   class View {
-    // Spielstein-Farben im Seiten-Stil (auf Aubergine gut sichtbar, unterscheidbar)
+    // Tetromino-Farben passend zum Spiel-Screenshot (kräftig auf Royalblau)
     static #TETROMINO_COLORS = {
-      1: "#a6ecc6", // I  mint
-      2: "#8b7fd6", // J  violett
-      3: "#f4b9e2", // L  rosa
-      4: "#e4dcc4", // O  beige
-      5: "#67b6a4", // S  teal
-      6: "#c9a2ec", // T  lavendel
-      7: "#ef9bb3", // Z  altrosa
+      1: "#2fc8ff", // I  cyan
+      2: "#4f7cff", // J  blau
+      3: "#ff9f1f", // L  orange
+      4: "#ffd23d", // O  gelb
+      5: "#3fd64a", // S  grün
+      6: "#ff3d9a", // T  magenta
+      7: "#ff5a3c", // Z  rot
     };
     static #FONT_FAMILY = "'Space Mono', 'Courier New', monospace";
     static #FONT_SIZE_LARGE = 18;
     static #FONT_SIZE_SMALL = 14;
     static #BORDER_WIDTH = 1;
-    static #BORDER_COLOR = "rgba(208,201,184,0.45)";
-    static #TEXT_COLOR = "#d0c9b8";
-    static #ACCENT_COLOR = "#a6ecc6";
-    static #BLOCK_BORDER_COLOR = "#2c1327";
+    static #BORDER_COLOR = "rgba(255,255,255,0.4)";
+    static #TEXT_COLOR = "#ffffff";
+    static #ACCENT_COLOR = "#2fc8ff";
+    static #BLOCK_BORDER_COLOR = "#0f1657";
     static #BLOCK_BORDER_WIDTH = 2;
     static #PANEL_OFFSET = 10;
     static #LINE_SPACING = 24;
-    static #OVERLAY_COLOR = "rgba(43,19,39,0.82)";
+    static #OVERLAY_COLOR = "rgba(15,22,87,0.85)";
 
     #element; #width; #height; #canvas; #context;
     #boardArea; #panelArea; #blockDimensions;
