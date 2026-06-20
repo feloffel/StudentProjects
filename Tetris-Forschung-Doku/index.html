@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Der Tetris-Effekt: Wie 2 Wochen Tetris das kognitive Leistungsprofil beeinflusst</title>
+<meta name="description" content="Forschungsprojekt Medientheorie · HFU · Pre/Post-Experiment zum kognitiven Transfer von Tetris.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=4">
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap topbar">
+    <span>Medientheorie <span class="dot"></span> SoSe&nbsp;2026</span>
+    <button class="menu-btn" id="menuBtn" aria-label="Menü">≡</button>
+    <nav id="nav">
+      <a href="#studie">Studie</a>
+      <a href="#methodik">Methodik</a>
+      <a href="#tests">Tests</a>
+      <a href="#ergebnisse">Ergebnisse</a>
+      <a href="#spielen">Spielen</a>
+      <a href="#testen">Selbst&nbsp;testen</a>
+      <a href="#medien">Medien</a>
+      <a href="#team">Team</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" style="border-bottom:none">
+  <div class="wrap">
+    <div class="eyebrow">Forschungsprojekt · Marius Dauner · Kim Chi Dinh · Lukas Rudolph · Prof. Gregor Kuschmirz</div>
+    <h1 class="big">DER<br><span class="out">TETRIS</span><span class="dot"></span><span class="mint">EFFEKT</span></h1>
+    <p class="question">
+      Forschungsfrage: <b>Wie beeinflusst 2&nbsp;Wochen Tetris das kognitive Leistungsprofil?</b>
+      Ein Pre-/Post-Experiment mit neuropsychologischen Tests, einer Trainings- und einer Kontrollgruppe.
+    </p>
+    <div class="cta">
+      <a class="btn play" href="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" target="_blank" rel="noopener">▶ Test selbst machen</a>
+      <a class="btn" href="#ergebnisse">Ergebnisse ansehen →</a>
+      <a class="btn" href="#methodik">Methodik →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STAT STRIP ================= -->
+<section style="padding-top:0;border-bottom:none">
+  <div class="wrap">
+    <div class="kicker" style="margin-top:48px">Die Studie in Zahlen</div>
+    <div class="stats" id="statStrip"><!-- JS --></div>
+  </div>
+</section>
+
+<!-- ================= STUDIE / WARUM TETRIS ================= -->
+<section id="studie">
+  <div class="wrap">
+    <div class="kicker">Worum es geht</div>
+    <h2 class="title">Warum<br>ausgerechnet<br>Tetris?</h2>
+    <p class="lead">
+      Tetris ist mehr als ein Spiel: Es verlangt sekündlich mentale Rotation, räumliche Planung
+      und schnelle Entscheidungen unter Zeitdruck. Studien sprechen vom „Tetris-Effekt": das Gehirn
+      übernimmt Denkmuster des Spiels in den Alltag. Wir fragen: Lässt sich diese Leistung messbar auf
+      <em>abstrakte</em> kognitive Tests übertragen, also gibt es einen echten <b>kognitiven Transfer</b>?
+    </p>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3 class="mint">Geschwindigkeit</h3>
+        <p>Werden Reaktions- und Bearbeitungszeiten nach dem Training kürzer?</p>
+      </div>
+      <div class="card">
+        <h3 class="mint">Präzision</h3>
+        <p>Steigt die Trefferquote bei räumlichen Aufgaben?</p>
+      </div>
+      <div class="card">
+        <h3 class="mint">Kapazität</h3>
+        <p>Wächst die Merkspanne im räumlichen Arbeitsgedächtnis?</p>
+      </div>
+    </div>
+    <div class="notice" style="border-left-color:var(--mint);margin-top:34px">
+      HYPOTHESE: Visuell-räumliche Leistungen verbessern sich; die nicht-räumliche
+      Kontrollaufgabe (Kopfrechnen) bleibt stabil. Genau diese Trennung unterscheidet einen
+      <em>echten Transfer</em> von einem bloßen Übungseffekt.
+    </div>
+  </div>
+</section>
+
+<!-- ================= METHODIK ================= -->
+<section id="methodik">
+  <div class="wrap">
+    <div class="kicker">Versuchsaufbau</div>
+    <h2 class="title">Der Versuchs­verlauf</h2>
+    <p class="lead">Drei Phasen, zwei Gruppen, so isolieren wir den Effekt des Spielens.</p>
+    <div class="timeline">
+      <div class="phase"><span class="num">01</span><div class="step">Pre-Test</div><h4>Ausgangswerte</h4><p>Alle Proband:innen absolvieren die Testbatterie A+B und liefern ihre Baseline.</p></div>
+      <div class="phase"><span class="num">02</span><div class="step">Trainingsphase</div><h4>2 Wochen Tetris</h4><p>30&nbsp;Minuten pro Tag, protokolliert (Uhrzeit, Highscore). Keine anderen Puzzle-Spiele.</p></div>
+      <div class="phase"><span class="num">03</span><div class="step">Post-Test</div><h4>Finale Messung</h4><p>Dieselbe Testbatterie. Differenz Pre→Post = individueller Effekt.</p></div>
+      <div class="phase"><span class="num">04</span><div class="step">Kontrollgruppe</div><h4>Ohne Tetris</h4><p>Gleicher Pre→Post-Abstand, aber <em>ohne</em> Training, kontrolliert den reinen Übungseffekt.</p></div>
+    </div>
+
+    <div class="method">
+      <div class="col">
+        <h4>Warum diese Tests?</h4>
+        <p>Wir haben die Batterie so zusammengestellt, dass sie zwei Bereiche gegenüberstellt:
+          <span class="mint">räumliche Aufgaben</span> (sollten profitieren) und eine
+          <span class="pink">numerische Kontrolle</span> (sollte stagnieren). Erst dieser Kontrast
+          macht einen Transfer-Effekt überhaupt nachweisbar.</p>
+      </div>
+      <div class="col">
+        <h4>Warum diese Analyse?</h4>
+        <p>Ausgewertet wird die <em>individuelle</em> Pre→Post-Differenz pro Test, gruppiert nach
+          kognitiver Domäne. Die Kontrollgruppe und die nicht-räumliche Kontrollaufgabe dienen als
+          doppelte Absicherung gegen Übungs- und Erwartungseffekte.</p>
+      </div>
+      <div class="col">
+        <h4>Grenzen & Störfaktoren</h4>
+        <ul>
+          <li>Kleine Stichprobe → Ergebnisse sind Tendenzen, nicht statistisch gesichert.</li>
+          <li>Übungseffekt durch wiederholtes Testen.</li>
+          <li>Selbstprotokollierte Spielzeit.</li>
+          <li>Tagesform, Motivation, Umgebung.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTS ================= -->
+<section id="tests">
+  <div class="wrap">
+    <div class="kicker">Die Testbatterie</div>
+    <h2 class="title">Was wir<br>gemessen haben</h2>
+    <p class="lead">Jeder Test zielt auf eine kognitive Domäne, und jede Auswahl hat einen Grund.
+      <span class="mint">Mint</span> = Verbesserung erwartet, <span class="pink">Rosa</span> = Stagnation erwartet (Kontrolle).</p>
+    <div class="grid cols-2" id="testGrid"><!-- JS --></div>
+  </div>
+</section>
+
+<!-- ================= ERGEBNISSE ================= -->
+<section id="ergebnisse">
+  <div class="wrap">
+    <div class="kicker">Auswertung</div>
+    <h2 class="title">Ergebnisse</h2>
+    <p class="lead">Pre → Post pro Test, automatisch aus den Rohdaten berechnet.
+      Niedrigere Zeit bzw. höhere Quote = bessere Leistung.</p>
+
+    <div class="controls">
+      <span style="opacity:.6">Klicke einzelne Proband:innen an, um sie in der Ansicht ein-/auszublenden.</span>
+    </div>
+
+    <div class="pchips" id="pchips"><!-- JS: Probanden-Filter --></div>
+    <div id="resultNotice"></div>
+    <div class="chart-grid" id="chartGrid"><!-- JS --></div>
+  </div>
+</section>
+
+<!-- ================= TETRIS SPIELEN ================= -->
+<section id="spielen">
+  <div class="wrap">
+    <div class="kicker">Trainingsspiel</div>
+    <h2 class="title">Tetris<br>spielen</h2>
+    <p class="lead">Spiele hier selbst Tetris für 2 Wochen und mache dann den Wahrnehmungs-Test!</p>
+    <div class="game">
+      <div class="game-stage">
+        <div id="tetrisRoot" aria-label="Tetris-Spielfeld"></div>
+        <button class="game-start" id="tetrisStart">▶ Spiel starten</button>
+      </div>
+      <div class="game-help">
+        <h4>Steuerung</h4>
+        <ul>
+          <li><span class="key">←</span> <span class="key">→</span> bewegen</li>
+          <li><span class="key">↑</span> drehen</li>
+          <li><span class="key">↓</span> schneller fallen</li>
+          <li><span class="key">Enter</span> Start / Pause</li>
+        </ul>
+        <p>Klicke ins Spielfeld, dann steuere mit den Pfeiltasten. Beim Wegscrollen pausiert das Spiel automatisch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SELBST TESTEN ================= -->
+<section id="testen">
+  <div class="wrap">
+    <div class="kicker">Mitmachen</div>
+    <h2 class="title">Test selbst<br>machen</h2>
+    <p class="lead">Mache hier selbst den Wahrnehmungs-Test!</p>
+    <div class="embed">
+      <div class="bar">
+        <span>tetris-effekt · web-app</span>
+        <a class="mint" href="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" target="_blank" rel="noopener">Im Vollbild öffnen ↗</a>
+      </div>
+      <iframe src="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" title="Tetris-Effekt WebApp" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MEDIEN ================= -->
+<section id="medien">
+  <div class="wrap">
+    <div class="kicker">Galerie</div>
+    <h2 class="title">Medien &<br>Eindrücke</h2>
+    <div class="gallery">
+      <div class="shot">Screenshot<br>Dashboard</div>
+      <div class="shot">GIF<br>Mentale Rotation</div>
+      <div class="shot">GIF<br>Corsi-Block</div>
+      <div class="shot">Screencast<br>WebApp-Durchlauf</div>
+      <div class="shot">Screenshot<br>Ergebnis-Export</div>
+      <div class="shot">Diagramm<br>Pre/Post-Vergleich</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEAM / FOOTER ================= -->
+<footer class="site" id="team">
+  <div class="wrap">
+    <div class="kicker">Team & Kontext</div>
+    <div class="row">
+      <span>Marius Dauner · Kim Chi Dinh · Lukas Rudolph</span>
+      <span>HFU · Medientheorie & Designgeschichte · 2026</span>
+    </div>
+    <div class="credits">
+      Forschungsfrage: Wie beeinflusst 2 Wochen Tetris das kognitive Leistungsprofil?
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data/dataset.js?v=4"></script>
+<script src="js/config.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
+<script src="js/tetris.js?v=4"></script>
+</body>
+</html>
