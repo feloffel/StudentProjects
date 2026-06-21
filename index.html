@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tetris-Forschung: Wie 2 Wochen Tetris das kognitive Leistungsprofil beeinflusst</title>
+<meta name="description" content="Forschungsprojekt Medientheorie · HFU · Pre/Post-Experiment zum kognitiven Transfer von Tetris.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=17">
+</head>
+<body>
+
+<!-- Hintergrund-Tetris (KimChi): fallende Steine links & rechts -->
+<div class="bg-tetris bg-tetris--left" id="bgLeft" aria-hidden="true"></div>
+<div class="bg-tetris bg-tetris--right" id="bgRight" aria-hidden="true"></div>
+
+<header class="site">
+  <div class="wrap topbar">
+    <span>Medientheorie <span class="dot"></span> SoSe&nbsp;2026</span>
+    <button class="menu-btn" id="menuBtn" aria-label="Menü">≡</button>
+    <nav id="nav">
+      <a href="#studie">Studie</a>
+      <a href="#methodik">Methodik</a>
+      <a href="#tests">Tests</a>
+      <a href="#ergebnisse">Ergebnisse</a>
+      <a href="#spielen">Spielen</a>
+      <a href="#testen">Selbst&nbsp;testen</a>
+      <a href="#fragebogen">Stimmen</a>
+      <a href="#reflexion">Reflexion</a>
+      <a href="#medien">Medien</a>
+      <a href="#team">Team</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" style="border-bottom:none">
+  <div class="wrap">
+    <div class="eyebrow">Forschungsprojekt · Marius Dauner · Kim Chi Dinh · Lukas Rudolph · Prof. Gregor Kuschmirz</div>
+    <h1 class="big">Wie <span class="out">Tetris</span><span class="dot"></span><br><span class="title-sub accent">unser Gehirn beeinflusst</span></h1>
+    <p class="question">
+      Forschungsfrage: <b>Wie beeinflusst 2&nbsp;Wochen Tetris das kognitive Leistungsprofil?</b>
+      Ein Pre-/Post-Experiment mit neuropsychologischen Tests, einer Trainings- und einer Kontrollgruppe.
+    </p>
+    <div class="cta">
+      <a class="btn play" href="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" target="_blank" rel="noopener">▶ Test selbst machen</a>
+      <a class="btn" href="#ergebnisse">Ergebnisse ansehen →</a>
+      <a class="btn" href="#methodik">Methodik →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STAT STRIP ================= -->
+<section style="padding-top:0;border-bottom:none">
+  <div class="wrap">
+    <div class="kicker" style="margin-top:48px;--kc:#2fc8ff">Die Studie in Zahlen</div>
+    <div class="stats" id="statStrip"><!-- JS --></div>
+  </div>
+</section>
+
+<!-- ================= STUDIE / WARUM TETRIS ================= -->
+<section id="studie">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ff3d9a">Worum es geht</div>
+    <h2 class="title">Warum<br>ausgerechnet<br>Tetris?</h2>
+    <p class="lead">
+      Tetris ist mehr als ein Spiel: Es verlangt sekündlich mentale Rotation, räumliche Planung
+      und schnelle Entscheidungen unter Zeitdruck. Bekannt ist auch der „Tetris-Effekt" — dass einem
+      die Blöcke nach langem Spielen bis in den Schlaf nachgehen. Uns interessiert aber nicht dieses
+      Alltagsphänomen, sondern die nüchtern messbare Frage: <b>Verbessert regelmäßiges Tetris-Spielen
+      die kognitiven Fähigkeiten</b> — oder wird man nur in der geübten Aufgabe selbst besser?
+    </p>
+    <div class="grid cols-3">
+      <div class="card" style="border-top:3px solid #2fc8ff">
+        <h3 style="color:#2fc8ff">Geschwindigkeit</h3>
+        <p>Werden Reaktions- und Bearbeitungszeiten nach dem Training kürzer?</p>
+      </div>
+      <div class="card" style="border-top:3px solid #ff3d9a">
+        <h3 style="color:#ff3d9a">Präzision</h3>
+        <p>Steigt die Trefferquote bei räumlichen Aufgaben?</p>
+      </div>
+      <div class="card" style="border-top:3px solid #3fd64a">
+        <h3 style="color:#3fd64a">Kapazität</h3>
+        <p>Wächst die Merkspanne im räumlichen Arbeitsgedächtnis?</p>
+      </div>
+    </div>
+    <div class="notice" style="border-left-color:var(--mint);margin-top:34px">
+      HYPOTHESE: Visuell-räumliche Leistungen verbessern sich; die nicht-räumliche
+      Kontrollaufgabe (Kopfrechnen) bleibt stabil. Genau diese Trennung unterscheidet einen
+      <em>echten Transfer</em> von einem bloßen Übungseffekt.
+    </div>
+
+    <div class="method">
+      <div class="col">
+        <h4>Warum das relevant ist</h4>
+        <p>„Gehirnjogging" und Brain-Training-Apps versprechen, mit kleinen Spielen die allgemeine
+          Denkleistung zu steigern. Ob solche Effekte wirklich auf andere Aufgaben <em>übertragen</em>
+          (Transfer) oder nur die geübte Aufgabe besser wird, ist offen — und für Lernen, Mediengestaltung
+          und den Alltag hochrelevant. Tetris ist dafür ein ideales, alltagsnahes Beispiel.</p>
+      </div>
+      <div class="col">
+        <h4>Forschungsstand</h4>
+        <p>Ob Tetris die kognitiven Fähigkeiten wirklich steigert, ist in der Forschung umstritten: Manche
+          Studien fanden Verbesserungen bei räumlichen Aufgaben (De&nbsp;Lisi & Wolford, 2002; Terlecki et&nbsp;al.,
+          2008), andere keinen Tetris-spezifischen Effekt, sondern nur einen allgemeinen Übungseffekt
+          (Okagaki & Frensch, 1994; Sims & Mayer, 2002; Pilegard & Mayer, 2018). Genau diesen Streitpunkt
+          greifen wir mit unserer Kontrollaufgabe auf. <a class="accent" href="#quellen">Quellen ↓</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= METHODIK ================= -->
+<section id="methodik">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#3fd64a">Versuchsaufbau</div>
+    <h2 class="title">Der Versuchs­verlauf</h2>
+    <p class="lead">Drei Phasen, zwei Gruppen, so isolieren wir den Effekt des Spielens.</p>
+    <div class="timeline">
+      <div class="phase"><span class="num">01</span><div class="step">Pre-Test</div><h4>Ausgangswerte</h4><p>Alle Proband:innen absolvieren die Testbatterie A+B und liefern ihre Baseline.</p></div>
+      <div class="phase"><span class="num">02</span><div class="step">Trainingsphase</div><h4>2 Wochen Tetris</h4><p>30&nbsp;Minuten pro Tag, protokolliert (Uhrzeit, Highscore). Keine anderen Puzzle-Spiele.</p></div>
+      <div class="phase"><span class="num">03</span><div class="step">Post-Test</div><h4>Finale Messung</h4><p>Dieselbe Testbatterie. Differenz Pre→Post = individueller Effekt.</p></div>
+      <div class="phase"><span class="num">04</span><div class="step">Kontrollgruppe</div><h4>Ohne Tetris</h4><p>Gleicher Pre→Post-Abstand, aber <em>ohne</em> Training, kontrolliert den reinen Übungseffekt.</p></div>
+    </div>
+
+    <div class="method">
+      <div class="col">
+        <h4>Warum diese Tests?</h4>
+        <p>Wir haben die Batterie so zusammengestellt, dass sie zwei Bereiche gegenüberstellt:
+          <span class="mint">räumliche Aufgaben</span> (sollten profitieren) und eine
+          <span class="pink">numerische Kontrolle</span> (sollte stagnieren). Erst dieser Kontrast
+          macht einen Transfer-Effekt überhaupt nachweisbar.</p>
+      </div>
+      <div class="col">
+        <h4>Warum diese Analyse?</h4>
+        <p>Ausgewertet wird die <em>individuelle</em> Pre→Post-Differenz pro Test, gruppiert nach
+          kognitiver Domäne. Die Kontrollgruppe und die nicht-räumliche Kontrollaufgabe dienen als
+          doppelte Absicherung gegen Übungs- und Erwartungseffekte.</p>
+      </div>
+      <div class="col">
+        <h4>Grenzen & Störfaktoren</h4>
+        <ul>
+          <li>Kleine Stichprobe → Ergebnisse sind Tendenzen, nicht statistisch gesichert.</li>
+          <li>Übungseffekt durch wiederholtes Testen.</li>
+          <li>Selbstprotokollierte Spielzeit.</li>
+          <li>Tagesform, Motivation, Umgebung.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTS ================= -->
+<section id="tests">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ffd23d">Die Testbatterie</div>
+    <h2 class="title">Was wir<br>gemessen haben</h2>
+    <p class="lead">Jeder Test zielt auf eine kognitive Domäne, und jede Auswahl hat einen Grund.
+      Jede Domäne hat ihre eigene Farbe, die sich in den Ergebnis-Charts wiederfindet. Das Label sagt, ob wir eine Verbesserung oder eine Stagnation erwarten.</p>
+    <div class="grid cols-2" id="testGrid"><!-- JS --></div>
+  </div>
+</section>
+
+<!-- ================= ERGEBNISSE ================= -->
+<section id="ergebnisse">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#2fc8ff">Auswertung</div>
+    <h2 class="title">Ergebnisse</h2>
+    <p class="lead">Wähle einen Test und sieh dir <b>alle</b> erfassten Kennzahlen im Pre&nbsp;→&nbsp;Post-Vergleich an.
+      Niedrigere Zeiten bzw. höhere Quoten und Spannen bedeuten bessere Leistung.</p>
+
+    <div class="interpret reveal">
+      <span class="badge-prov">Vorläufige Einordnung</span>
+      <p>Bislang haben erst einige Proband:innen den Post-Test abgeschlossen, die Auswertung ist daher eine
+        <b>Tendenz, kein gesichertes Ergebnis</b>. Über die bisher vollständigen Fälle zeigt sich ein erwartetes Muster:
+        die <span class="accent">visuell-räumlichen Tests</span> (mentale Rotation, Falten, visuelle Suche, Corsi)
+        verbessern sich in Geschwindigkeit und Präzision deutlicher als die
+        <span class="accent-2">numerische Kontrollaufgabe</span>. Ein Teil des Effekts dürfte ein allgemeiner
+        Übungseffekt durch das wiederholte Testen sein, den wir über die Kontrollaufgabe und die Kontrollgruppe
+        einordnen. Eine belastbare Aussage über echten kognitiven Transfer ist erst möglich, wenn alle Post-Tests
+        und die Kontrollgruppe vollständig vorliegen.</p>
+      <p class="prov-note">Hinweis: Dieser Text wird nach Abschluss aller Post-Tests aktualisiert.</p>
+    </div>
+
+    <div class="controls">
+      <span style="opacity:.6">Gruppe wählen und einzelne Proband:innen an-/abklicken (z.&nbsp;B. eine Person isolieren). „K" = Kontrollgruppe.</span>
+    </div>
+    <div class="groupfilter" id="groupFilter"><!-- JS: Training / Kontrolle --></div>
+    <div class="pchips" id="pchips"><!-- JS: Probanden-Filter --></div>
+    <div id="resultNotice"></div>
+
+    <div class="tabs" id="testTabs"><!-- JS: Test-Auswahl --></div>
+    <div class="test-context" id="testContext"><!-- JS --></div>
+    <div id="guessPanel"><!-- JS: Tipp-Spiel --></div>
+    <div id="verdict"><!-- JS: Auflösung --></div>
+    <div class="chart-grid" id="metricGrid"><!-- JS: Metriken des gewählten Tests --></div>
+  </div>
+</section>
+
+<!-- ================= TETRIS SPIELEN ================= -->
+<section id="spielen">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ff9f1f">Trainingsspiel</div>
+    <h2 class="title">Tetris<br>spielen</h2>
+    <p class="lead">Spiele genau das Tetris, das unsere Proband:innen zwei Wochen lang gespielt haben, direkt
+      hier. Dein Score landet automatisch im <span class="accent">Leaderboard</span>.
+      <a class="accent" href="spiel.html" target="_blank" rel="noopener" style="white-space:nowrap">In neuem Tab öffnen ↗</a></p>
+
+    <!-- Lukas: Tetris-Spiel + Firebase-Leaderboard (an Theme angepasst) -->
+    <div class="tetris-app">
+      <div class="game-col">
+        <div class="game-frame">
+          <canvas id="game"></canvas>
+          <button class="game-start" id="game-start">▶ Spiel starten</button>
+          <button class="game-pause" id="game-pause" aria-label="Pause">⏸</button>
+          <div class="game-pause-overlay" id="game-pause-overlay"><span>▶ Fortsetzen</span></div>
+        </div>
+        <div class="touch-controls" aria-label="Touch-Steuerung">
+          <button class="tc" id="t-left" aria-label="Nach links">←</button>
+          <button class="tc" id="t-rotate" aria-label="Drehen">⟳</button>
+          <button class="tc" id="t-right" aria-label="Nach rechts">→</button>
+          <button class="tc" id="t-down" aria-label="Schneller">↓</button>
+          <button class="tc" id="t-drop" aria-label="Hard-Drop">⤓</button>
+          <button class="tc" id="t-restart" aria-label="Neustart">↻</button>
+        </div>
+      </div>
+      <div class="game-side">
+        <div id="leaderboard-panel">
+          <h2>Top 10</h2>
+          <ul id="leaderboard-list"><li>Lade...</li></ul>
+        </div>
+        <div class="game-help">
+          <h4>Steuerung</h4>
+          <ul>
+            <li><span class="key">←</span> <span class="key">→</span> bewegen</li>
+            <li><span class="key">↑</span> drehen</li>
+            <li><span class="key">↓</span> schneller fallen</li>
+            <li><span class="key">Leer</span> Hard-Drop</li>
+            <li><span class="key">R</span> Neustart</li>
+          </ul>
+          <p>Am Handy: die Tasten unter dem Spielfeld nutzen. Das Spiel pausiert automatisch, wenn du wegscrollst.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Game-Over-Eintrag (Overlay) -->
+<div id="score-submit-overlay">
+  <form id="score-submit-form">
+    <div>Game Over! Score: <span id="score-submit-value">0</span> &middot; Level: <span id="score-submit-level">0</span></div>
+    <input id="score-submit-name" type="text" placeholder="Dein Name" maxlength="20">
+    <div>
+      <button type="submit">Eintragen</button>
+      <button type="button" id="score-submit-skip">Ohne Eintrag schlie&szlig;en</button>
+    </div>
+  </form>
+</div>
+
+<!-- ================= SELBST TESTEN ================= -->
+<section id="testen">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ff3d9a">Mitmachen</div>
+    <h2 class="title">Test selbst<br>machen</h2>
+    <p class="lead">Mache hier selbst den Wahrnehmungs-Test!</p>
+    <div class="embed">
+      <div class="bar">
+        <span>tetris-effekt · web-app</span>
+        <a class="mint" href="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" target="_blank" rel="noopener">Im Vollbild öffnen ↗</a>
+      </div>
+      <iframe src="https://feloffel.github.io/StudentProjects/Tetris-Effekt_WebApp/" title="Tetris-Effekt WebApp" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABSCHLUSS-FRAGEBOGEN ================= -->
+<section id="fragebogen">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#3fd64a">Abschluss</div>
+    <h2 class="title">Stimmen der<br>Proband:innen</h2>
+    <p class="lead">Zum Abschluss stellen wir unseren Proband:innen ein paar Fragen zum Projekt, zu unserer
+      Vorgehensweise und zu ihrem eigenen Erleben. Unter jeder Frage kannst du dir die aufgenommenen
+      Antworten anhören. Wir ergänzen die Audio-Aufnahmen laufend.</p>
+    <div class="qgrid" id="qgrid"><!-- JS: Fragen + Audio-Antworten --></div>
+  </div>
+</section>
+
+<!-- ================= MEDIEN ================= -->
+<section id="medien">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#b46bff">Galerie</div>
+    <h2 class="title">Medien &<br>Eindrücke</h2>
+    <div class="gallery">
+      <figure class="shot">
+        <img src="assets/images/imp1.jpg" alt="Eindruck aus der Testphase" loading="lazy">
+        <figcaption>Eindruck aus der Testphase</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="assets/images/gplay1.gif" alt="Tetris im Spiel" loading="lazy">
+        <figcaption>Tetris im Spiel</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REFLEXION & AUSBLICK ================= -->
+<section id="reflexion">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ff3d9a">Reflexion & Ausblick</div>
+    <h2 class="title">Was wir<br>gelernt haben</h2>
+
+    <div class="method">
+      <div class="col">
+        <h4>Unsere Forschungsfrage im Verlauf</h4>
+        <p>Anfangs lautete sie: „Inwiefern beeinflusst die repetitive Logik von Tetris die
+          <em>raum-zeitliche Wahrnehmung der Spielenden im Alltag</em>?" — eng am Phänomen „Tetris-Effekt".
+          Im Verlauf haben wir den Fokus bewusst verschoben: weg vom schwer messbaren Alltagserleben hin zur
+          nüchternen Frage „Wie beeinflusst 2&nbsp;Wochen Tetris das <em>kognitive Leistungsprofil</em>?" —
+          und damit zu einem Design, das sich mit Pre/Post-Tests und Kontrollgruppe überhaupt prüfen lässt.</p>
+      </div>
+      <div class="col">
+        <h4>Geplant vs. tatsächlich</h4>
+        <p>Geplant war eine größere Stichprobe mit klar getrennter Trainings- und Kontrollgruppe und
+          vollständiger Pre/Post-Messung. Tatsächlich führten Zeit und Aufwand zu einer kleinen Stichprobe,
+          und nicht alle Post-Tests sind abgeschlossen — die Auswertung bleibt daher ausdrücklich vorläufig.</p>
+      </div>
+      <div class="col">
+        <h4>Erkenntnisse</h4>
+        <p><b>Inhaltlich:</b> erste Tendenzen sprechen für bessere räumliche Leistungen, aber ein Teil ist
+          schlichter Übungseffekt (auch die Kontrollaufgabe wird schneller). <b>Methodisch:</b> saubere
+          Datenerhebung, eine echte Kontrollgruppe und ein Pre/Post-Design sind deutlich aufwändiger als
+          gedacht — und genau das entscheidet über die Aussagekraft.</p>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card" style="border-top:3px solid #ffd23d">
+        <h3 style="color:#ffd23d">Neue Fragen</h3>
+        <p>Hält ein Effekt über Wochen an (Follow-up)? Profitieren Anfänger:innen stärker als Geübte?
+          Genügt weniger als 30&nbsp;Minuten pro Tag? Und vor allem: Wie sauber lässt sich echter Transfer
+          vom reinen Übungseffekt trennen?</p>
+      </div>
+      <div class="card" style="border-top:3px solid #3fd64a">
+        <h3 style="color:#3fd64a">Was wir besser machen würden</h3>
+        <p>Deutlich größere Stichprobe; randomisierte Zuteilung zu Training und Kontrolle; eine <em>aktive</em>
+          Kontroll-Tätigkeit statt „nichts"; gleiche Tageszeit und Bedingungen; mehrere Übungsdurchläufe
+          vorab, um Übungseffekte herauszurechnen; und ein verbindlicheres Spiel- und Mess-Protokoll.</p>
+      </div>
+    </div>
+
+    <div class="sources" id="quellen">
+      <h4>Quellen (Auswahl)</h4>
+      <ul>
+        <li>De&nbsp;Lisi, R., &amp; Wolford, J.&nbsp;L. (2002). Improving Children's Mental Rotation Accuracy with Computer Game Playing. <em>The Journal of Genetic Psychology</em>, 163(3), 272–282.</li>
+        <li>Terlecki, M.&nbsp;S., Newcombe, N.&nbsp;S., &amp; Little, M. (2008). Durable and Generalized Effects of Spatial Experience on Mental Rotation. <em>Applied Cognitive Psychology</em>, 22(7), 996–1013.</li>
+        <li>Okagaki, L., &amp; Frensch, P.&nbsp;A. (1994). Effects of Video Game Playing on Measures of Spatial Performance. <em>Journal of Applied Developmental Psychology</em>, 15(1), 33–58.</li>
+        <li>Sims, V.&nbsp;K., &amp; Mayer, R.&nbsp;E. (2002). Domain Specificity of Spatial Expertise: The Case of Video Game Players. <em>Applied Cognitive Psychology</em>, 16(1), 97–115.</li>
+        <li>Pilegard, C., &amp; Mayer, R.&nbsp;E. (2018). Game Over for Tetris as a Platform for Cognitive Skill Training. <em>Contemporary Educational Psychology</em>, 54, 29–41.</li>
+        <li>Shepard, R.&nbsp;N., &amp; Metzler, J. (1971). Mental Rotation of Three-Dimensional Objects. <em>Science</em>, 171(3972), 701–703.</li>
+        <li>Corsi, P.&nbsp;M. (1972). Human Memory and the Medial Temporal Region of the Brain. McGill University.</li>
+        <li>Baddeley, A.&nbsp;D., &amp; Hitch, G. (1974). Working Memory. In <em>The Psychology of Learning and Motivation</em> (Bd. 8, S. 47–89).</li>
+        <li>Stickgold, R., et&nbsp;al. (2000). Replaying the Game: Hypnagogic Images in Normals and Amnesics. <em>Science</em>, 290(5490), 350–353. <span class="src-note">(Ursprung des Begriffs „Tetris-Effekt")</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEAM / FOOTER ================= -->
+<footer class="site" id="team">
+  <div class="wrap">
+    <div class="kicker" style="--kc:#ffd23d">Team & Kontext</div>
+    <div class="row">
+      <span>Marius Dauner · Kim Chi Dinh · Lukas Rudolph</span>
+      <span>HFU · Medientheorie & Designgeschichte · 2026</span>
+    </div>
+    <div class="credits">
+      Forschungsfrage: Wie beeinflusst 2 Wochen Tetris das kognitive Leistungsprofil?
+    </div>
+  </div>
+</footer>
+
+<!-- Ausklappbarer Musik-Player -->
+<div class="music" id="musicPlayer">
+  <div class="music-panel" id="musicPanel">
+    <div class="music-head">
+      <span class="music-title" id="musicTitle">Hintergrundmusik</span>
+      <button class="music-close" id="musicClose" aria-label="Einklappen">×</button>
+    </div>
+    <div class="music-row">
+      <button class="music-play" id="musicPlay" aria-label="Abspielen / Pause">▶</button>
+      <input type="range" id="musicSeek" min="0" max="100" value="0" aria-label="Position">
+      <span class="music-time" id="musicTime">0:00</span>
+    </div>
+    <div class="music-row">
+      <span class="music-vol-ic">VOL</span>
+      <input type="range" id="musicVol" min="0" max="100" value="70" aria-label="Lautstärke">
+    </div>
+    <p class="music-note" id="musicNote"></p>
+  </div>
+  <button class="music-toggle" id="musicToggle" aria-label="Musik-Player öffnen">♪</button>
+  <audio id="musicAudio" src="assets/music/hintergrund.mp3" loop preload="none"></audio>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data/dataset.js?v=17"></script>
+<script src="js/config.js?v=17"></script>
+<script src="js/app.js?v=17"></script>
+
+<!-- KimChi: Hintergrund-Tetris -->
+<script src="js/bg-tetris.js?v=17"></script>
+
+<!-- Lukas: Tetris-Spiel + Firebase-Leaderboard -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/leaderboard.js?v=17"></script>
+<script src="js/game.js?v=17"></script>
+<script src="js/game-init.js?v=17"></script>
+<script src="js/music.js?v=17"></script>
+</body>
+</html>
