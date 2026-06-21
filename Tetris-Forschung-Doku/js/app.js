@@ -111,23 +111,30 @@
   const axisTick = (v, unit) => unit === "pct" ? v + "%" : (unit === "ms" ? (v >= 1000 ? (v / 1000) + "s" : v) : v);
 
   /* ---------- 3) State -------------------------------------------------- */
+  const CONTROL = new Set(window.CONTROL_GROUP || []);
   let ROWS = [], PARTS = [];
   const manualOff = new Set();
   let activeTest = Object.keys(META)[0];
   let revealed = false, guess = null;   // Tipp-Spiel-Zustand
+  let groupFilter = "all";              // "all" | "training" | "control"
 
   function buildParticipants() {
     const map = new Map();
     ROWS.forEach(r => {
       const p = r.teilnehmer || "?";
-      if (!map.has(p)) map.set(p, { name: p, rows: [], pre: 0, post: 0 });
+      if (!map.has(p)) map.set(p, { name: p, rows: [], pre: 0, post: 0, control: CONTROL.has(p) });
       const e = map.get(p);
       e.rows.push(r);
       if (isPre(r)) e.pre++; else if (isPost(r)) e.post++;
     });
     PARTS = [...map.values()].sort((a, b) => b.rows.length - a.rows.length);
   }
-  const activeNames = () => new Set(PARTS.filter(p => !manualOff.has(p.name)).map(p => p.name));
+  function inGroup(name) {
+    if (groupFilter === "control") return CONTROL.has(name);
+    if (groupFilter === "training") return !CONTROL.has(name);
+    return true;
+  }
+  const activeNames = () => new Set(PARTS.filter(p => inGroup(p.name) && !manualOff.has(p.name)).map(p => p.name));
 
   /* ---------- 4) Statik ------------------------------------------------- */
   function renderStats() {
@@ -163,12 +170,26 @@
   }
 
   /* ---------- 5) Ergebnisse -------------------------------------------- */
+  function renderGroupFilter() {
+    const el = document.getElementById("groupFilter");
+    if (!el) return;
+    const opts = [["all", "Alle"], ["training", "Trainingsgruppe"], ["control", "Kontrollgruppe"]];
+    el.innerHTML = opts.map(([v, l]) =>
+      `<button class="gf ${v === groupFilter ? "on" : ""}" data-g="${v}">${l}</button>`).join("");
+    el.querySelectorAll(".gf").forEach(b => b.onclick = () => {
+      groupFilter = b.dataset.g; renderGroupFilter(); renderChips(); renderMetrics();
+    });
+  }
   function renderChips() {
     const box = document.getElementById("pchips");
-    box.innerHTML = PARTS.map(p => {
-      const off = manualOff.has(p.name);
-      return `<span class="chip ${off ? "off" : "on"}" data-p="${p.name}">${p.name}</span>`;
-    }).join("");
+    const list = PARTS.filter(p => inGroup(p.name));
+    box.innerHTML = list.length
+      ? list.map(p => {
+          const off = manualOff.has(p.name);
+          const k = p.control ? ' <span class="chip-k" title="Kontrollgruppe">K</span>' : '';
+          return `<span class="chip ${off ? "off" : "on"}" data-p="${p.name}">${p.name}${k}</span>`;
+        }).join("")
+      : `<span class="chip-empty">Keine Proband:innen in dieser Gruppe (Namen in config.js → CONTROL_GROUP eintragen).</span>`;
     box.querySelectorAll(".chip").forEach(c => c.onclick = () => {
       const n = c.dataset.p;
       manualOff.has(n) ? manualOff.delete(n) : manualOff.add(n);
@@ -357,6 +378,7 @@
     buildParticipants();
     renderStats();
     renderTestCards();
+    renderGroupFilter();
     renderChips();
     renderTabs();
     renderMetrics();
