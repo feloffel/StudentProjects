@@ -45,13 +45,13 @@ const SHAPES = [
 
 // Farben an das Website-Theme angepasst (Tetromino-Palette: I,J,L,O,S,T,Z)
 const SHAPE_COLORS = [
-    '#2fc8ff', // I cyan
-    '#4f7cff', // J blau
-    '#ff9f1f', // L orange
-    '#ffd23d', // O gelb
-    '#3fd64a', // S grün
-    '#ff3d9a', // T magenta
-    '#ff5a3c', // Z rot
+    '#00BCD4', // I cyan
+    '#485FE5', // J blau
+    '#FF9800', // L orange
+    '#FFEB3B', // O gelb
+    '#4CAF50', // S grün
+    '#A629BC', // T magenta
+    '#F44336', // Z rot 
 ];
 
 const COLOR_SIDEBAR_BORDER = 'rgba(126,156,255,.45)';

@@ -16,11 +16,24 @@
     const startBtn = document.getElementById('game-start');
     const pauseBtn = document.getElementById('game-pause');
     const pauseOverlay = document.getElementById('game-pause-overlay');
+    const overOverlay = document.getElementById('game-over-overlay');
+    const restartBtn = document.getElementById('game-restart');
     let started = false;
 
     function showPaused(on) {
       if (pauseOverlay) pauseOverlay.style.display = on ? 'flex' : 'none';
       if (pauseBtn) pauseBtn.style.display = (started && !on) ? 'block' : 'none';
+    }
+    function showOver(on) {
+      if (overOverlay) overOverlay.style.display = on ? 'flex' : 'none';
+    }
+    function doRestart() {
+      if (!started) return;
+      ctl.inject('restart');
+      setTimeout(() => ctl.release('restart'), 60);
+      lastOver = false;
+      showOver(false);
+      showPaused(false);
     }
 
     function begin() {
@@ -44,7 +57,20 @@
     if (startBtn) startBtn.addEventListener('click', begin);
     if (pauseBtn) pauseBtn.addEventListener('click', doPause);
     if (pauseOverlay) pauseOverlay.addEventListener('click', doResume);
+    if (restartBtn) restartBtn.addEventListener('click', doRestart);
     showPaused(false); // Grundzustand: nichts sichtbar, bis gestartet wird
+    showOver(false);
+
+    // --- Game-Over erkennen und Neustart-Overlay zeigen ---
+    let lastOver = false;
+    setInterval(() => {
+      if (!started) return;
+      const over = ctl.isGameOver();
+      if (over === lastOver) return;
+      lastOver = over;
+      showOver(over);
+      if (pauseBtn) pauseBtn.style.display = over ? 'none' : 'block';
+    }, 200);
 
     // --- Touch-/Klick-Steuerung ---
     const MAP = {

@@ -350,7 +350,7 @@
         ? `<div class="qanswers">` + ans.map(a =>
             `<div class="qanswer"><span class="alabel">${a.label || "Antwort"}</span>
              <audio controls preload="none" src="${a.src}"></audio></div>`).join("") + `</div>`
-        : `<div class="qpending">Antworten folgen — Audiodatei in <code>assets/audio/</code> ablegen und in <code>config.js</code> verknüpfen.</div>`;
+        : `<div class="qpending">Antworten folgen. Audiodatei in <code>assets/audio/</code> ablegen und in <code>config.js</code> verknüpfen.</div>`;
       return `<div class="qcard reveal" style="border-top:3px solid ${c}">
         <div class="qtop"><span class="qnum" style="color:${c}">${String(i + 1).padStart(2, "0")}</span>
           <span class="qcat">${q.kategorie}</span></div>
