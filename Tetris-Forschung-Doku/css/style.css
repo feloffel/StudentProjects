@@ -138,7 +138,11 @@ h1.big .title-sub{display:inline-block;font-size:.66em;line-height:1.02;margin-t
 .chart-card h4{font-family:var(--disp);font-weight:700;font-size:17px;text-transform:uppercase}
 .chart-card .dom{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
   white-space:nowrap;opacity:.7}
+.chart-card .metric-desc{font-size:12px;line-height:1.5;color:var(--ink-dim);margin:2px 0 8px}
 .chart-card .sub{font-family:var(--mono);font-size:11px;opacity:.6;margin-bottom:14px}
+.chart-card .metric-verdict{font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--ink);
+  opacity:.85;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.chart-card .metric-verdict:empty{display:none}
 .chart-box{position:relative;height:200px}
 .empty{font-family:var(--mono);font-size:12px;opacity:.55;padding:30px 0;text-align:center;line-height:1.7}
 

@@ -264,8 +264,10 @@
     grid.innerHTML = m.metrics.map((mt, i) =>
       `<div class="chart-card">
         <div class="ch-head"><h4>${mt.label}</h4></div>
+        ${mt.desc ? `<div class="metric-desc">${mt.desc}</div>` : ""}
         <div class="sub" id="sub${i}"></div>
         <div class="chart-box"><canvas id="cv${i}"></canvas></div>
+        <div class="metric-verdict" id="verdict${i}"></div>
       </div>`).join("");
 
     let nBetter = 0, nWorse = 0, nSame = 0;
@@ -273,21 +275,37 @@
       const pre = calcMetric(preRows, mt);
       const post = (hasPost && showPost) ? calcMetric(postRows, mt) : null;
       const sub = document.getElementById("sub" + i);
+      const vEl = document.getElementById("verdict" + i);
 
       if (pre != null && post != null) {
-        const same = Math.abs(post - pre) < 1e-9;
         const better = (mt.better === "down") ? post < pre : post > pre;
+        const diffPct = mt.unit === "pct" ? Math.abs(post - pre) : (pre ? Math.abs(100 * (post - pre) / pre) : 0);
+        const same = diffPct < 2;
         if (same) nSame++; else if (better) nBetter++; else nWorse++;
         const d = (mt.unit === "pct")
           ? (post - pre >= 0 ? "+" : "") + Math.round(post - pre) + " %-Pkt."
           : (post - pre >= 0 ? "+" : "") + Math.round(100 * (post - pre) / pre) + " %";
         sub.textContent = `Δ ${d} · ${same ? "gleich" : (better ? "✓ besser" : "schlechter")}`;
+        // Bewertungssatz
+        let v;
+        if (same) v = "Vorher und nachher fast gleich, also kein klarer Effekt.";
+        else {
+          const grad = diffPct >= 12 ? "deutlich" : "etwas";
+          if (mt.unit === "ms") v = better ? `Die Gruppe war ${grad} schneller.` : `Die Gruppe war ${grad} langsamer.`;
+          else if (mt.unit === "pct") v = better ? `Das wurde ${grad} besser.` : `Das wurde ${grad} schlechter.`;
+          else v = better ? `Der Wert wurde ${grad} besser.` : `Der Wert wurde ${grad} schlechter.`;
+          if (flat && better) v += " Bei der Kontrollaufgabe spricht das eher für einen Übungseffekt.";
+        }
+        if (vEl) vEl.textContent = "Beurteilung: " + v;
       } else if (pre != null && hasPost && !showPost) {
         sub.textContent = "Pre sichtbar · tippe oben, um Post aufzudecken";
+        if (vEl) vEl.textContent = "";
       } else if (pre != null) {
         sub.textContent = "Post-Test ausstehend";
+        if (vEl) vEl.textContent = "Beurteilung folgt, sobald die Post-Tests vorliegen.";
       } else {
         sub.textContent = "keine Daten";
+        if (vEl) vEl.textContent = "";
       }
 
       CHARTS.push(new Chart(document.getElementById("cv" + i), {
