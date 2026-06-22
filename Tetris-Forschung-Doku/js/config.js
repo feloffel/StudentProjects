@@ -11,7 +11,17 @@
    stehen, gelten als Trainingsgruppe. Auf der Ergebnis-Seite lässt sich darüber
    "Trainingsgruppe vs. Kontrollgruppe" filtern. Namen exakt wie in der CSV. */
 window.CONTROL_GROUP = [
-  // "Beispielname",
+  "1",
+  "Laurel",
+  "Burcu",
+  "Polly",
+  "TP-08",
+];
+
+/* Standardmäßig in der Ergebnis-Ansicht ausgeblendete Proband:innen
+   (z.B. wer den Post-Test noch nicht gemacht hat). Per Klick wieder aktivierbar. */
+window.DEFAULT_OFF = [
+  "Laurel",
 ];
 
 /* 1) KOGNITIVE DOMÄNEN (Gruppierung + Erwartung laut Hypothese) */

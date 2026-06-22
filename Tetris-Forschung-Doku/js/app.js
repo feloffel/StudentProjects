@@ -113,7 +113,7 @@
   /* ---------- 3) State -------------------------------------------------- */
   const CONTROL = new Set(window.CONTROL_GROUP || []);
   let ROWS = [], PARTS = [];
-  const manualOff = new Set();
+  const manualOff = new Set(window.DEFAULT_OFF || []);
   let activeTest = Object.keys(META)[0];
   let revealed = false, guess = null;   // Tipp-Spiel-Zustand
   let groupFilter = "all";              // "all" | "training" | "control"
