@@ -139,10 +139,25 @@ h1.big .title-sub{display:inline-block;font-size:.66em;line-height:1.02;margin-t
 .chart-card .dom{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
   white-space:nowrap;opacity:.7}
 .chart-card .metric-desc{font-size:12px;line-height:1.5;color:var(--ink-dim);margin:2px 0 8px}
-.chart-card .sub{font-family:var(--mono);font-size:11px;opacity:.6;margin-bottom:14px}
+.chart-card .sub{font-family:var(--mono);font-size:11px;color:var(--ink-dim);margin-bottom:14px}
+.chart-card .sub .sub-main{color:var(--ink);font-size:13px}
+.chart-card .sub .sub-pct{color:var(--ink-dim);margin-left:6px}
 .chart-card .metric-verdict{font-family:var(--mono);font-size:11px;line-height:1.55;color:var(--ink);
   opacity:.85;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
 .chart-card .metric-verdict:empty{display:none}
+
+/* ---- Gesamtüberblick (alle Tests zusammen) ---------------------------- */
+.overview-h{font-family:var(--disp);font-weight:700;font-size:clamp(18px,2.2vw,22px);
+  text-transform:uppercase;letter-spacing:.01em;margin:34px 0 6px}
+.overview-sub{font-family:var(--mono);font-size:12px;line-height:1.55;color:var(--ink-dim);margin-bottom:16px;max-width:760px}
+.overview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-bottom:8px}
+.ov-card{background:var(--bg-2);padding:22px clamp(16px,2vw,24px)}
+.ov-card .ov-label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim)}
+.ov-card .ov-val{font-family:var(--disp);font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1;margin:10px 0 6px}
+.ov-card .ov-of{font-size:.5em;font-weight:400;opacity:.7}
+.ov-card .ov-tag{font-family:var(--mono);font-size:11px;letter-spacing:.03em;text-transform:uppercase}
+.ov-card .ov-note{font-family:var(--mono);font-size:10px;opacity:.55;margin-top:10px;line-height:1.5}
 .chart-box{position:relative;height:200px}
 .empty{font-family:var(--mono);font-size:12px;opacity:.55;padding:30px 0;text-align:center;line-height:1.7}
 
@@ -380,3 +395,54 @@ footer .credits{margin-top:30px;font-size:11px;opacity:.5;line-height:1.8}
 
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
 .reveal.in{opacity:1;transform:none}
+
+/* ---- Spaghetti-Plot (Pre/Post-Auswertung) ----------------------------- */
+.tb-controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between;
+  margin:34px 0 14px}
+.tb-nav{display:flex;align-items:center;gap:14px}
+.tb-nav button{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;
+  padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);
+  transition:.15s}
+.tb-nav button:hover:not(:disabled){border-color:var(--mint);color:var(--mint)}
+.tb-nav button:disabled{opacity:.3;cursor:default}
+.tb-titlebox{min-width:180px;text-align:center;display:flex;flex-direction:column;gap:3px}
+.tb-titlebox #tb-label{font-family:var(--disp);font-weight:700;font-size:clamp(16px,2vw,20px);
+  text-transform:uppercase;line-height:1}
+.tb-unit{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-dim)}
+.tb-filters{display:flex;gap:16px;align-items:center;flex-wrap:wrap;
+  font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.tb-filters label{display:flex;align-items:center;gap:7px;cursor:pointer;opacity:.85}
+.tb-filters input{accent-color:var(--mint);width:15px;height:15px}
+.tb-filters select{font-family:var(--mono);font-size:12px;padding:8px 12px;border:1px solid var(--line);
+  background:var(--bg-2);color:var(--ink);cursor:pointer;text-transform:uppercase}
+.tb-legend{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:10px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-dim)}
+.tb-key{display:flex;align-items:center;gap:7px}
+.tb-key i{width:22px;height:3px;border-radius:2px;display:inline-block}
+.tb-key--dash{opacity:.7}
+.tb-chart-wrapper{position:relative;width:100%;height:420px;background:var(--bg-2);
+  border:1px solid var(--line);padding:18px 14px 10px}
+.tb-stat{font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--ink-dim);
+  margin-top:16px;max-width:880px}
+.tb-stat-badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 9px;border-radius:99px;margin-right:10px;vertical-align:1px}
+.tb-stat-badge.sig{color:var(--green);border:1px solid rgba(63,214,74,.5)}
+.tb-stat-badge.ns{color:var(--ink-dim);border:1px solid var(--line)}
+
+/* ---- Statistik-Karten ------------------------------------------------- */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);margin-top:18px}
+.stat-card{background:var(--bg);padding:20px clamp(16px,2vw,22px);border-top:3px solid var(--line)}
+.stat-card.sig{border-top-color:var(--green)}
+.stat-card.ns{border-top-color:var(--ink-dim)}
+.stat-card.control{border-top-color:var(--pink)}
+.sc-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.sc-name{font-family:var(--disp);font-weight:700;font-size:16px;text-transform:uppercase}
+.sc-name em{font-weight:400;font-size:.8em;opacity:.7;text-transform:none}
+.sc-badge{font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 8px;border-radius:99px;white-space:nowrap;border:1px solid var(--line);color:var(--ink-dim)}
+.stat-card.sig .sc-badge{color:var(--green);border-color:rgba(63,214,74,.5)}
+.sc-p{font-family:var(--mono);font-size:11px;color:var(--ink);opacity:.85;margin-bottom:8px}
+.sc-note{font-size:13px;line-height:1.5;color:var(--ink-dim)}
+@media(max-width:680px){.tb-controls{flex-direction:column;align-items:stretch}
+  .tb-chart-wrapper{height:340px}}

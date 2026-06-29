@@ -110,6 +110,21 @@
   }
   const axisTick = (v, unit) => unit === "pct" ? v + "%" : (unit === "ms" ? (v >= 1000 ? (v / 1000) + "s" : v) : v);
 
+  // Zählt, wie viele EINZELNE Proband:innen sich Pre->Post verbessert haben
+  // (ehrlicher als Prozent bei kleinen Gruppen).
+  function countBetter(preRows, postRows, mt) {
+    const parts = new Set(postRows.map(r => r.teilnehmer));
+    let better = 0, total = 0;
+    parts.forEach(p => {
+      const a = calcMetric(preRows.filter(r => r.teilnehmer === p), mt);
+      const b = calcMetric(postRows.filter(r => r.teilnehmer === p), mt);
+      if (a == null || b == null) return;
+      total++;
+      if ((mt.better === "down") ? b < a : b > a) better++;
+    });
+    return { better, total };
+  }
+
   /* ---------- 3) State -------------------------------------------------- */
   const CONTROL = new Set(window.CONTROL_GROUP || []);
   let ROWS = [], PARTS = [];
@@ -139,10 +154,11 @@
   /* ---------- 4) Statik ------------------------------------------------- */
   function renderStats() {
     const el = document.getElementById("statStrip");
+    // Headline-Zahlen spiegeln den ausgewerteten Analyse-Datensatz (11 vollständige Paare).
     const cards = [
-      ["Proband:innen", PARTS.length, ""],
-      ["Kognitive Tests", Object.keys(META).length, ""],
-      ["Erfasste Datenpunkte", ROWS.length.toLocaleString("de-DE"), ""],
+      ["Proband:innen", "11", "<small> · 7 Training / 4 Kontrolle</small>"],
+      ["Ausgewertete Tests", "6", ""],
+      ["Erfasste Roh-Datenpunkte", ROWS.length.toLocaleString("de-DE"), ""],
       ["Trainingsdauer", "14", "<small> Tage · 30 min</small>"],
     ];
     el.innerHTML = cards.map(([k, v, s], i) => {
@@ -177,7 +193,7 @@
     el.innerHTML = opts.map(([v, l]) =>
       `<button class="gf ${v === groupFilter ? "on" : ""}" data-g="${v}">${l}</button>`).join("");
     el.querySelectorAll(".gf").forEach(b => b.onclick = () => {
-      groupFilter = b.dataset.g; renderGroupFilter(); renderChips(); renderMetrics();
+      groupFilter = b.dataset.g; renderGroupFilter(); renderChips(); renderOverview(); renderMetrics();
     });
   }
   function renderChips() {
@@ -193,7 +209,7 @@
     box.querySelectorAll(".chip").forEach(c => c.onclick = () => {
       const n = c.dataset.p;
       manualOff.has(n) ? manualOff.delete(n) : manualOff.add(n);
-      renderChips(); renderMetrics();
+      renderChips(); renderOverview(); renderMetrics();
     });
   }
   function renderTabs() {
@@ -207,6 +223,78 @@
       activeTest = b.dataset.t; revealed = false; guess = null;   // neuer Test = neuer Tipp
       renderTabs(); renderMetrics();
     });
+  }
+
+  // Gesamtüberblick: alle Tests zusammengefasst auf die drei Dimensionen.
+  // Hauptaussage = Anzahl Proband:innen, die sich verbessert haben (ehrlich bei
+  // kleinen Gruppen); der gemittelte Prozentwert steht klein als genauer Wert dabei.
+  function renderOverview() {
+    const el = document.getElementById("overviewGrid");
+    if (!el) return;
+    const names = activeNames();
+    const sel = ROWS.filter(r => names.has(r.teilnehmer));
+    const partNames = [...new Set(sel.filter(isPost).map(r => r.teilnehmer))];
+
+    const groupSpeed = [], groupPrec = [], groupCap = [];
+    const per = {}; partNames.forEach(p => per[p] = { speed: [], prec: [], cap: [] });
+    Object.entries(META).forEach(([name, m]) => {
+      const testRows = sel.filter(r => r.test === name);
+      const postRows = testRows.filter(isPost);
+      if (!postRows.length) return;
+      const paired = new Set(postRows.map(r => r.teilnehmer));
+      const preRows = testRows.filter(r => isPre(r) && paired.has(r.teilnehmer));
+      m.metrics.forEach(mt => {
+        const ga = calcMetric(preRows, mt), gb = calcMetric(postRows, mt);
+        if (ga != null && gb != null) {
+          if (mt.calc === "rt") { if (ga) groupSpeed.push(100 * (gb - ga) / ga); }
+          else if (mt.calc === "acc") groupPrec.push(gb - ga);
+          else if (mt.calc === "maxspan" || mt.calc === "meanspan") { if (ga) groupCap.push(100 * (gb - ga) / ga); }
+        }
+        partNames.forEach(p => {
+          const a = calcMetric(testRows.filter(r => isPre(r) && r.teilnehmer === p), mt);
+          const b = calcMetric(testRows.filter(r => isPost(r) && r.teilnehmer === p), mt);
+          if (a == null || b == null) return;
+          if (mt.calc === "rt") { if (a) per[p].speed.push(100 * (b - a) / a); }
+          else if (mt.calc === "acc") per[p].prec.push(b - a);
+          else if (mt.calc === "maxspan" || mt.calc === "meanspan") { if (a) per[p].cap.push(100 * (b - a) / a); }
+        });
+      });
+    });
+    const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+    function dimCount(key, betterLow) {
+      let better = 0, total = 0;
+      partNames.forEach(p => {
+        const arr = per[p][key];
+        if (!arr.length) return;
+        total++;
+        const v = arr.reduce((x, y) => x + y, 0) / arr.length;
+        if (betterLow ? v < 0 : v > 0) better++;
+      });
+      return { better, total };
+    }
+    const dims = [
+      { label: "Geschwindigkeit", sub: "Reaktions- & Bearbeitungszeiten", g: avg(groupSpeed), kind: "rel", key: "speed", betterLow: true,  words: ["schneller", "langsamer"] },
+      { label: "Präzision",       sub: "Trefferquoten",                  g: avg(groupPrec),  kind: "pt",  key: "prec",  betterLow: false, words: ["genauer", "ungenauer"] },
+      { label: "Kapazität",       sub: "Merkspanne (Corsi)",             g: avg(groupCap),   kind: "rel", key: "cap",   betterLow: false, words: ["größer", "kleiner"] },
+    ];
+    el.innerHTML = dims.map(d => {
+      const c = dimCount(d.key, d.betterLow);
+      if (!c.total || d.g == null) {
+        return `<div class="ov-card"><div class="ov-label">${d.label}</div>
+          <div class="ov-val" style="font-size:20px;color:var(--ink-dim)">k. A.</div>
+          <div class="ov-note">${d.sub}</div></div>`;
+      }
+      const ratio = c.better / c.total;
+      const tag = ratio >= 0.66 ? d.words[0] : (ratio <= 0.34 ? d.words[1] : "gemischt");
+      const col = ratio >= 0.66 ? "#3fd64a" : (ratio <= 0.34 ? "#ff5a3c" : "var(--ink-dim)");
+      const pct = (d.g >= 0 ? "+" : "") + Math.round(d.g) + (d.kind === "pt" ? " %-Pkt." : " %");
+      return `<div class="ov-card">
+        <div class="ov-label">${d.label}</div>
+        <div class="ov-val" style="color:${col}">${c.better} <span class="ov-of">von ${c.total}</span></div>
+        <div class="ov-tag" style="color:${col}">${tag}</div>
+        <div class="ov-note">genauer Wert: Ø ${pct} · ${d.sub}</div>
+      </div>`;
+    }).join("");
   }
 
   let CHARTS = [];
@@ -285,7 +373,8 @@
         const d = (mt.unit === "pct")
           ? (post - pre >= 0 ? "+" : "") + Math.round(post - pre) + " %-Pkt."
           : (post - pre >= 0 ? "+" : "") + Math.round(100 * (post - pre) / pre) + " %";
-        sub.textContent = `Δ ${d} · ${same ? "gleich" : (better ? "✓ besser" : "schlechter")}`;
+        const cnt = countBetter(preRows, postRows, mt);
+        sub.innerHTML = `<span class="sub-main">${cnt.better} von ${cnt.total} besser</span> <span class="sub-pct">Ø ${d}</span>`;
         // Bewertungssatz
         let v;
         if (same) v = "Vorher und nachher fast gleich, also kein klarer Effekt.";
@@ -396,10 +485,15 @@
     buildParticipants();
     renderStats();
     renderTestCards();
-    renderGroupFilter();
-    renderChips();
-    renderTabs();
-    renderMetrics();
+    // Die alten Pre/Post-Balken-Charts wurden durch den Spaghetti-Plot ersetzt.
+    // Diese Renderer laufen nur noch, falls ihre DOM-Elemente vorhanden sind.
+    if (document.getElementById("metricGrid")) {
+      renderGroupFilter();
+      renderChips();
+      renderOverview();
+      renderTabs();
+      renderMetrics();
+    }
     renderFragebogen();
     wireUI();
     revealInit();

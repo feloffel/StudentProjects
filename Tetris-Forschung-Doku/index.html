@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/style.css?v=26">
 </head>
 <body>
 
@@ -174,34 +174,96 @@
   <div class="wrap">
     <div class="kicker" style="--kc:#2fc8ff">Auswertung</div>
     <h2 class="title">Ergebnisse</h2>
-    <p class="lead">Wähle einen Test und sieh dir unsere erfassten Kennzahlen im Pre&nbsp;→&nbsp;Post-Vergleich an.
-      Niedrigere Zeiten bzw. höhere Quoten und Spannen bedeuten bessere Leistung.</p>
+    <p class="lead">Ausgewertet haben wir die <b>11&nbsp;Proband:innen mit vollständigem Pre- und Post-Test</b>
+      (7&nbsp;Trainingsgruppe, 4&nbsp;Kontrollgruppe) über sechs Aufgaben. Jede Linie ist eine Person, die
+      gestrichelte Linie der Gruppenmittelwert. Darunter steht, was die Statistik dazu sagt.</p>
 
     <div class="interpret reveal">
       <span class="badge-prov">Einordnung</span>
-      <p>Inzwischen haben fast alle Proband:innen den Post-Test gemacht (eine Person fehlt noch und ist
-        standardmäßig ausgeblendet). Das Bild ist ziemlich klar: Bei fast allen Tests wurde die Gruppe nach
-        den zwei Wochen <b>schneller</b>, am stärksten beim <span class="accent">Papierfalten</span> und der
-        <span class="accent">mentalen Rotation</span>. Das Entscheidende dabei: Auch die
-        <span class="accent-2">numerische Kontrollaufgabe (Kopfrechnen)</span> wurde deutlich schneller. Wenn
-        man bei einer Aufgabe ganz ohne Raumbezug genauso viel schneller wird, ist das ein starkes Zeichen für
-        einen allgemeinen Test-Wiederholungs-Effekt (die Personen wurden schlichtweg routinierter im Umgang mit der Web-App und der Testsituation) und nicht für einen gezielten Tetris-Transfer. Bei der Genauigkeit gibt es kein klares Muster, mal etwas besser, mal etwas schlechter. Kurz gesagt: Unsere Daten sprechen eher
-        dafür, dass man vor allem im Testen selbst geübter wird.</p>
-      <p class="prov-note">Hinweis: kleine Stichprobe und kein statistischer Test. Es fehlt nur noch eine Person, eine große Änderung erwarten wir dadurch nicht.</p>
+      <p>Nur <b>zwei der sechs Tests</b> zeigen eine statistisch echte Veränderung von Pre zu Post:
+        <span class="accent">Regeln wechseln</span> (p&nbsp;=&nbsp;.034) und
+        <span class="accent">Papier falten</span> (p&nbsp;=&nbsp;.007). Das Entscheidende: In
+        <b>keinem einzigen Test</b> hat sich die Trainingsgruppe signifikant stärker verbessert als die
+        Kontrollgruppe (keine Gruppe&times;Zeit-Wechselwirkung). Beide Gruppen wurden ähnlich besser, bei
+        Papierfalten die Kontrollgruppe sogar stärker. Und die
+        <span class="accent-2">nicht-räumliche Kontrollaufgabe (Kopfrechnen)</span> blieb stabil.</p>
+      <p>Das spricht klar für einen <b>allgemeinen Übungseffekt</b> (man wird routinierter im Testen) und
+        gegen einen gezielten Tetris-Transfer. Genau diese Trennung war das Ziel unseres Aufbaus.</p>
+      <p class="prov-note">Methode: Repeated-Measures-ANOVA je Test (Pre→Post und Gruppe×Zeit), ergänzt durch
+        t-Tests der Gruppen. Kleine Stichprobe (N&nbsp;=&nbsp;11), Ergebnisse sind belastbare Tendenzen.</p>
     </div>
 
-    <div class="controls">
-      <span style="opacity:.6">Gruppe wählen und einzelne Proband:innen an-/abklicken (z.&nbsp;B. eine Person isolieren). „K" = Kontrollgruppe.</span>
+    <!-- Spaghetti-Plot (Lukas) -->
+    <div class="tb-controls">
+      <div class="tb-nav">
+        <button id="tb-prev">← Zurück</button>
+        <div class="tb-titlebox">
+          <span id="tb-label"></span>
+          <span id="tb-unit" class="tb-unit"></span>
+        </div>
+        <button id="tb-next">Weiter →</button>
+      </div>
+      <div class="tb-filters">
+        <label><input type="checkbox" id="tb-show-ind" checked> Einzelne Verläufe</label>
+        <label><input type="checkbox" id="tb-show-mean" checked> Gruppenmittelwert</label>
+        <select id="tb-group">
+          <option value="both">Beide Gruppen</option>
+          <option value="Kontroll">Kontrollgruppe</option>
+          <option value="Test">Trainingsgruppe</option>
+        </select>
+      </div>
     </div>
-    <div class="groupfilter" id="groupFilter"><!-- JS: Training / Kontrolle --></div>
-    <div class="pchips" id="pchips"><!-- JS: Probanden-Filter --></div>
-    <div id="resultNotice"></div>
+    <div class="tb-legend">
+      <span class="tb-key"><i style="background:#5b9bff"></i>Kontrollgruppe</span>
+      <span class="tb-key"><i style="background:#ff5a5a"></i>Trainingsgruppe</span>
+      <span class="tb-key tb-key--dash">gestrichelt = Gruppenmittelwert</span>
+    </div>
+    <div class="tb-chart-wrapper">
+      <canvas id="tb-chart"></canvas>
+    </div>
+    <p id="tb-stat" class="tb-stat"></p>
 
-    <div class="tabs" id="testTabs"><!-- JS: Test-Auswahl --></div>
-    <div class="test-context" id="testContext"><!-- JS --></div>
-    <div id="guessPanel"><!-- JS: Tipp-Spiel --></div>
-    <div id="verdict"><!-- JS: Auflösung --></div>
-    <div class="chart-grid" id="metricGrid"><!-- JS: Metriken des gewählten Tests --></div>
+    <!-- Statistik auf einen Blick -->
+    <h3 class="overview-h">Statistik auf einen Blick</h3>
+    <p class="overview-sub">Veränderung von Pre zu Post je Test (Repeated-Measures-ANOVA). „signifikant"
+      heißt: die Veränderung ist nicht durch Zufall erklärbar (p&nbsp;&lt;&nbsp;.05).</p>
+    <div class="stat-grid">
+      <div class="stat-card sig">
+        <div class="sc-top"><span class="sc-name">Regeln wechseln</span><span class="sc-badge">signifikant</span></div>
+        <div class="sc-p">p = .034 · großer Effekt (η²p = .41)</div>
+        <div class="sc-note">Wechselkosten sinken in beiden Gruppen. Kein Tetris-Vorteil (Gruppe×Zeit p = .70).</div>
+      </div>
+      <div class="stat-card sig">
+        <div class="sc-top"><span class="sc-name">Papier falten</span><span class="sc-badge">signifikant</span></div>
+        <div class="sc-p">p = .007 · großer Effekt (η²p = .67)</div>
+        <div class="sc-note">Beide Gruppen deutlich besser, Kontrolle sogar stärker. Kein Tetris-Vorteil (p = .14).</div>
+      </div>
+      <div class="stat-card ns">
+        <div class="sc-top"><span class="sc-name">Mentale Rotation</span><span class="sc-badge">nicht sig.</span></div>
+        <div class="sc-p">p = .53</div>
+        <div class="sc-note">Keine Veränderung. Gruppen starten schon unterschiedlich (Pre-Unterschied p = .052).</div>
+      </div>
+      <div class="stat-card ns">
+        <div class="sc-top"><span class="sc-name">Corsi-Merkspanne</span><span class="sc-badge">nicht sig.</span></div>
+        <div class="sc-p">p = .59</div>
+        <div class="sc-note">Kontrolle steigt, Test sinkt, der Unterschied ist aber zufallsnah (p = .11).</div>
+      </div>
+      <div class="stat-card ns">
+        <div class="sc-top"><span class="sc-name">Symbolsuche</span><span class="sc-badge">nicht sig.</span></div>
+        <div class="sc-p">p = .56</div>
+        <div class="sc-note">Werte bleiben in beiden Gruppen praktisch gleich.</div>
+      </div>
+      <div class="stat-card ns control">
+        <div class="sc-top"><span class="sc-name">Kopfrechnen <em>(Kontrolle)</em></span><span class="sc-badge">nicht sig.</span></div>
+        <div class="sc-p">p = .45</div>
+        <div class="sc-note">Aufgabe ohne Raumbezug bleibt stabil, genau das erwarten wir ohne echten Transfer.</div>
+      </div>
+    </div>
+    <div class="notice" style="border-left-color:var(--mint);margin-top:24px">
+      FAZIT: Zwei Aufgaben verbessern sich signifikant, aber in <b>beiden Gruppen gleich</b>. Kein Test zeigt
+      einen Vorteil der Trainingsgruppe. Die Kontrollaufgabe bleibt stabil. Damit sprechen unsere Daten für
+      einen <em>Übungseffekt</em> und gegen einen Tetris-spezifischen Transfer.
+    </div>
   </div>
 </section>
 
@@ -337,12 +399,13 @@
       </div>
       <div class="col">
         <h4>Erkenntnisse</h4>
-        <p><b>Inhaltlich:</b> Fast alle wurden bei fast allen Tests schneller, sogar beim Kopfrechnen, das gar
-          nichts mit Raum zu tun hat. Genau das spricht eher für einen normalen Übungseffekt als für einen echten
-          Tetris-Effekt. Bei der Genauigkeit gab es kein klares Muster.
-          <b>Methodisch:</b> Saubere Daten, eine Kontrollaufgabe und ein Pre/Post-Vergleich sind viel mehr Arbeit
-          als gedacht. Aber genau das hat uns gezeigt, wie leicht man einen Übungseffekt mit einem echten Effekt
-          verwechseln kann.</p>
+        <p><b>Inhaltlich:</b> Nur zwei von sechs Tests verbesserten sich statistisch echt (Regeln wechseln,
+          Papierfalten), und zwar in <em>beiden</em> Gruppen gleich. Kein Test zeigte einen Vorteil der
+          Trainingsgruppe, und die Kontrollaufgabe Kopfrechnen blieb stabil. Das spricht für einen normalen
+          Übungseffekt und gegen einen echten Tetris-Effekt.
+          <b>Methodisch:</b> Saubere Daten, eine Kontrollaufgabe, eine Kontrollgruppe und ein Pre/Post-Vergleich
+          sind viel mehr Arbeit als gedacht. Aber genau das hat uns gezeigt, wie leicht man einen Übungseffekt
+          mit einem echten Effekt verwechseln kann.</p>
       </div>
     </div>
 
@@ -415,19 +478,23 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="data/dataset.js?v=22"></script>
-<script src="js/config.js?v=22"></script>
-<script src="js/app.js?v=22"></script>
+<script src="data/dataset.js?v=26"></script>
+<script src="js/config.js?v=26"></script>
+<script src="js/app.js?v=26"></script>
+
+<!-- Lukas: Spaghetti-Plot der Pre/Post-Auswertung -->
+<script src="data/spaghetti.js?v=26"></script>
+<script src="js/spaghettiplot.js?v=26"></script>
 
 <!-- KimChi: Hintergrund-Tetris -->
-<script src="js/bg-tetris.js?v=22"></script>
+<script src="js/bg-tetris.js?v=26"></script>
 
 <!-- Lukas: Tetris-Spiel + Firebase-Leaderboard -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="js/leaderboard.js?v=22"></script>
-<script src="js/game.js?v=22"></script>
-<script src="js/game-init.js?v=22"></script>
-<script src="js/music.js?v=22"></script>
+<script src="js/leaderboard.js?v=26"></script>
+<script src="js/game.js?v=26"></script>
+<script src="js/game-init.js?v=26"></script>
+<script src="js/music.js?v=26"></script>
 </body>
 </html>

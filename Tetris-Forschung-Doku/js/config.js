@@ -143,41 +143,44 @@ window.FRAGEBOGEN = [
   { kategorie: "Ablauf & Vorgehen",
     frage: "Wie verständlich und gut organisiert fandest du den Ablauf der Studie aus Pre-Test, zwei Wochen Tetris und Post-Test?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f1/f1_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f1/f1_Janik.m4a" },
+      { label: "Kontrollperson", src: "assets/audio/f1/f1_kontrollgruppe1.mp3" },
     ] },
   { kategorie: "Umsetzung & Tool",
     frage: "Wie hat dir die Test-WebApp gefallen? Gab es technische Hürden, unklare Aufgaben oder etwas, das dich gestört hat?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f2/f2_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f2/f2_Janik.m4a" },
+      { label: "Kontrollperson", src: "assets/audio/f2/f2_kontrollgruppe1.mp3" },
     ] },
   { kategorie: "Erleben: die 2 Wochen",
     frage: "Wie hat sich das tägliche, 30-minütige Tetris-Spielen über die zwei Wochen angefühlt? Hat sich deine Motivation oder Routine im Verlauf verändert?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f3/f3_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f3/f3_Janik.m4a" },
     ] },
   { kategorie: "Tetris-Effekt",
     frage: "Hattest du während oder nach den zwei Wochen typische Tetris-Momente, zum Beispiel Formen im Alltag gedanklich angeordnet, Muster gesehen oder sogar davon geträumt?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f4/f4_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f4/f4_Janik.m4a" },
     ] },
   { kategorie: "Selbstwahrnehmung",
     frage: "Hattest du das Gefühl, in bestimmten Bereichen wie räumlichem Denken, Reaktion oder Konzentration schneller oder besser geworden zu sein?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f5/f5_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f5/f5_Janik.m4a" },
     ] },
   { kategorie: "Jetzt: danach",
     frage: "Wie geht es dir jetzt nach Abschluss? Vermisst du das tägliche Spielen, ist es zur Gewohnheit geworden, oder bist du froh, dass es vorbei ist?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f6/f6_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f6/f6_Janik.m4a" },
     ] },
   { kategorie: "Kritik & Verbesserung",
     frage: "Was würdest du an der Studie, den Tests oder unserer Vorgehensweise verbessern, wenn wir sie wiederholen würden?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f7/f7_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f7/f7_Janik.m4a" },
+      { label: "Kontrollperson", src: "assets/audio/f7/f7_kontrollgruppe1.mp3" },
     ] },
   { kategorie: "Offen",
     frage: "Ist dir sonst noch etwas aufgefallen oder durch den Kopf gegangen, das du uns mitteilen möchtest?",
     antworten: [
-      { label: "Janik", src: "assets/audio/f8/f8_Janik.m4a" },
+      { label: "Proband", src: "assets/audio/f8/f8_Janik.m4a" },
     ] },
 ];
